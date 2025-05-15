@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EF", "EF.csproj", "{84283BEF-7D33-3C77-F963-14CCE6BC5D8D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameLogic", "GameLogic.csproj", "{6C236EA8-9D39-6B5D-681E-C3DE070EF9DC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{84283BEF-7D33-3C77-F963-14CCE6BC5D8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84283BEF-7D33-3C77-F963-14CCE6BC5D8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84283BEF-7D33-3C77-F963-14CCE6BC5D8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84283BEF-7D33-3C77-F963-14CCE6BC5D8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C236EA8-9D39-6B5D-681E-C3DE070EF9DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C236EA8-9D39-6B5D-681E-C3DE070EF9DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C236EA8-9D39-6B5D-681E-C3DE070EF9DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C236EA8-9D39-6B5D-681E-C3DE070EF9DC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
