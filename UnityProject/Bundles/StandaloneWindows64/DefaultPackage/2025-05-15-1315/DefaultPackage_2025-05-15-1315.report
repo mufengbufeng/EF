@@ -1,0 +1,211 @@
+{
+    "Summary": {
+        "YooVersion": "2.3.9",
+        "UnityVersion": "2022.3.14f1c1",
+        "BuildDate": "2025/5/15 21:55:56",
+        "BuildSeconds": 2,
+        "BuildTarget": 19,
+        "BuildPipeline": "BuiltinBuildPipeline",
+        "BuildBundleType": 2,
+        "BuildPackageName": "DefaultPackage",
+        "BuildPackageVersion": "2025-05-15-1315",
+        "BuildPackageNote": "2025/5/15 21:55:53",
+        "UniqueBundleName": false,
+        "EnableAddressable": true,
+        "LocationToLower": false,
+        "IncludeAssetGUID": false,
+        "AutoCollectShaders": true,
+        "IgnoreRuleName": "YooAsset.Editor.NormalIgnoreRule",
+        "ClearBuildCacheFiles": true,
+        "UseAssetDependencyDB": false,
+        "EnableSharePackRule": true,
+        "SingleReferencedPackAlone": true,
+        "EncryptionClassName": "null",
+        "FileNameStyle": 0,
+        "CompressOption": 2,
+        "DisableWriteTypeTree": false,
+        "IgnoreTypeTreeChanges": true,
+        "WriteLinkXML": true,
+        "CacheServerHost": "",
+        "CacheServerPort": 0,
+        "BuiltinShadersBundleName": "",
+        "MonoScriptsBundleName": "",
+        "AssetFileTotalCount": 10,
+        "MainAssetTotalCount": 10,
+        "AllBundleTotalCount": 2,
+        "AllBundleTotalSize": 1395025,
+        "EncryptedBundleTotalCount": 0,
+        "EncryptedBundleTotalSize": 0
+    },
+    "AssetInfos": [
+        {
+            "Address": "EF.dll",
+            "AssetPath": "Assets/AssetRaw/DLL/EF.dll.bytes",
+            "AssetGUID": "e879f1cd3d803f64290369a451de37da",
+            "AssetTags": [],
+            "MainBundleName": "assets_assetraw_dll.bundle",
+            "MainBundleSize": 1348404,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "GameLogic.dll",
+            "AssetPath": "Assets/AssetRaw/DLL/GameLogic.dll.bytes",
+            "AssetGUID": "9da58e13000f2fc429dcc1217d69302f",
+            "AssetTags": [],
+            "MainBundleName": "assets_assetraw_dll.bundle",
+            "MainBundleSize": 1348404,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "GameProto.dll",
+            "AssetPath": "Assets/AssetRaw/DLL/GameProto.dll.bytes",
+            "AssetGUID": "659550d24e41d99498db82093894bc96",
+            "AssetTags": [],
+            "MainBundleName": "assets_assetraw_dll.bundle",
+            "MainBundleSize": 1348404,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "mscorlib.dll",
+            "AssetPath": "Assets/AssetRaw/DLL/mscorlib.dll.bytes",
+            "AssetGUID": "2d43eb61adb377d408effade2da0b105",
+            "AssetTags": [],
+            "MainBundleName": "assets_assetraw_dll.bundle",
+            "MainBundleSize": 1348404,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "System.Core.dll",
+            "AssetPath": "Assets/AssetRaw/DLL/System.Core.dll.bytes",
+            "AssetGUID": "8944c9b8a133a64438e78ae1a1f453af",
+            "AssetTags": [],
+            "MainBundleName": "assets_assetraw_dll.bundle",
+            "MainBundleSize": 1348404,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "System.dll",
+            "AssetPath": "Assets/AssetRaw/DLL/System.dll.bytes",
+            "AssetGUID": "b80c9335c4ef79c45aebf6133fc1de88",
+            "AssetTags": [],
+            "MainBundleName": "assets_assetraw_dll.bundle",
+            "MainBundleSize": 1348404,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "UniTask.dll",
+            "AssetPath": "Assets/AssetRaw/DLL/UniTask.dll.bytes",
+            "AssetGUID": "c930bd6cc06e3a740bac3d4592f2e554",
+            "AssetTags": [],
+            "MainBundleName": "assets_assetraw_dll.bundle",
+            "MainBundleSize": 1348404,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "YooAsset.dll",
+            "AssetPath": "Assets/AssetRaw/DLL/YooAsset.dll.bytes",
+            "AssetGUID": "cd7a8fde96199b241a72e1776aeaa41e",
+            "AssetTags": [],
+            "MainBundleName": "assets_assetraw_dll.bundle",
+            "MainBundleSize": 1348404,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "Cube",
+            "AssetPath": "Assets/AssetRaw/Prefabs/Cube.prefab",
+            "AssetGUID": "009f394fb69c54d438a8e8fb911dd4a3",
+            "AssetTags": [],
+            "MainBundleName": "assets_assetraw_prefabs.bundle",
+            "MainBundleSize": 46621,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "Sphere",
+            "AssetPath": "Assets/AssetRaw/Prefabs/Sphere.prefab",
+            "AssetGUID": "e04f8388dd7cf53418bb08fc65a4b1b4",
+            "AssetTags": [],
+            "MainBundleName": "assets_assetraw_prefabs.bundle",
+            "MainBundleSize": 46621,
+            "DependAssets": [],
+            "DependBundles": []
+        }
+    ],
+    "BundleInfos": [
+        {
+            "BundleName": "assets_assetraw_dll.bundle",
+            "FileName": "4b838ef98728c09d3839174b90085fff.bundle",
+            "FileHash": "4b838ef98728c09d3839174b90085fff",
+            "FileCRC": "858aac49",
+            "FileSize": 1348404,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/AssetRaw/DLL/EF.dll.bytes",
+                    "AssetGUID": "e879f1cd3d803f64290369a451de37da"
+                },
+                {
+                    "AssetPath": "Assets/AssetRaw/DLL/GameLogic.dll.bytes",
+                    "AssetGUID": "9da58e13000f2fc429dcc1217d69302f"
+                },
+                {
+                    "AssetPath": "Assets/AssetRaw/DLL/GameProto.dll.bytes",
+                    "AssetGUID": "659550d24e41d99498db82093894bc96"
+                },
+                {
+                    "AssetPath": "Assets/AssetRaw/DLL/mscorlib.dll.bytes",
+                    "AssetGUID": "2d43eb61adb377d408effade2da0b105"
+                },
+                {
+                    "AssetPath": "Assets/AssetRaw/DLL/System.Core.dll.bytes",
+                    "AssetGUID": "8944c9b8a133a64438e78ae1a1f453af"
+                },
+                {
+                    "AssetPath": "Assets/AssetRaw/DLL/System.dll.bytes",
+                    "AssetGUID": "b80c9335c4ef79c45aebf6133fc1de88"
+                },
+                {
+                    "AssetPath": "Assets/AssetRaw/DLL/UniTask.dll.bytes",
+                    "AssetGUID": "c930bd6cc06e3a740bac3d4592f2e554"
+                },
+                {
+                    "AssetPath": "Assets/AssetRaw/DLL/YooAsset.dll.bytes",
+                    "AssetGUID": "cd7a8fde96199b241a72e1776aeaa41e"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_assetraw_prefabs.bundle",
+            "FileName": "feff726b6432a5b716dfb54e04ad23cf.bundle",
+            "FileHash": "feff726b6432a5b716dfb54e04ad23cf",
+            "FileCRC": "67e34273",
+            "FileSize": 46621,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/AssetRaw/Prefabs/Cube.prefab",
+                    "AssetGUID": "009f394fb69c54d438a8e8fb911dd4a3"
+                },
+                {
+                    "AssetPath": "Assets/AssetRaw/Prefabs/Sphere.prefab",
+                    "AssetGUID": "e04f8388dd7cf53418bb08fc65a4b1b4"
+                }
+            ]
+        }
+    ],
+    "IndependAssets": []
+}

@@ -15,6 +15,13 @@ UnityProject/ProjectSettings/CommonBurstAotSettings.json
 UnityProject/ProjectSettings/BurstAotSettings_StandaloneWindows.json
 
 #Unity
-UnityProject/Library
-UnityProject/Log
+UnityProject/Library/
+UnityProject/Log/
+UnityProject/yoo/
+UnityProject/Temp/
+UnityProject/HybridCLRData/
 
+
+Build/
+
+/UnityProject/HybridCLRData

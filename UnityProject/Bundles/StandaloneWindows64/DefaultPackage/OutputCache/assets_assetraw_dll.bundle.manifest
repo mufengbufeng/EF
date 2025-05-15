@@ -1,0 +1,27 @@
+ManifestFileVersion: 0
+CRC: 3122244267
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 55a149b1353232557c4e60b19e1d062a
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 5ad585dd02dfb5016c0dad519eab8f49
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 55a149b1353232557c4e60b19e1d062a
+HashAppended: 0
+ClassTypes:
+- Class: 49
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/AssetRaw/DLL/YooAsset.dll.bytes
+- Assets/AssetRaw/DLL/GameLogic.dll.bytes
+- Assets/AssetRaw/DLL/System.dll.bytes
+- Assets/AssetRaw/DLL/EF.dll.bytes
+- Assets/AssetRaw/DLL/GameProto.dll.bytes
+- Assets/AssetRaw/DLL/System.Core.dll.bytes
+- Assets/AssetRaw/DLL/UniTask.dll.bytes
+- Assets/AssetRaw/DLL/mscorlib.dll.bytes
+Dependencies: []

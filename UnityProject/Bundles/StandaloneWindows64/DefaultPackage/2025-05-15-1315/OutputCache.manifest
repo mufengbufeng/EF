@@ -1,0 +1,10 @@
+ManifestFileVersion: 0
+CRC: 1403376310
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: assets_assetraw_dll.bundle
+      Dependencies: {}
+    Info_1:
+      Name: assets_assetraw_prefabs.bundle
+      Dependencies: {}

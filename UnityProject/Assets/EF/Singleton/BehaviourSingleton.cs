@@ -32,6 +32,7 @@ namespace EF
         {
             get
             {
+                Log.Info("获取单例实例");
                 if (_instance == null)
                 {
                     // 尝试在场景中查找该类型的实例
