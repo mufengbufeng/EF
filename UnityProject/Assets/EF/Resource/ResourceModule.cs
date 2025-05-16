@@ -2,12 +2,12 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using EF;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.U2D;
 using YooAsset;
 
-namespace GameLogic
+namespace EF
 {
     public class ResourceModule : BehaviourSingleton<ResourceModule>
     {
@@ -274,6 +274,34 @@ namespace GameLogic
             return null;
 
         }
+
+        public Sprite LoadSprite(string location, string spriteName)
+        {
+            if (string.IsNullOrEmpty(location) || string.IsNullOrEmpty(spriteName))
+            {
+                Log.Error("LoadSprite location is null");
+                return null;
+            }
+            var assetHandle = LoadAsset<SpriteAtlas>(location);
+            if (assetHandle != null)
+            {
+                return assetHandle.GetSprite(spriteName);
+            }
+            return null;
+        }
+
+        public async UniTask<Sprite> LoadSpriteAsync(string location, string spriteName)
+        {
+            if (string.IsNullOrEmpty(location) || string.IsNullOrEmpty(spriteName))
+            {
+                Log.Error("LoadSprite location is null");
+                return null;
+            }
+
+            var assetHandle = await LoadAssetAsync<SpriteAtlas>(location);
+            if (assetHandle != null) return assetHandle.GetSprite(spriteName);
+            return null;
+        }
         /// <summary>
         /// 同步加载子资源。
         /// </summary>
@@ -289,6 +317,11 @@ namespace GameLogic
                 return null;
             }
             var assetHandle = package.LoadSubAssetsSync<T>(location);
+            if (assetHandle == null)
+            {
+                Log.Error($"Unable to load sub asset {subName}");
+                return null;
+            }
             var subAsset = assetHandle?.GetSubAssetObject<T>(subName);
             if (subAsset != null)
             {
@@ -369,6 +402,22 @@ namespace GameLogic
             return null;
         }
 
+        public async UniTask<SceneHandle> LoadSceneAsync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, LocalPhysicsMode physicsMode = LocalPhysicsMode.None)
+        {
+            if (string.IsNullOrEmpty(location))
+            {
+                Log.Error("LoadSceneAsync location is null");
+                return null;
+            }
+            var sceneHandle = package.LoadSceneAsync(location, sceneMode, physicsMode);
+            await sceneHandle.ToUniTask();
+            if (sceneHandle != null)
+            {
+                return sceneHandle;
+            }
+            return null;
+        }
+
         public GameObject LoadGameObject(string location, Transform parent = null)
         {
             if (string.IsNullOrEmpty(location))
@@ -419,6 +468,31 @@ namespace GameLogic
             return null;
         }
         #endregion
+
+
+        /// <summary>
+        /// 卸载未使用的资源
+        /// </summary>
+        public async UniTaskVoid UnloadUnusedAssets()
+        {
+            UnloadAllAssetsOperation result = package.UnloadAllAssetsAsync();
+            await result.ToUniTask();
+            if (result.Status == EOperationStatus.Succeed)
+            {
+                Log.Info("UnloadUnusedAssets Succeed");
+            }
+            else
+            {
+                Log.Error($"UnloadUnusedAssets Failed, Error = {result.Error}");
+            }
+        }
+
+        // 尝试卸载指定的资源对象
+        // 注意：如果该资源还在被使用，该方法会无效。
+        public void TryUnloadUnusedAsset(string location)
+        {
+            package.TryUnloadUnusedAsset(location);
+        }
 
     }
 }

@@ -1,0 +1,170 @@
+{
+    "FileVersion": "2.3.1",
+    "EnableAddressable": true,
+    "LocationToLower": false,
+    "IncludeAssetGUID": false,
+    "OutputNameStyle": 0,
+    "BuildBundleType": 1,
+    "BuildPipeline": "EditorSimulateBuildPipeline",
+    "PackageName": "DefaultPackage",
+    "PackageVersion": "Simulate",
+    "PackageNote": "2025/5/16 11:51:29",
+    "AssetList": [
+        {
+            "Address": "EF.dll",
+            "AssetPath": "Assets/AssetRaw/DLL/EF.dll.bytes",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "GameLogic.dll",
+            "AssetPath": "Assets/AssetRaw/DLL/GameLogic.dll.bytes",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "GameProto.dll",
+            "AssetPath": "Assets/AssetRaw/DLL/GameProto.dll.bytes",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "mscorlib.dll",
+            "AssetPath": "Assets/AssetRaw/DLL/mscorlib.dll.bytes",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "System.Core.dll",
+            "AssetPath": "Assets/AssetRaw/DLL/System.Core.dll.bytes",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "System.dll",
+            "AssetPath": "Assets/AssetRaw/DLL/System.dll.bytes",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "UniTask.dll",
+            "AssetPath": "Assets/AssetRaw/DLL/UniTask.dll.bytes",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "YooAsset.dll",
+            "AssetPath": "Assets/AssetRaw/DLL/YooAsset.dll.bytes",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "Cube",
+            "AssetPath": "Assets/AssetRaw/Prefabs/Cube.prefab",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 1,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "Sphere",
+            "AssetPath": "Assets/AssetRaw/Prefabs/Sphere.prefab",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 1,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "TestScene",
+            "AssetPath": "Assets/AssetRaw/Scenes/TestScene.unity",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 2,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "TestView",
+            "AssetPath": "Assets/AssetRaw/UI/TestView.prefab",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 3,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "Atlas_Common",
+            "AssetPath": "Assets/AssetRaw/UIRaw/Atlas_Common.spriteatlasv2",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 4,
+            "DependBundleIDs": []
+        }
+    ],
+    "BundleList": [
+        {
+            "BundleName": "assets_assetraw_dll.bundle",
+            "UnityCRC": 0,
+            "FileHash": "82eaaff6db552b130a2d584cbfd5cdb9",
+            "FileCRC": "00000000",
+            "FileSize": 2919936,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": []
+        },
+        {
+            "BundleName": "assets_assetraw_prefabs.bundle",
+            "UnityCRC": 0,
+            "FileHash": "7a203d41610d1170a74620678fd82f82",
+            "FileCRC": "00000000",
+            "FileSize": 5961,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": []
+        },
+        {
+            "BundleName": "assets_assetraw_scenes.bundle",
+            "UnityCRC": 0,
+            "FileHash": "f320acd683c8126808a68cc03bd9460e",
+            "FileCRC": "00000000",
+            "FileSize": 11122,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": []
+        },
+        {
+            "BundleName": "assets_assetraw_ui.bundle",
+            "UnityCRC": 0,
+            "FileHash": "8225ca9ce398c2e3d527fd9fdde20c08",
+            "FileCRC": "00000000",
+            "FileSize": 5616,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": []
+        },
+        {
+            "BundleName": "assets_assetraw_uiraw.bundle",
+            "UnityCRC": 0,
+            "FileHash": "ec67aa2a3c46113fd01d1c392217adb6",
+            "FileCRC": "00000000",
+            "FileSize": 394,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": []
+        }
+    ]
+}

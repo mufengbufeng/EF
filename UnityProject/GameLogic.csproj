@@ -64,9 +64,13 @@
     <Analyzer Include="D:\unity\installed\2022.3.14f1c1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\GameLogic\Base\ImageExtended.cs" />
+    <Compile Include="Assets\Scripts\GameLogic\Base\ColorExtended.cs" />
+    <Compile Include="Assets\Scripts\GameLogic\View\TestView.cs" />
+    <Compile Include="Assets\Scripts\GameLogic\Base\TransformExtended.cs" />
+    <Compile Include="Assets\Scripts\GameLogic\Common\ReferenceCollector.cs" />
     <Compile Include="Assets\Scripts\GameLogic\Common\GameModule.cs" />
-    <Compile Include="Assets\Scripts\GameLogic\Base\Resourse\HasAssetResult.cs" />
-    <Compile Include="Assets\Scripts\GameLogic\Base\Resourse\ResourceModule.cs" />
+    <Compile Include="Assets\Scripts\GameLogic\Common\UHubComponent.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Scripts\GameLogic\GameLogic.asmdef" />

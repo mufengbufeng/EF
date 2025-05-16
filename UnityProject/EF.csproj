@@ -64,11 +64,23 @@
     <Analyzer Include="D:\unity\installed\2022.3.14f1c1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\EF\Resource\ResourceModule.cs" />
     <Compile Include="Assets\EF\Singleton\BehaviourSingleton.cs" />
+    <Compile Include="Assets\EF\UI\Base\BaseUIView.cs" />
+    <Compile Include="Assets\EF\UI\Enums\UILayer.cs" />
     <Compile Include="Assets\EF\Singleton\Singleton.cs" />
+    <Compile Include="Assets\EF\Scene\SceneModule.cs" />
     <Compile Include="Assets\EF\Common\Log.cs" />
+    <Compile Include="Assets\EF\UI\Interfaces\IUIController.cs" />
+    <Compile Include="Assets\EF\UI\Core\UIManager.cs" />
+    <Compile Include="Assets\EF\Resource\HasAssetResult.cs" />
     <Compile Include="Assets\EF\Common\LogHelper.cs" />
+    <Compile Include="Assets\EF\UI\Interfaces\IUIView.cs" />
+    <Compile Include="Assets\EF\Event\EventModule.cs" />
     <Compile Include="Assets\EF\Singleton\SingletonModule.cs" />
+    <Compile Include="Assets\EF\UI\Interfaces\IUIModel.cs" />
+    <Compile Include="Assets\EF\UI\Base\BaseUIModel.cs" />
+    <Compile Include="Assets\EF\UI\Base\BaseUIController.cs" />
     <Compile Include="Assets\EF\Singleton\ISingleton.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -977,6 +989,14 @@
     </Reference>
     <Reference Include="System.Xml.XPath.XDocument">
       <HintPath>D:\unity\installed\2022.3.14f1c1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\Facades\System.Xml.XPath.XDocument.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="YooAsset">
+      <HintPath>Library\ScriptAssemblies\YooAsset.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UniTask">
+      <HintPath>Library\ScriptAssemblies\UniTask.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.UI">

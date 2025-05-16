@@ -1,4 +1,4 @@
-namespace GameLogic
+namespace EF
 {
     /// <summary>
     /// 检查资源是否存在的结果。

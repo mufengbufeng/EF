@@ -17,6 +17,7 @@ public class Init : MonoBehaviour
 
     void Start()
     {
+        DontDestroyOnLoad(this);
         InitYooAsset().Forget();
     }
 

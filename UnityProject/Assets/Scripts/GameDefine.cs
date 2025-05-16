@@ -7,7 +7,7 @@ public static class GameDefine
     public static string PackageName = "DefaultPackage";
     public static string PackageVersion = "v1.0";   // YooAsset的包版本号
     public static string BigVersion = "1.0.0";  // 大版本号
-    public static EPlayMode PlayMode = EPlayMode.HostPlayMode;
+    public static EPlayMode PlayMode = EPlayMode.EditorSimulateMode;
     public static string DefaultCDN = "http://172.16.13.210:8000/CDN";
     public static string FallBackCDN = "http://172.16.13.210:8000/CDN";
 

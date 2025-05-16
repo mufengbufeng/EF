@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Editor\ScriptingDefineSymbols.cs" />
     <Compile Include="Assets\Scripts\Editor\BuildDLLCommand.cs" />
+    <Compile Include="Assets\Scripts\Editor\ReferenceCollectorEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\SynAssemblysContent.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -1051,6 +1052,10 @@
     </Reference>
     <Reference Include="Unity.Rider.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.2D.Sprite.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UniTask.Linq">
