@@ -1,0 +1,36 @@
+ManifestFileVersion: 0
+CRC: 3460444783
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 1ab878ab8ce9247afc2309ca312eed86
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 6961ca36f609c58b08d885ad27680915
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 1ab878ab8ce9247afc2309ca312eed86
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b0c4b4f48a1da594b97d0b99d71476be, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 222
+  Script: {instanceID: 0}
+- Class: 224
+  Script: {instanceID: 0}
+- Class: 225
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers:
+- AssemblyName: UnityEngine.CoreModule
+  ClassName: UnityEngine.Events.PersistentCallGroup
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.MaskableGraphic/CullStateChangedEvent
+Assets:
+- Assets/AssetRaw/UI/Common/Joystick.prefab
+Dependencies: []

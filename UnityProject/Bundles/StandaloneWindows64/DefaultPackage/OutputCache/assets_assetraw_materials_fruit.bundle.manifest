@@ -1,0 +1,98 @@
+ManifestFileVersion: 0
+CRC: 4101432053
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 4d50ffaf96b6c86594a3e8577cddb2d5
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: b30fce1a9ad74efb72be6c308c56e365
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 4d50ffaf96b6c86594a3e8577cddb2d5
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/AssetRaw/Materials/Fruit/Mat_Cardboard_Boxes.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Fruit_Stickers_02.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_WoodCrates.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Passion_Fruit.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Pepino.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Berry_Boxes_03.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Soursop.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Peaches.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Baskets_02.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Persimmon.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Plums.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Bananas_Green.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Mandarin_Oranges.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Bananas_Red.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Papaya.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Bananas_Ripe.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Figs.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Kiwis.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Coconut.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Honeydew.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Pomegranate_01.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Berries_Cherries.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Yellow_Melon.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Guava_02.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Orange.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Guava_01.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Berry_Boxes_01.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Tamarind.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Watermelon_01.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Rambutan.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Dragonfruit.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Star_Apple.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Jackfruit.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Prickly_Pears.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Apples_01.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Pineapple.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Cantaloupe.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Cloudberry_Tamarillo.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Kiwano.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Fruit_Net.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Pears_01.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Quince.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Apples_02.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Pears_02.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Watermelon_03.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Cherimoya.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Mangoes.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Starfruit.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Strawberries.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Watermelon_02.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Lemon_Lime.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Pomelo.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_FancyBox_01.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Berry_Boxes_02.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Baskets_01.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Grapes.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Bananas_Yellow.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Durian.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_FancyBox_02.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Fruit_Stickers_01.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Mangosteen.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Lucuma.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_FingerLimes.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Lychee.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Plane.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Apricot_Plums.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Orange_Kumquat.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Watermelon_04.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Pineapple_Ripe.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Plastic.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Pomegranate_02.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Dragonfruit_Yellow.mat
+- Assets/AssetRaw/Materials/Fruit/Mat_Mandarin_Subsurface.mat
+Dependencies:
+- C:/UnityWork/Self/Open/EF/UnityProject/Bundles/StandaloneWindows64/DefaultPackage/OutputCache/assets_assetraw_artraw.bundle
+- C:/UnityWork/Self/Open/EF/UnityProject/Bundles/StandaloneWindows64/DefaultPackage/OutputCache/unityshaders.bundle

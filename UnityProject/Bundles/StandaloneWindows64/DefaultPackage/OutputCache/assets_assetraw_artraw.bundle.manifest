@@ -1,0 +1,90 @@
+ManifestFileVersion: 0
+CRC: 3504266392
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 95a0025672770dc092f781b0fdec9634
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 2612ac43db082a73502ee80f2eceb73f
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 95a0025672770dc092f781b0fdec9634
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/AssetRaw/ArtRaw/Berry_Boxes_03.png
+- Assets/AssetRaw/ArtRaw/Jackfruit.png
+- Assets/AssetRaw/ArtRaw/Pineapple.png
+- Assets/AssetRaw/ArtRaw/Orange.png
+- Assets/AssetRaw/ArtRaw/Mandarin_Oranges.png
+- Assets/AssetRaw/ArtRaw/Watermelon_03.png
+- Assets/AssetRaw/ArtRaw/Orange_Kumquat.png
+- Assets/AssetRaw/ArtRaw/Strawberries.png
+- Assets/AssetRaw/ArtRaw/Guava_01.png
+- Assets/AssetRaw/ArtRaw/Rambutan.png
+- Assets/AssetRaw/ArtRaw/Berry_Boxes_01.png
+- Assets/AssetRaw/ArtRaw/Durian.png
+- Assets/AssetRaw/ArtRaw/Pomelo.png
+- Assets/AssetRaw/ArtRaw/Pears_02.png
+- Assets/AssetRaw/ArtRaw/Yellow_Melon.png
+- Assets/AssetRaw/ArtRaw/Grapes.png
+- Assets/AssetRaw/ArtRaw/Lychee.png
+- Assets/AssetRaw/ArtRaw/Persimmon.png
+- Assets/AssetRaw/ArtRaw/Pomegranate_01.png
+- Assets/AssetRaw/ArtRaw/Basket_02.png
+- Assets/AssetRaw/ArtRaw/Lemon_Lime.png
+- Assets/AssetRaw/ArtRaw/Guava_02.png
+- Assets/AssetRaw/ArtRaw/Soursop.png
+- Assets/AssetRaw/ArtRaw/Pomegranate_02.png
+- Assets/AssetRaw/ArtRaw/Cantaloupe.png
+- Assets/AssetRaw/ArtRaw/Figs.png
+- Assets/AssetRaw/ArtRaw/Mangoes.png
+- Assets/AssetRaw/ArtRaw/Apples_02.png
+- Assets/AssetRaw/ArtRaw/Berries.png
+- Assets/AssetRaw/ArtRaw/Banana_Green.png
+- Assets/AssetRaw/ArtRaw/Basket_01.png
+- Assets/AssetRaw/ArtRaw/FingerLimes.png
+- Assets/AssetRaw/ArtRaw/Pepino.png
+- Assets/AssetRaw/ArtRaw/WoodCrates.png
+- Assets/AssetRaw/ArtRaw/Papaya.png
+- Assets/AssetRaw/ArtRaw/Pineapple_Ripe.png
+- Assets/AssetRaw/ArtRaw/Plums.png
+- Assets/AssetRaw/ArtRaw/Starfruit.png
+- Assets/AssetRaw/ArtRaw/Cloudberry_Tamarillo.png
+- Assets/AssetRaw/ArtRaw/Pears_01.png
+- Assets/AssetRaw/ArtRaw/Prickly_Pear.png
+- Assets/AssetRaw/ArtRaw/Dragonfruit.png
+- Assets/AssetRaw/ArtRaw/Cardboard_Boxes.png
+- Assets/AssetRaw/ArtRaw/Quince.png
+- Assets/AssetRaw/ArtRaw/Berry_Boxes_02.png
+- Assets/AssetRaw/ArtRaw/FancyBox_02.png
+- Assets/AssetRaw/ArtRaw/Fruit_Stickers_01.png
+- Assets/AssetRaw/ArtRaw/Watermelon_04.png
+- Assets/AssetRaw/ArtRaw/Kiwano.png
+- Assets/AssetRaw/ArtRaw/Honeydew.png
+- Assets/AssetRaw/ArtRaw/Banana_Ripe.png
+- Assets/AssetRaw/ArtRaw/Banana_Yellow.png
+- Assets/AssetRaw/ArtRaw/FancyBox_01.png
+- Assets/AssetRaw/ArtRaw/Fruit_Net.png
+- Assets/AssetRaw/ArtRaw/Dragonfruit_Yellow.png
+- Assets/AssetRaw/ArtRaw/Passion_Fruit.png
+- Assets/AssetRaw/ArtRaw/Mangosteen.png
+- Assets/AssetRaw/ArtRaw/Tamarind.png
+- Assets/AssetRaw/ArtRaw/Kiwis.png
+- Assets/AssetRaw/ArtRaw/Apricot_Plums.png
+- Assets/AssetRaw/ArtRaw/Cherimoya.png
+- Assets/AssetRaw/ArtRaw/Lucuma.png
+- Assets/AssetRaw/ArtRaw/Watermelon_02.png
+- Assets/AssetRaw/ArtRaw/Peach_Apricot.png
+- Assets/AssetRaw/ArtRaw/Banana_Red.png
+- Assets/AssetRaw/ArtRaw/Peaches.png
+- Assets/AssetRaw/ArtRaw/Fruit_Stickers_02.png
+- Assets/AssetRaw/ArtRaw/Watermelon_01.png
+- Assets/AssetRaw/ArtRaw/Star_Apple.png
+- Assets/AssetRaw/ArtRaw/Apples_01.png
+- Assets/AssetRaw/ArtRaw/Coconuts.png
+Dependencies: []

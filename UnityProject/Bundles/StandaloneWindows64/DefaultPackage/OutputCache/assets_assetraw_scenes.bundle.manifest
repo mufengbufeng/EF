@@ -1,0 +1,65 @@
+ManifestFileVersion: 0
+CRC: 179071700
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: ba620891334aa3fbb8ea8489b13a6225
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: bb072570f91359407129c040aafb6ed3
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: ba620891334aa3fbb8ea8489b13a6225
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 20
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 64
+  Script: {instanceID: 0}
+- Class: 65
+  Script: {instanceID: 0}
+- Class: 81
+  Script: {instanceID: 0}
+- Class: 89
+  Script: {instanceID: 0}
+- Class: 104
+  Script: {instanceID: 0}
+- Class: 108
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 136
+  Script: {instanceID: 0}
+- Class: 157
+  Script: {instanceID: 0}
+- Class: 196
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/AssetRaw/Scenes/Game.unity
+- Assets/AssetRaw/Scenes/New Scene.unity
+Dependencies:
+- C:/UnityWork/Self/Open/EF/UnityProject/Bundles/StandaloneWindows64/DefaultPackage/OutputCache/assets_assetraw_materials_hole.bundle
+- C:/UnityWork/Self/Open/EF/UnityProject/Bundles/StandaloneWindows64/DefaultPackage/OutputCache/assets_assetraw_prefabs.bundle
+- C:/UnityWork/Self/Open/EF/UnityProject/Bundles/StandaloneWindows64/DefaultPackage/OutputCache/assets_assetraw_prefabs_player.bundle
+- C:/UnityWork/Self/Open/EF/UnityProject/Bundles/StandaloneWindows64/DefaultPackage/OutputCache/share_packages_com_unity_render-pipelines_universal_runtime_materials.bundle

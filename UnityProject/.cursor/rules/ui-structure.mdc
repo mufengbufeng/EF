@@ -1,0 +1,15 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# UI 框架结构说明
+
+[Assets/EF/UI](mdc:Assets/EF/UI) 目录为 UI 框架相关代码，主要子目录如下：
+
+- `Base/`：UI 基础类，如 BaseController、BaseModel、BaseView。
+- `Core/`：UI 管理核心，如 UIManager。
+- `Enums/`：UI 相关枚举类型，如 UILayer。
+- `Interfaces/`：UI 相关接口，如 IUIView、IUIModel、IUIController。
+
+各部分协作实现 UI 的 MVC 架构。

@@ -1,0 +1,15 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# FSM 核心结构说明
+
+[Assets/EF/Fsm/Core](mdc:Assets/EF/Fsm/Core) 目录包含有限状态机（FSM）核心实现：
+
+- `IState.cs`：状态接口。
+- `BaseState.cs`：基础状态类。
+- `FiniteStateMachine.cs`：有限状态机实现。
+- `FSMManager.cs`：状态机管理器。
+
+用于实现游戏对象或系统的状态切换与管理。

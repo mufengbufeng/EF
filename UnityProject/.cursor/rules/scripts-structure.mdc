@@ -1,0 +1,20 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Scripts 目录结构说明
+
+[Assets/Scripts](mdc:Assets/Scripts) 目录包含游戏主逻辑代码，主要子目录如下：
+
+- `Base/`：基础工具类与扩展方法。
+- `Common/`：通用功能代码。
+- `Controller/`：控制器类，负责游戏流程与逻辑控制。
+- `EventDefine/`：事件定义相关代码。
+- `GameEntity/`：游戏实体相关类。
+- `Model/`：数据模型，包含 GamePlay、Game 等子目录。
+- `View/`：视图层，负责 UI 和游戏对象的显示。
+- `Editor/`：编辑器扩展相关代码。
+- `GameProto/`、`GameScripts/`、`GameSettings/`：协议、脚本与设置相关。
+
+具体实现可参考各子目录下的文件。

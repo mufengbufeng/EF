@@ -1,0 +1,25 @@
+ManifestFileVersion: 0
+CRC: 4037507396
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 6de3c6bca52e1b74a33d333cac9c7b98
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 033fafe2c9f6c610c3a734393882fd4c
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 6de3c6bca52e1b74a33d333cac9c7b98
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+- Class: 687078895
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/AssetRaw/Art/Atlas/Atlas_Common.spriteatlasv2
+Dependencies:
+- C:/UnityWork/Self/Open/EF/UnityProject/Bundles/StandaloneWindows64/DefaultPackage/OutputCache/share_assets_art_atlas_common.bundle

@@ -1,0 +1,18 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# 项目结构说明
+
+本项目为 Unity 工程，主要目录结构如下：
+
+- `Assets/`：存放所有资源和代码，核心开发目录。
+  - `Scripts/`：游戏主逻辑代码，包含 Base、Controller、Model、View 等子目录。
+  - `EF/`：框架相关代码，包含 UI、Fsm、Singleton、Pool Manager 等模块。
+  - 其他如 Art、Materials、Prefabs、Scenes、Shader、UI 等为美术和资源相关目录。
+- `Bundles/`：打包输出的资源。
+- `HybridCLRData/`、`Library/`、`Temp/`、`Logs/` 等为 Unity 自动生成或第三方工具相关目录。
+- `Packages/`、`ProjectSettings/`、`UserSettings/`：Unity 工程配置相关。
+
+详细代码结构可参考 [Assets/Scripts](mdc:Assets/Scripts) 和 [Assets/EF](mdc:Assets/EF) 目录。

@@ -1,0 +1,20 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# EF 目录结构说明
+
+[Assets/EF](mdc:Assets/EF) 目录为框架相关代码，主要子目录如下：
+
+- `UI/`：UI 框架，包含 Base（基础类）、Core（核心管理）、Enums（枚举）、Interfaces（接口）等。
+- `Fsm/`：有限状态机相关实现，核心代码在 Fsm/Core/。
+- `Singleton/`：单例模式相关实现。
+- `Pool Manager/`：对象池管理。
+- `Resource/`：资源管理相关。
+- `Scene/`：场景管理相关。
+- `Common/`：通用工具与基础功能。
+- `Editor/`：编辑器扩展。
+- `Event/`：事件系统相关。
+
+详细实现可参考各子目录下的文件。

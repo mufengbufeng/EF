@@ -1,0 +1,22 @@
+ManifestFileVersion: 0
+CRC: 700994867
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: c4a816eed44dd7e587171888282309b9
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 923768aebf385ad86f7762daa8034951
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: c4a816eed44dd7e587171888282309b9
+HashAppended: 0
+ClassTypes:
+- Class: 213
+  Script: {instanceID: 0}
+- Class: 687078895
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Art/Atlas/Common/Common_001.png
+Dependencies: []

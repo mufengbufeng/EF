@@ -1,0 +1,31 @@
+ManifestFileVersion: 0
+CRC: 461777470
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: c85330690e60b3268be3aed3e2095a8e
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 134b7874faf1e4f485ed3c5a681e862b
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: c85330690e60b3268be3aed3e2095a8e
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/AssetRaw/Prefabs/Player/HoleCoverPre.prefab
+Dependencies:
+- C:/UnityWork/Self/Open/EF/UnityProject/Bundles/StandaloneWindows64/DefaultPackage/OutputCache/assets_assetraw_prefabs.bundle

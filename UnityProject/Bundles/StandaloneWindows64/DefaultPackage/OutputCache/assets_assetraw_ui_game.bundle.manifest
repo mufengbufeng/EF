@@ -1,0 +1,44 @@
+ManifestFileVersion: 0
+CRC: 4145961072
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 338ccc03ebd4fe5bfb7ad9b2e05a665e
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: fa6b4a5f2474880bb1ccaecfd25a5acf
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 338ccc03ebd4fe5bfb7ad9b2e05a665e
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: b0c4b4f48a1da594b97d0b99d71476be, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 00d7b02de32a8084eaf1fac5f66744c2, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 222
+  Script: {instanceID: 0}
+- Class: 223
+  Script: {instanceID: 0}
+- Class: 224
+  Script: {instanceID: 0}
+- Class: 225
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers:
+- AssemblyName: GameLogic
+  ClassName: GameLogic.ReferenceCollectorData
+- AssemblyName: UnityEngine.CoreModule
+  ClassName: UnityEngine.Events.PersistentCallGroup
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.MaskableGraphic/CullStateChangedEvent
+Assets:
+- Assets/AssetRaw/UI/Game/GameView.prefab
+Dependencies: []

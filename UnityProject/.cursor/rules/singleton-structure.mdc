@@ -1,0 +1,14 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# 单例模式结构说明
+
+[Assets/EF/Singleton](mdc:Assets/EF/Singleton) 目录包含单例模式相关实现：
+
+- `Singleton.cs`、`SingletonModule.cs`、`BehaviourSingleton.cs`：不同类型的单例实现。
+- `ISingleton.cs`：单例接口。
+- `Example/`：单例用法示例（当前为空）。
+
+用于全局唯一对象的管理。
