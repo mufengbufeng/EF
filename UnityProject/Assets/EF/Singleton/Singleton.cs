@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace EF
 {
-    
+
     /// <summary>
     /// 通用单例模式基类，适用于普通C#类的单例实现
     /// </summary>
@@ -29,8 +29,10 @@ namespace EF
                     SingletonModule.Register(_instance);
 
                     // 在应用程序退出时自动释放单例
-                    Application.quitting += () => {
-                        if (_instance != null) {
+                    Application.quitting += () =>
+                    {
+                        if (_instance != null)
+                        {
                             _instance.Release();
                         }
                     };
@@ -67,7 +69,7 @@ namespace EF
         /// </summary>
         protected virtual void Init()
         {
-            UnityEngine.Debug.Log($"单例 {typeof(T).Name} 已初始化");
+            Log.Info($"单例 {typeof(T).Name} 已初始化");
         }
 
         /// <summary>
@@ -76,7 +78,7 @@ namespace EF
         /// </summary>
         public virtual void Active()
         {
-            UnityEngine.Debug.Log($"单例 {typeof(T).Name} 已激活");
+            Log.Info($"单例 {typeof(T).Name} 已激活");
         }
 
         /// <summary>
@@ -86,8 +88,8 @@ namespace EF
         /// </summary>
         public virtual void Release()
         {
-            UnityEngine.Debug.Log($"单例 {typeof(T).Name} 准备释放");
-            
+            Log.Info($"单例 {typeof(T).Name} 准备释放");
+
             if (_instance != null)
             {
                 OnRelease();
@@ -95,7 +97,7 @@ namespace EF
                 _instance = null;
             }
         }
-        
+
         /// <summary>
         /// 在实例被释放前调用，用于执行额外的清理工作
         /// 子类可重写此方法以实现自定义释放前逻辑

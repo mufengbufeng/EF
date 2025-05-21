@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace GameLogic
 {
-    public class TestView : BaseUIView
+    public class TestView : BaseView
     {
         public Image Image;
         public UHubComponent UHub;

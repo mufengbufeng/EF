@@ -14,6 +14,11 @@ namespace EF
         protected static T _instance = null;
 
         /// <summary>
+        /// 标记单例是否正在初始化过程中，避免重复初始化
+        /// </summary>
+        protected static bool _isInitializing = false;
+
+        /// <summary>
         /// 是否在切换场景时保留此对象
         /// </summary>
         [SerializeField]
@@ -32,22 +37,45 @@ namespace EF
         {
             get
             {
-                Log.Info("获取单例实例");
-                if (_instance == null)
+                // 如果已经有实例，直接返回
+                if (_instance != null)
                 {
-                    // 尝试在场景中查找该类型的实例
-                    _instance = FindObjectOfType<T>();
+                    return _instance;
+                }
 
-                    // 如果场景中不存在，则创建一个新的游戏对象并添加组件
+                // 检测是否正在初始化中，防止在Awake或其他初始化过程中循环引用
+                if (_isInitializing)
+                {
+                    Log.Warning($"检测到 {typeof(T).Name} 在初始化过程中递归访问Instance属性，可能导致多实例问题");
+                    return null;
+                }
+
+                _isInitializing = true;
+
+                try
+                {
+                    // 先尝试从SingletonModule获取
+                    _instance = SingletonModule.Get<T>();
+
                     if (_instance == null)
                     {
+                        Log.Info($"创建 {typeof(T).Name} 单例实例");
+                        // 创建新实例
                         GameObject singletonObject = new GameObject($"{typeof(T).Name} (Singleton)");
                         _instance = singletonObject.AddComponent<T>();
+                        // 注意：AddComponent会触发Awake，此时_isInitializing为true
                     }
 
-                    // 初始化实例
-                    _instance.Init();
-                    SingletonModule.Register(_instance);
+                    // 确保实例被初始化和注册
+                    if (_instance != null && !SingletonModule.Contains<T>())
+                    {
+                        _instance.Init();
+                        SingletonModule.Register(_instance);
+                    }
+                }
+                finally
+                {
+                    _isInitializing = false;
                 }
 
                 return _instance;
@@ -73,17 +101,25 @@ namespace EF
                 return;
             }
 
-            // 如果这是第一个实例，进行初始化
-            _instance = this as T;
-
-            // 如果需要，设置为不随场景切换而销毁
-            if (_dontDestroyOnLoad && transform.parent == null)
+            // 如果当前没有实例，则进行初始化
+            if (_instance == null)
             {
-                DontDestroyOnLoad(gameObject);
-            }
+                _instance = this as T;
 
-            // 注册到单例系统
-            // SingletonModule.Register(_instance);
+                // 如果需要，设置为不随场景切换而销毁
+                if (_dontDestroyOnLoad && transform.parent == null)
+                {
+                    DontDestroyOnLoad(gameObject);
+                }
+
+                // 仅当不是通过Instance属性创建的实例才执行初始化
+                // 因为Instance属性中创建的实例会直接调用Init和Register
+                if (!_isInitializing && !SingletonModule.Contains<T>())
+                {
+                    Init();
+                    SingletonModule.Register(this);
+                }
+            }
         }
 
         /// <summary>

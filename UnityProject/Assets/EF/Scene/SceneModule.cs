@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using YooAsset;
@@ -12,12 +13,35 @@ namespace EF
         {
             if (sceneHandles.ContainsKey(sceneName))
             {
-                Debug.LogError($"Scene {sceneName} is already loaded.");
+                Log.Error($"Scene {sceneName} is already loaded.");
                 return default;
             }
 
             var sceneHandle = ResourceModule.Instance.LoadScene(sceneName, sceneMode, physicsMode);
             var obj = sceneHandle.SceneObject;
+            sceneHandles.Add(sceneName, sceneHandle);
+            return obj;
+        }
+
+        public Scene? TryGetScene(string sceneName)
+        {
+            if (sceneHandles.ContainsKey(sceneName))
+            {
+                return sceneHandles[sceneName].SceneObject;
+            }
+            return null;
+        }
+
+        public async UniTask<Scene> LoadSceneAsync(string sceneName, LoadSceneMode loadSceneMode = LoadSceneMode.Single, LocalPhysicsMode localPhysicsMode = LocalPhysicsMode.None)
+        {
+            if (sceneHandles.ContainsKey(sceneName))
+            {
+                Log.Error($"Scene {sceneName} is already loaded.");
+                return default;
+            }
+
+            var sceneHandle = await ResourceModule.Instance.LoadSceneAsync(sceneName, loadSceneMode, localPhysicsMode);
+            Scene obj = sceneHandle.SceneObject;
             sceneHandles.Add(sceneName, sceneHandle);
             return obj;
         }
@@ -29,7 +53,7 @@ namespace EF
                 var sceneHandle = sceneHandles[sceneName];
                 sceneHandle.Release();
                 sceneHandles.Remove(sceneName);
-                Debug.Log($"Scene {sceneName} unloaded.");
+                Log.Info($"Scene {sceneName} unloaded.");
             }
             else
             {

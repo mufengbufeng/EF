@@ -735,16 +735,27 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: ENABLE_HYBRIDCLR
-    PS5: ENABLE_HYBRIDCLR
-    Standalone: ENABLE_HYBRIDCLR
-    WebGL: ENABLE_HYBRIDCLR
-    Windows Store Apps: ENABLE_HYBRIDCLR
-    iPhone: ENABLE_HYBRIDCLR
+    Android: ENABLE_HYBRIDCLR;DOTWEEN
+    EmbeddedLinux: DOTWEEN
+    GameCoreScarlett: DOTWEEN
+    GameCoreXboxOne: DOTWEEN
+    LinuxHeadlessSimulation: DOTWEEN
+    Nintendo Switch: DOTWEEN
+    PS4: DOTWEEN
+    PS5: ENABLE_HYBRIDCLR;DOTWEEN
+    QNX: DOTWEEN
+    Stadia: DOTWEEN
+    Standalone: ENABLE_HYBRIDCLR;DOTWEEN
+    VisionOS: DOTWEEN
+    WebGL: ENABLE_HYBRIDCLR;DOTWEEN
+    Windows Store Apps: ENABLE_HYBRIDCLR;DOTWEEN
+    XboxOne: DOTWEEN
+    iPhone: ENABLE_HYBRIDCLR;DOTWEEN
+    tvOS: DOTWEEN
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
-    Standalone: 1
+    Standalone: 0
   il2cppCompilerConfiguration:
     Standalone: 0
   il2cppCodeGeneration: {}
@@ -848,7 +859,7 @@ PlayerSettings:
   hmiLogStartupTiming: 0
   hmiCpuConfiguration: 
   apiCompatibilityLevel: 3
-  activeInputHandler: 0
+  activeInputHandler: 1
   windowsGamepadBackendHint: 0
   cloudProjectId: 
   framebufferDepthMemorylessMode: 0

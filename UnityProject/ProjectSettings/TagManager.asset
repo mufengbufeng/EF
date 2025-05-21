@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - MainCanvas
+  - PointObject
   layers:
   - Default
   - TransparentFX
@@ -12,11 +13,11 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Masked
+  - Mask
+  - Hole
+  - HolePlane
+  - Plane
   - 
   - 
   - 

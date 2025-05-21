@@ -8,20 +8,22 @@ namespace EF
     public class UIManager : BehaviourSingleton<UIManager>
     {
         public Transform Canvas;
-        public Dictionary<string, BaseUIView> ViewDict = new Dictionary<string, BaseUIView>();
+        public Dictionary<string, BaseView> ViewDict = new Dictionary<string, BaseView>();
+      
         protected override void Init()
         {
             base.Init();
             Canvas = GameObject.FindGameObjectWithTag("MainCanvas").transform;
         }
         // 打开UI
-        public T OpenUI<T>(string uiName, UILayer layer, params object[] userData) where T : BaseUIView
+        public T OpenUI<T>(string uiName, UILayer layer, params object[] userData) where T : BaseView
         {
             if (ViewDict.TryGetValue(uiName, out var existingView))
             {
                 existingView.ShowView();
                 return (T)existingView;
             }
+
 
             GameObject uiObj = ResourceModule.Instance.LoadGameObject(uiName, Canvas);
             var canvas = uiObj.GetComponent<Canvas>();
@@ -40,7 +42,7 @@ namespace EF
             return view;
         }
 
-        public async UniTask<T> OpenUIAsync<T>(string uiName, UILayer layer, params object[] userData) where T : BaseUIView
+        public async UniTask<T> OpenUIAsync<T>(string uiName, UILayer layer, params object[] userData) where T : BaseView
         {
             if (ViewDict.TryGetValue(uiName, out var existingView))
             {
@@ -93,6 +95,7 @@ namespace EF
             if (ViewDict.TryGetValue(uiName, out var view))
             {
                 view.CloseView();
+
                 ViewDict.Remove(uiName);
             }
             else

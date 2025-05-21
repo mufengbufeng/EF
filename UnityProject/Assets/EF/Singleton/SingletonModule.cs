@@ -11,6 +11,12 @@ namespace EF
         // 存储所有注册的单例实例
         private static Dictionary<System.Type, ISingleton> _singletons = new();
 
+        public static T Get<T>() where T : ISingleton
+        {
+            _singletons.TryGetValue(typeof(T), out ISingleton singleton);
+            return (T)singleton;
+        }
+
         /// <summary>
         /// 持有（注册）单例实例
         /// </summary>
@@ -29,6 +35,16 @@ namespace EF
             singleton.Active();
 
             Log.Info($"单例 {type.Name} 已注册到系统");
+        }
+
+        /// <summary>
+        /// 检查指定类型的单例是否已注册
+        /// </summary>
+        /// <typeparam name="T">要检查的单例类型</typeparam>
+        /// <returns>如果单例已注册，则返回true；否则返回false</returns>
+        public static bool Contains<T>() where T : ISingleton
+        {
+            return _singletons.ContainsKey(typeof(T));
         }
 
         /// <summary>

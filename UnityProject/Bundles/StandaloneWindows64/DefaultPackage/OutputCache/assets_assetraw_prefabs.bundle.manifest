@@ -1,15 +1,15 @@
 ManifestFileVersion: 0
-CRC: 1905305143
+CRC: 1530230677
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: f9a2c7bc7e66c311dae20ea9617fab43
+    Hash: 12d1e3a84385e71c81083e88efd88659
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 4587ef6f95f03cd9eb1b5942fca4ec1a
+    Hash: 134b7874faf1e4f485ed3c5a681e862b
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: f9a2c7bc7e66c311dae20ea9617fab43
+    Hash: 12d1e3a84385e71c81083e88efd88659
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -24,14 +24,8 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 43
   Script: {instanceID: 0}
-- Class: 48
-  Script: {instanceID: 0}
-- Class: 65
-  Script: {instanceID: 0}
-- Class: 135
-  Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/AssetRaw/Prefabs/Sphere.prefab
-- Assets/AssetRaw/Prefabs/Cube.prefab
-Dependencies: []
+- Assets/AssetRaw/Prefabs/HoleCoverNew.fbx
+Dependencies:
+- C:/UnityWork/Self/Open/EF/UnityProject/Bundles/StandaloneWindows64/DefaultPackage/OutputCache/assets_assetraw_materials_hole.bundle

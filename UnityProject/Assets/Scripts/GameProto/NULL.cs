@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using EF;
 using UnityEngine;
 
 namespace GameProto
@@ -9,7 +10,7 @@ namespace GameProto
     {
         public static void TestLog(string str)
         {
-            Debug.Log(str + "bbbbb");
+            Log.Info(str + "bbbbb");
         }
     }
 }

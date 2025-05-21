@@ -1,4 +1,5 @@
 #if ENABLE_HYBRIDCLR
+using EF;
 using HybridCLR.Editor;
 using HybridCLR.Editor.Commands;
 #endif
@@ -39,9 +40,9 @@ public static class BuildDLLCommand
         // 临时
         SyncAssemblyContent.RefreshAssembly();
 
-        Debug.Log($"BuildAndCopyDlls: {EditorUserBuildSettings.activeBuildTarget}");
+        Log.Info($"BuildAndCopyDlls: {EditorUserBuildSettings.activeBuildTarget}");
 #if ENABLE_HYBRIDCLR
-        Debug.Log($"进来 BuildAndCopyDlls: {EditorUserBuildSettings.activeBuildTarget}");
+        Log.Info($"进来 BuildAndCopyDlls: {EditorUserBuildSettings.activeBuildTarget}");
         BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
         CompileDllCommand.CompileDll(target);
         CopyAOTHotUpdateDlls(target);
@@ -80,7 +81,7 @@ public static class BuildDLLCommand
             }
             string dllBytesPath = $"{aotAssembliesDstDir}/{dll}.bytes";
             System.IO.File.Copy(srcDllPath, dllBytesPath, true);
-            Debug.Log($"[CopyAOTAssembliesToStreamingAssets] copy AOT dll {srcDllPath} -> {dllBytesPath}");
+            Log.Info($"[CopyAOTAssembliesToStreamingAssets] copy AOT dll {srcDllPath} -> {dllBytesPath}");
         }
 #endif
     }
@@ -97,7 +98,7 @@ public static class BuildDLLCommand
             string dllPath = $"{hotfixDllSrcDir}/{dll}";
             string dllBytesPath = $"{hotfixAssembliesDstDir}/{dll}.bytes";
             System.IO.File.Copy(dllPath, dllBytesPath, true);
-            Debug.Log($"[CopyHotUpdateAssembliesToStreamingAssets] copy hotfix dll {dllPath} -> {dllBytesPath}");
+            Log.Info($"[CopyHotUpdateAssembliesToStreamingAssets] copy hotfix dll {dllPath} -> {dllBytesPath}");
         }
 #endif
     }

@@ -21,7 +21,7 @@ UnityProject/yoo/
 UnityProject/Temp/
 UnityProject/HybridCLRData/
 
-
 Build/
 
-/UnityProject/HybridCLRData
+.svn
+*.svn

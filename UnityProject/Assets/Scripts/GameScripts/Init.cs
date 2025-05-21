@@ -1,9 +1,12 @@
 using Cysharp.Threading.Tasks;
+using EF;
+using GameLogic;
 using HybridCLR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Schema;
 using UnityEngine;
 using YooAsset;
 
@@ -11,14 +14,23 @@ using YooAsset;
 
 public class Init : MonoBehaviour
 {
-    /// <summary>
-    /// 资源系统运行模式
-    /// </summary>
+    public GameObject Canvas;
+    public GameObject LoadingView;
 
     void Start()
     {
         DontDestroyOnLoad(this);
+        StartInit().Forget();
+    }
+
+    private async UniTaskVoid StartInit()
+    {
+        var UHub = transform.GetOrAddComponent<UHubComponent>();
+        UHub.BindUI(this, gameObject);
+        LoadingView.SetActive(true);
         InitYooAsset().Forget();
+        Destroy(LoadingView);
+
     }
 
     #region YooAsset初始化
@@ -35,19 +47,19 @@ public class Init : MonoBehaviour
         // 平台区分 修改 Platform
 
         if (!initResult) return;
-        Debug.Log("资源包初始化成功！");
+        Log.Info("资源包初始化成功！");
         // 1.获取资源版本
         bool requestResult = await RequestPackageVersion(packageName);
         if (!requestResult) return;
-        Debug.Log("资源包版本请求成功！");
+        Log.Info("资源包版本请求成功！");
         // 2.更新资源清单
         bool updateResult = await UpdatePackageManifest(packageName);
         if (!updateResult) return;
-        Debug.Log("资源包清单更新成功！");
+        Log.Info("资源包清单更新成功！");
         // 3. 资源包下载
         bool downloadResult = await DownLoad(packageName);
         if (!downloadResult) return;
-        Debug.Log("资源包下载成功！");
+        Log.Info("资源包下载成功！");
         // 4. 更新新的DLL
         await UpdateDLL(package);
         // 5. 加载DLL
@@ -66,7 +78,7 @@ public class Init : MonoBehaviour
         Type type = mainLogicAssembly.GetType("GameLogic.GameModule");
         if (type != null)
         {
-            Debug.Log($"找到类型：{type}");
+            Log.Info($"找到类型：{type}");
         }
         else
         {
@@ -119,13 +131,13 @@ public class Init : MonoBehaviour
     // 当开始下载某个文件
     private void OnDownloadFileBeginFunction(DownloadFileData data)
     {
-        Debug.Log($"开始下载文件：{data.FileName}");
+        Log.Info($"开始下载文件：{data.FileName}");
     }
 
     // 当下载进度发生变化
     private void OnDownloadUpdateFunction(DownloadUpdateData data)
     {
-        Debug.Log($"下载进度：{data.Progress}");
+        Log.Info($"下载进度：{data.Progress}");
     }
 
     // 当下载器发生错误
@@ -137,7 +149,7 @@ public class Init : MonoBehaviour
     // 当下载器结束（无论成功或失败）
     private void OnDownloadFinishFunction(DownloaderFinishData data)
     {
-        Debug.Log($"下载完成：{data.PackageName},下载是否成功：{data.Succeed}");
+        Log.Info($"下载完成：{data.PackageName},下载是否成功：{data.Succeed}");
     }
 
     private async UniTask<bool> UpdatePackageManifest(string packageName)
@@ -169,7 +181,7 @@ public class Init : MonoBehaviour
         {
             //更新成功
             GameDefine.PackageVersion = operation.PackageVersion;
-            Debug.Log($"Request package Version : {GameDefine.PackageVersion}");
+            Log.Info($"Request package Version : {GameDefine.PackageVersion}");
             return true;
         }
         else
@@ -211,7 +223,7 @@ public class Init : MonoBehaviour
 
         if (initOperation.Status == EOperationStatus.Succeed)
         {
-            Debug.Log("资源包初始化成功！");
+            Log.Info("资源包初始化成功！");
             return true;
         }
         else
@@ -233,7 +245,7 @@ public class Init : MonoBehaviour
 
         if (initOperation.Status == EOperationStatus.Succeed)
         {
-            Debug.Log("资源包初始化成功！");
+            Log.Info("资源包初始化成功！");
             return true;
         }
         else
@@ -246,7 +258,7 @@ public class Init : MonoBehaviour
     //联机模式
     public async UniTask<bool> InitPackageHostModel(ResourcePackage package)
     {
-        Debug.Log("资源包初始化HostPlayMode");
+        Log.Info("资源包初始化HostPlayMode");
         string defaultHostServer = GameDefine.DefaultHostServer;
         string fallbackHostServer = GameDefine.FallBackHostServer;
 
@@ -266,7 +278,7 @@ public class Init : MonoBehaviour
 
         if (initOperation.Status == EOperationStatus.Succeed)
         {
-            Debug.Log("资源包初始化成功！"); return true;
+            Log.Info("资源包初始化成功！"); return true;
         }
         else
         {
@@ -296,7 +308,7 @@ public class Init : MonoBehaviour
 
         if (initOperation.Status == EOperationStatus.Succeed)
         {
-            Debug.Log("资源包初始化成功！");
+            Log.Info("资源包初始化成功！");
             return true;
         }
         else
@@ -325,7 +337,7 @@ public class Init : MonoBehaviour
             await handle;
             var assetObj = handle.AssetObject as TextAsset;
             s_assetDatas[asset] = assetObj;
-            Debug.Log($"dll:{asset}   {assetObj == null}");
+            Log.Info($"dll:{asset}   {assetObj == null}");
         }
 
 
@@ -396,7 +408,7 @@ public class Init : MonoBehaviour
             byte[] dllBytes = ReadBytesFromStreamingAssets(aotDllName);
             // 加载assembly对应的dll，会自动为它hook。一旦aot泛型函数的native函数不存在，用解释器版本代码
             LoadImageErrorCode err = RuntimeApi.LoadMetadataForAOTAssembly(dllBytes, mode);
-            Debug.Log($"LoadMetadataForAOTAssembly:{aotDllName}. mode:{mode} ret:{err}");
+            Log.Info($"LoadMetadataForAOTAssembly:{aotDllName}. mode:{mode} ret:{err}");
         }
     }
 
@@ -419,7 +431,7 @@ public class Init : MonoBehaviour
         // #else
         //             _hotUpdateAss = System.AppDomain.CurrentDomain.GetAssemblies().First(a => a.GetName().Name == "HotUpdate");
         // #endif
-        // Debug.Log("运行热更代码");
+        // Log.Info("运行热更代码");
         // StartCoroutine(Run_InstantiateComponentByAsset());
 
         foreach (string hotUpdateDllName in GameDefine.Dlls)
@@ -431,7 +443,7 @@ public class Init : MonoBehaviour
             // _hotfixAssemblyList.Add(Assembly.Load(ReadBytesFromStreamingAssets($"{assetLocation}.dll")));
             _hotfixAssemblyList.Add(System.AppDomain.CurrentDomain.GetAssemblies().First(a => a.GetName().Name == assetLocation));
 #endif
-            Debug.Log($"加载热更dll：{hotUpdateDllName}");
+            Log.Info($"加载热更dll：{hotUpdateDllName}");
         }
 
     }

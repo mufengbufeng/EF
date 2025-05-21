@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EF;
 using UnityEditor;
 using UnityEngine;
 
@@ -18,7 +19,7 @@ public static class SyncAssemblyContent
         // 检查两个列表是否都为空，如果是，记录日志并返回。
         if (hotUpdateAssemblyFiles.Count == 0 && aotAssemblyNames.Count == 0)
         {
-            Debug.Log("HybridCLR.Editor.SettingsUtil 程序集列表值为空");
+            Log.Info("HybridCLR.Editor.SettingsUtil 程序集列表值为空");
             return;
         }
 
@@ -42,7 +43,7 @@ public static class SyncAssemblyContent
             }
         }
 
-        Debug.Log($"AOT COUNT {aotAssemblyNames.Count}");
+        Log.Info($"AOT COUNT {aotAssemblyNames.Count}");
         if (aotAssemblyNames.Count > 0)
         {
             SyncAssemblyContent.AOTMetaAssemblies.Clear();

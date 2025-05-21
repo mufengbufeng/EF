@@ -1,10 +1,6 @@
 using Cysharp.Threading.Tasks;
-using GameProto;
 using EF;
-using JetBrains.Annotations;
-using UnityEngine;
-using UnityEngine.PlayerLoop;
-using System.CodeDom;
+using UnityEngine.SceneManagement;
 
 
 namespace GameLogic
@@ -14,7 +10,10 @@ namespace GameLogic
         public static ResourceModule Resource;
         public static EventModule Event;
         public static UIManager UI;
+        public static FSMManager FSM;
         public static SceneModule Scene;
+        public static GameConfig.Tables Data;
+
         public static void Run()
         {
             Init();
@@ -22,28 +21,36 @@ namespace GameLogic
 
         public static void Init()
         {
+            FSM = FSMManager.Instance;
             Resource = ResourceModule.Instance;
             Event = EventModule.Instance;
             UI = UIManager.Instance;
             Scene = SceneModule.Instance;
+            Data = ConfigSystem.Instance.Tables;
+
             Start();
         }
-
         public static void Start()
         {
-            GameModule.Event.Add(1, (obj) =>
+            GameModel.Instance.InitGame();
+            // GamePlayController.Instance.StartGame();
+            StartGameCommon().Forget();
+        }
+
+        public static async UniTaskVoid StartGameCommon()
+        {
+            Scene scene = await GameModule.Scene.LoadSceneAsync("Game");
+            UI.OpenUI<MainView>("MainView", UILayer.Normal);
+            UnityEngine.GameObject[] objs = scene.GetRootGameObjects();
+            GameSceneEntity entity = null;
+            foreach (var obj in objs)
             {
-                NULL.TestLog("1111");
-            });
-
-            Resource.LoadGameObjectAsync("Cube").Forget();
-            var testView = UI.OpenUI<TestView>("TestView", UILayer.Normal, 0, 1);
-
-            var sceneobj = Scene.LoadScene("TestScene");
-
-            NULL.TestLog("2222");
-
-            GameModule.Event.Trigger(1);
+                if (obj.name == "Root")
+                {
+                    entity = obj.AddComponent<GameSceneEntity>();
+                }
+            }
+            entity.Init(GameState.Home).Forget();
         }
 
 
