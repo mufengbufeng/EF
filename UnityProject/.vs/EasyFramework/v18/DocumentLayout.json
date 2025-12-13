@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\UnityGame\\Self\\EasyFramework\\UnityProject\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{34F7BDE9-1426-0529-2783-1FCB911DE1F0}|EF.Runtime.csproj|d:\\unitygame\\self\\easyframework\\unityproject\\assets\\ef\\efruntime\\frifloecs\\frifloecsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34F7BDE9-1426-0529-2783-1FCB911DE1F0}|EF.Runtime.csproj|solutionrelative:assets\\ef\\efruntime\\frifloecs\\frifloecsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34F7BDE9-1426-0529-2783-1FCB911DE1F0}|EF.Runtime.csproj|d:\\unitygame\\self\\easyframework\\unityproject\\assets\\ef\\efruntime\\frifloecs\\ifrifloecsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34F7BDE9-1426-0529-2783-1FCB911DE1F0}|EF.Runtime.csproj|solutionrelative:assets\\ef\\efruntime\\frifloecs\\ifrifloecsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{625FA53D-F2F6-2709-6FF2-D11D375B3791}|GameLogic.csproj|d:\\unitygame\\self\\easyframework\\unityproject\\assets\\gamescripts\\hotfix\\gamelogic\\gamelogicentry.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{625FA53D-F2F6-2709-6FF2-D11D375B3791}|GameLogic.csproj|solutionrelative:assets\\gamescripts\\hotfix\\gamelogic\\gamelogicentry.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "FrifloEcsManager.cs",
+              "DocumentMoniker": "D:\\UnityGame\\Self\\EasyFramework\\UnityProject\\Assets\\EF\\EFRuntime\\FrifloEcs\\FrifloEcsManager.cs",
+              "RelativeDocumentMoniker": "Assets\\EF\\EFRuntime\\FrifloEcs\\FrifloEcsManager.cs",
+              "ToolTip": "D:\\UnityGame\\Self\\EasyFramework\\UnityProject\\Assets\\EF\\EFRuntime\\FrifloEcs\\FrifloEcsManager.cs",
+              "RelativeToolTip": "Assets\\EF\\EFRuntime\\FrifloEcs\\FrifloEcsManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-23T09:54:54.757Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "IFrifloEcsManager.cs",
+              "DocumentMoniker": "D:\\UnityGame\\Self\\EasyFramework\\UnityProject\\Assets\\EF\\EFRuntime\\FrifloEcs\\IFrifloEcsManager.cs",
+              "RelativeDocumentMoniker": "Assets\\EF\\EFRuntime\\FrifloEcs\\IFrifloEcsManager.cs",
+              "ToolTip": "D:\\UnityGame\\Self\\EasyFramework\\UnityProject\\Assets\\EF\\EFRuntime\\FrifloEcs\\IFrifloEcsManager.cs",
+              "RelativeToolTip": "Assets\\EF\\EFRuntime\\FrifloEcs\\IFrifloEcsManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEEAAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-23T09:32:27.94Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "GameLogicEntry.cs",
+              "DocumentMoniker": "D:\\UnityGame\\Self\\EasyFramework\\UnityProject\\Assets\\GameScripts\\HotFix\\GameLogic\\GameLogicEntry.cs",
+              "RelativeDocumentMoniker": "Assets\\GameScripts\\HotFix\\GameLogic\\GameLogicEntry.cs",
+              "ToolTip": "D:\\UnityGame\\Self\\EasyFramework\\UnityProject\\Assets\\GameScripts\\HotFix\\GameLogic\\GameLogicEntry.cs",
+              "RelativeToolTip": "Assets\\GameScripts\\HotFix\\GameLogic\\GameLogicEntry.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-23T09:25:36.628Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
