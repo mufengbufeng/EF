@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(openspec list:*)",
+      "Bash(openspec validate:*)",
+      "mcp__mcp-router__list_directory",
+      "mcp__mcp-router__list_allowed_directories",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(openspec archive add-component-binding:*)",
+      "Bash(openspec archive add-entity-module:*)",
+      "Bash(dotnet build:*)",
+      "Bash(openspec show:*)",
+      "Bash(openspec archive rename-model-tview-to-tdata:*)",
+      "Bash(dir:*)",
+      "mcp__mcp-router__directory_tree",
+      "Bash(Get-ChildItem -Path \"D:\\UnityGame\\Self\\EasyFramework\\UnityProject\\Assets\\EF\\EFRuntime\\Procedure\" -Recurse)",
+      "Bash(findstr:*)",
+      "Bash(ls:*)"
+    ]
+  }
+}

@@ -60,7 +60,7 @@ namespace EF.Fsm
                 throw new InvalidOperationException($"已存在宿主 {typeof(TOwner).FullName}，名称 {key.Name} 的状态机。");
             }
 
-            Fsm<TOwner> fsm = new(key.Name, owner, stateList);
+            Fsm<TOwner> fsm = new Fsm<TOwner>(key.Name, owner, stateList);
             _fsms.Add(key, fsm);
             return fsm;
         }

@@ -42,15 +42,48 @@
     <UnityVersion>6000.2.6f2</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Analyzer Include="C:\Users\mfbf\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.2.0\Analyzers\Microsoft.Unity.Analyzers.dll" />
+    <Analyzer Include="C:\Users\mfbf\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.2.1\Analyzers\Microsoft.Unity.Analyzers.dll" />
     <Analyzer Include="D:\DocApp\UnityEditor\6000.2.6f2\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="D:\DocApp\UnityEditor\6000.2.6f2\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
     <Analyzer Include="D:\DocApp\UnityEditor\6000.2.6f2\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
+    <Analyzer Include="D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\AspectGenerator.dll" />
+    <Analyzer Include="D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\JobEntityGenerator.dll" />
+    <Analyzer Include="D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\SystemGenerator.dll" />
+    <Analyzer Include="D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\Unity.Entities.Analyzer.dll" />
+    <Analyzer Include="D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\SystemGenerator.LambdaJobs.dll" />
+    <Analyzer Include="D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\SystemGenerator.SystemAPI.QueryBuilder.dll" />
+    <Analyzer Include="D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\SystemGenerator.SystemAPI.dll" />
+    <Analyzer Include="D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\SystemGenerator.SystemAPI.Query.dll" />
+    <Analyzer Include="D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\SystemGenerator.Common.dll" />
+    <Analyzer Include="D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\Common.dll" />
+    <Analyzer Include="D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\SystemGenerator.EntityQueryBulkOperations.dll" />
+    <Analyzer Include="D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\Unity.Entities.Analyzer.CodeFixes.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\GameScripts\HotFix\GameLogic\EntryController.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Procedure\Main\SplashProcedure.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Scene\GameSceneManager.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Background\GameBackgroundModule.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\GameLifetimeScope.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Define\GameSceneEventDefine.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Enum\EGameEvent.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Model\GamePlayModel.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Enemy\GameEnemyModule.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Background\IGameBackgroundModule.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Main\MainController.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Procedure\Main\LoginProcedure.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Procedure\Main\InitProcedure.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Procedure\Main\MainMenuProcedure.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Main\MainView.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Entry\EntryController.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Enum\ModuleScope.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GameLogicEntry.cs" />
-    <Compile Include="Assets\GameScripts\HotFix\GameLogic\EntryView.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Procedure\GamePlay\GamePlayProcedure.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Entry\EntryView.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Scene\GameSceneEvents.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Scene\IGameSceneManager.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\GameScope.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Main\MainModel.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Enemy\IGameEnemyModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\GameScripts\HotFix\GameLogic\GameLogic.asmdef" />
@@ -600,10 +633,6 @@
       <HintPath>Library\PackageCache\com.unity.collab-proxy@ab839cc7d2ad\Lib\Editor\unityplastic.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Friflo.Json.Fliox">
-      <HintPath>Assets\Plugins\Friflo\Friflo.Json.Fliox.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System.IO.Hashing">
       <HintPath>Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.IO.Hashing\System.IO.Hashing.dll</HintPath>
       <Private>False</Private>
@@ -620,10 +649,6 @@
       <HintPath>Library\PackageCache\com.unity.visualscripting@191c0d7e3b69\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Friflo.Json.Fliox.Annotation">
-      <HintPath>Assets\Plugins\Friflo\Friflo.Json.Fliox.Annotation.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="LZ4">
       <HintPath>Library\PackageCache\com.code-philosophy.hybridclr@01754c8fb47b\Plugins\LZ4.dll</HintPath>
       <Private>False</Private>
@@ -638,14 +663,6 @@
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe">
       <HintPath>Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Friflo.Engine.ECS">
-      <HintPath>Assets\Plugins\Friflo\Friflo.Engine.ECS.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Friflo.Json.Burst">
-      <HintPath>Assets\Plugins\Friflo\Friflo.Json.Burst.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Android.Types">
@@ -1170,6 +1187,10 @@
     </Reference>
     <Reference Include="YooAsset">
       <HintPath>Library\ScriptAssemblies\YooAsset.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="VContainer">
+      <HintPath>Library\ScriptAssemblies\VContainer.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.UI">

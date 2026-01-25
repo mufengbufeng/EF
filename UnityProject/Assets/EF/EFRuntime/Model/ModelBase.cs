@@ -179,37 +179,37 @@ namespace EF.Model
     }
 
     /// <summary>
-    /// 泛型模型基类，负责创建和维护只读视图。
+    /// 泛型模型基类，负责创建和维护只读数据接口。
     /// </summary>
-    /// <typeparam name="TView">只读视图接口或类型。</typeparam>
-    public abstract class ModelBase<TView> : ModelBase where TView : class
+    /// <typeparam name="TData">只读数据接口或类型。</typeparam>
+    public abstract class ModelBase<TData> : ModelBase where TData : class
     {
-        private TView _view;
+        private TData _data;
 
         protected internal override Type GetViewType()
         {
-            return typeof(TView);
+            return typeof(TData);
         }
 
         protected internal sealed override object GetViewInstance()
         {
-            if (_view == null)
+            if (_data == null)
             {
-                throw new InvalidOperationException($"模型 {GetType().FullName} 尚未完成初始化，无法获取视图 {typeof(TView).FullName}。");
+                throw new InvalidOperationException($"模型 {GetType().FullName} 尚未完成初始化，无法获取数据 {typeof(TData).FullName}。");
             }
 
-            return _view;
+            return _data;
         }
 
         /// <summary>
-        /// 获取只读视图实例，供子类访问。
+        /// 获取只读数据接口实例，供子类访问。
         /// </summary>
-        protected TView View => (TView)GetViewInstance();
+        protected TData Data => (TData)GetViewInstance();
 
         /// <inheritdoc />
         protected sealed override void OnInitialize()
         {
-            _view = CreateView() ?? throw new InvalidOperationException($"模型 {GetType().FullName} 未能创建视图 {typeof(TView).FullName}。");
+            _data = CreateData() ?? throw new InvalidOperationException($"模型 {GetType().FullName} 未能创建数据 {typeof(TData).FullName}。");
             OnModelInitialized();
         }
 
@@ -217,7 +217,7 @@ namespace EF.Model
         protected sealed override void OnShutdown()
         {
             OnModelReleased();
-            _view = null;
+            _data = null;
         }
 
         /// <summary>
@@ -235,9 +235,9 @@ namespace EF.Model
         }
 
         /// <summary>
-        /// 创建只读视图实例，必须返回非空对象。
+        /// 创建只读数据接口实例，必须返回非空对象。
         /// </summary>
-        protected abstract TView CreateView();
+        protected abstract TData CreateData();
     }
 
     internal interface IModelInternal

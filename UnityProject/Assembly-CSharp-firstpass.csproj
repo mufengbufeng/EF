@@ -42,7 +42,7 @@
     <UnityVersion>6000.2.6f2</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Analyzer Include="C:\Users\mfbf\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.2.0\Analyzers\Microsoft.Unity.Analyzers.dll" />
+    <Analyzer Include="C:\Users\mfbf\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.2.1\Analyzers\Microsoft.Unity.Analyzers.dll" />
     <Analyzer Include="D:\DocApp\UnityEditor\6000.2.6f2\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="D:\DocApp\UnityEditor\6000.2.6f2\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
     <Analyzer Include="D:\DocApp\UnityEditor\6000.2.6f2\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
@@ -70,17 +70,9 @@
     <Compile Include="Assets\Plugins\Demigiant\DOTween\Modules\DOTweenModuleEPOOutline.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Plugins\Friflo\Friflo.Json.Fliox.Annotation.xml" />
-    <None Include="Assets\Plugins\Friflo\Friflo.Json.Fliox.xml" />
     <None Include="Assets\Plugins\Demigiant\DOTween\DOTween.XML" />
-    <None Include="Assets\Plugins\Friflo\Friflo.Engine.ECS.xml" />
-    <None Include="Assets\Plugins\Friflo\Friflo.Json.Fliox.dll" />
     <None Include="Assets\Plugins\Demigiant\DOTween\DOTween.dll" />
-    <None Include="Assets\Plugins\Friflo\Friflo.Json.Fliox.Annotation.dll" />
-    <None Include="Assets\Plugins\Friflo\Friflo.Json.Burst.xml" />
     <None Include="Assets\Plugins\Demigiant\DOTween\readme.txt" />
-    <None Include="Assets\Plugins\Friflo\Friflo.Engine.ECS.dll" />
-    <None Include="Assets\Plugins\Friflo\Friflo.Json.Burst.dll" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -583,10 +575,6 @@
       <HintPath>Library\PackageCache\com.unity.testtools.codecoverage@205a02cbcb39\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Friflo.Json.Fliox">
-      <HintPath>Assets\Plugins\Friflo\Friflo.Json.Fliox.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System.IO.Hashing">
       <HintPath>Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.IO.Hashing\System.IO.Hashing.dll</HintPath>
       <Private>False</Private>
@@ -603,10 +591,6 @@
       <HintPath>Library\PackageCache\com.unity.visualscripting@191c0d7e3b69\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Friflo.Json.Fliox.Annotation">
-      <HintPath>Assets\Plugins\Friflo\Friflo.Json.Fliox.Annotation.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="LZ4">
       <HintPath>Library\PackageCache\com.code-philosophy.hybridclr@01754c8fb47b\Plugins\LZ4.dll</HintPath>
       <Private>False</Private>
@@ -617,14 +601,6 @@
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe">
       <HintPath>Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Friflo.Engine.ECS">
-      <HintPath>Assets\Plugins\Friflo\Friflo.Engine.ECS.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Friflo.Json.Burst">
-      <HintPath>Assets\Plugins\Friflo\Friflo.Json.Burst.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Android.Types">
@@ -1331,6 +1307,10 @@
       <HintPath>Library\ScriptAssemblies\UniTask.Linq.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="VContainer">
+      <HintPath>Library\ScriptAssemblies\VContainer.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.2D.Sprite.AIIntegration.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.AIIntegration.Editor.dll</HintPath>
       <Private>False</Private>
@@ -1425,6 +1405,10 @@
     </Reference>
     <Reference Include="Unity.Mathematics.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Mathematics.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="VContainer.Editor">
+      <HintPath>Library\ScriptAssemblies\VContainer.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Entities.UI.Editor">

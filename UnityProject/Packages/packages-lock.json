@@ -22,7 +22,7 @@
       "hash": "64285ae060c9fe2aeb2a73b076b160939ce3be1a"
     },
     "com.tuyoogame.yooasset": {
-      "version": "2.3.17",
+      "version": "2.3.18",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -403,7 +403,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.timeline": {
-      "version": "1.8.9",
+      "version": "1.8.10",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -432,6 +432,13 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
+    },
+    "jp.hadashikick.vcontainer": {
+      "version": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.17.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "177dbda557fd652ce7f5d1647a3621653e094373"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

@@ -5,12 +5,13 @@ using System.Reflection;
 using Cysharp.Threading.Tasks;
 using EF.Common;
 using EF.Debugger;
+using EF.Entity;
 using EF.Event;
-using EF.FrifloEcs;
 using EF.Fsm;
 using EF.HotFix;
 using EF.Model;
 using EF.ObjectPool;
+using EF.Procedure;
 using EF.Resource;
 using EF.Save;
 using EF.Sound;
@@ -28,11 +29,13 @@ public class GameEntry : MonoBehaviour
     private IResourceManager _resourceManager;
     private ModelManager _modelManager;
     private HotFixConfig _hotFixConfig;
+    private IEntityManager _entityManager;
+    private bool _moduleSystemUpdateEnabled;
 
     private void Awake()
     {
         // DontDestroyOnLoad(this);
-        
+
         // 1. 先注册资源管理器（其他管理器可能依赖它）
         ModuleSystem.Register<IResourceManager>(new ResourceManager());
         _resourceManager = ModuleSystem.Get<IResourceManager>();
@@ -42,8 +45,8 @@ public class GameEntry : MonoBehaviour
         ModuleSystem.Register<ITimerManager>(new TimerManager());
         ModuleSystem.Register<IObjectPoolManager>(new ObjectPoolManager());
         ModuleSystem.Register<IFsmManager>(new FsmManager());
+        ModuleSystem.Register<IProcedureManager>(new ProcedureManager());
         ModuleSystem.Register<ISaveManager>(new SaveManager());
-        ModuleSystem.Register<IFrifloEcsManager>(new FrifloEcsManager());
         ModuleSystem.Register(new ModelManager());
         // 3. 注册 ModelManager（UIManager 依赖它）
         _modelManager = ModuleSystem.Get<ModelManager>();
@@ -51,6 +54,14 @@ public class GameEntry : MonoBehaviour
         // 4. 注册需要 ResourceManager 和 ModelManager 的管理器
         ModuleSystem.Register<IUIManager>(new UIManager(_resourceManager, _modelManager));
         ModuleSystem.Register<ISoundManager>(new SoundManager(_resourceManager));
+
+        // 5. 注册 EntityManager（依赖 ObjectPoolManager 和 ResourceManager）
+        var entityManager = new EntityManager();
+        entityManager.SetObjectPoolManager(ModuleSystem.Get<IObjectPoolManager>());
+        entityManager.SetResourceManager(_resourceManager);
+        entityManager.SetEntityHelper(new DefaultEntityHelper());
+        ModuleSystem.Register<IEntityManager>(entityManager);
+        _entityManager = entityManager;
 
         Log.Info("[GameEntry] EF 框架管理器注册完成。");
 
@@ -66,7 +77,20 @@ public class GameEntry : MonoBehaviour
         LoadHotUpdateAssemblies();
         InvokeHotfixEntry();
 
+        // 热更入口初始化完成后，才开始驱动 ModuleSystem.Update，避免未初始化状态下的误更新。
+        _moduleSystemUpdateEnabled = true;
+
         Log.Info("[GameEntry] 热更初始化流程完成。");
+    }
+
+    private void Update()
+    {
+        if (!_moduleSystemUpdateEnabled)
+        {
+            return;
+        }
+
+        ModuleSystem.Update(Time.deltaTime, Time.unscaledDeltaTime);
     }
 
     private void LoadHotfixConfig()
@@ -136,7 +160,7 @@ public class GameEntry : MonoBehaviour
 
     private void InvokeHotfixEntry()
     {
-        const string entryTypeName = "GameLogicEntry";
+        const string entryTypeName = "GameLogic.GameLogicEntry";
         const string entryMethodName = "Init";
 
         foreach (Assembly assembly in _loadedHotfixAssemblies)

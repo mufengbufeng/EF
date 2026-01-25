@@ -41,42 +41,51 @@ namespace EF.Model
                 throw new ArgumentNullException(nameof(model));
             }
 
-            IModelInternal internalModel = model;
-
             lock (_syncRoot)
             {
-                Type concreteType = model.GetType();
-                if (_models.ContainsKey(concreteType))
-                {
-                    throw new InvalidOperationException($"模型 {concreteType.FullName} 已经注册，不能重复注册。");
-                }
-
-                Type viewType = internalModel.ViewType ?? throw new InvalidOperationException($"模型 {concreteType.FullName} 未提供有效的视图类型。");
-                if (_viewToModel.ContainsKey(viewType))
-                {
-                    throw new InvalidOperationException($"视图类型 {viewType.FullName} 已被模型 {_viewToModel[viewType].FullName} 占用。");
-                }
-
-                internalModel.Initialize(this);
-                object viewInstance = internalModel.ViewInstance ?? throw new InvalidOperationException($"模型 {concreteType.FullName} 无法创建视图实例。");
-
-                _models.Add(concreteType, internalModel);
-                _viewToModel.Add(viewType, concreteType);
-                _updateOrder.Add(internalModel);
+                return RegisterInternal(model);
             }
+        }
+
+        /// <summary>
+        /// 内部注册逻辑，调用者必须持有 _syncRoot 锁。
+        /// </summary>
+        private TModel RegisterInternal<TModel>(TModel model)
+            where TModel : ModelBase
+        {
+            IModelInternal internalModel = model;
+
+            Type concreteType = model.GetType();
+            if (_models.ContainsKey(concreteType))
+            {
+                throw new InvalidOperationException($"模型 {concreteType.FullName} 已经注册，不能重复注册。");
+            }
+
+            Type viewType = internalModel.ViewType ?? throw new InvalidOperationException($"模型 {concreteType.FullName} 未提供有效的视图类型。");
+            if (_viewToModel.ContainsKey(viewType))
+            {
+                throw new InvalidOperationException($"视图类型 {viewType.FullName} 已被模型 {_viewToModel[viewType].FullName} 占用。");
+            }
+
+            internalModel.Initialize(this);
+            object viewInstance = internalModel.ViewInstance ?? throw new InvalidOperationException($"模型 {concreteType.FullName} 无法创建视图实例。");
+
+            _models.Add(concreteType, internalModel);
+            _viewToModel.Add(viewType, concreteType);
+            _updateOrder.Add(internalModel);
 
             return model;
         }
 
         /// <summary>
-        /// 注册一个模型实例并返回对应视图。
+        /// 注册一个模型实例并返回对应数据接口。
         /// </summary>
-        public TView Register<TModel, TView>(TModel model)
-            where TModel : ModelBase<TView>
-            where TView : class
+        public TData Register<TModel, TData>(TModel model)
+            where TModel : ModelBase<TData>
+            where TData : class
         {
             Register(model);
-            return (TView)((IModelInternal)model).ViewInstance;
+            return (TData)((IModelInternal)model).ViewInstance;
         }
 
         /// <summary>
@@ -89,14 +98,14 @@ namespace EF.Model
         }
 
         /// <summary>
-        /// 通过类型自动创建并注册模型，并返回对应视图。
+        /// 通过类型自动创建并注册模型，并返回对应数据接口。
         /// </summary>
-        public TView Register<TModel, TView>()
-            where TModel : ModelBase<TView>, new()
-            where TView : class
+        public TData Register<TModel, TData>()
+            where TModel : ModelBase<TData>, new()
+            where TData : class
         {
             TModel model = Register(new TModel());
-            return (TView)((IModelInternal)model).ViewInstance;
+            return (TData)((IModelInternal)model).ViewInstance;
         }
 
         /// <summary>
@@ -137,28 +146,28 @@ namespace EF.Model
         }
 
         /// <summary>
-        /// 根据视图类型注销模型。
+        /// 根据数据接口类型注销模型。
         /// </summary>
-        public bool UnregisterByView<TView>() where TView : class
+        public bool UnregisterByData<TData>() where TData : class
         {
-            return UnregisterByView(typeof(TView));
+            return UnregisterByData(typeof(TData));
         }
 
         /// <summary>
-        /// 根据视图类型注销模型。
+        /// 根据数据接口类型注销模型。
         /// </summary>
-        public bool UnregisterByView(Type viewType)
+        public bool UnregisterByData(Type dataType)
         {
-            if (viewType == null)
+            if (dataType == null)
             {
-                throw new ArgumentNullException(nameof(viewType));
+                throw new ArgumentNullException(nameof(dataType));
             }
 
             Type modelType;
 
             lock (_syncRoot)
             {
-                if (!_viewToModel.TryGetValue(viewType, out modelType))
+                if (!_viewToModel.TryGetValue(dataType, out modelType))
                 {
                     return false;
                 }
@@ -169,64 +178,167 @@ namespace EF.Model
 
         /// <summary>
         /// 获取某个模型实例。
+        /// 如果模型未注册将抛出异常。
         /// </summary>
         public TModel GetModel<TModel>() where TModel : ModelBase
-        {
-            if (TryGetModel(out TModel model))
-            {
-                return model;
-            }
-
-            throw new KeyNotFoundException($"模型 {typeof(TModel).FullName} 尚未注册。");
-        }
-
-        /// <summary>
-        /// 获取只读视图。
-        /// </summary>
-        public TView Get<TView>() where TView : class
-        {
-            if (TryGet(out TView view))
-            {
-                return view;
-            }
-
-            throw new KeyNotFoundException($"视图 {typeof(TView).FullName} 尚未注册。");
-        }
-
-        /// <summary>
-        /// 尝试获取模型实例。
-        /// </summary>
-        public bool TryGetModel<TModel>(out TModel model) where TModel : ModelBase
         {
             lock (_syncRoot)
             {
                 if (_models.TryGetValue(typeof(TModel), out IModelInternal internalModel))
                 {
-                    model = (TModel)internalModel;
+                    return (TModel)internalModel;
+                }
+            }
+
+            throw new KeyNotFoundException($"模型 {typeof(TModel).FullName} 尚未注册。");
+        }
+
+
+
+        /// <summary>
+        /// 获取只读数据接口。
+        /// </summary>
+        public TData Get<TData>() where TData : class
+        {
+            if (TryGet(out TData data))
+            {
+                return data;
+            }
+
+            throw new KeyNotFoundException($"数据接口 {typeof(TData).FullName} 尚未注册。");
+        }
+
+        /// <summary>
+        /// 尝试获取模型实例，如果未注册则自动创建并注册。
+        /// 该方法保证返回非空实例。
+        /// </summary>
+        /// <typeparam name="TModel">模型类型，必须有无参构造函数。</typeparam>
+        /// <returns>模型实例（保证非空）。</returns>
+        public TModel TryGetModel<TModel>() where TModel : ModelBase, new()
+        {
+            lock (_syncRoot)
+            {
+                // 先尝试获取现有实例
+                if (_models.TryGetValue(typeof(TModel), out IModelInternal existing))
+                {
+                    return (TModel)existing;
+                }
+
+                // 不存在则在锁内创建并注册
+                return RegisterInternal(new TModel());
+            }
+        }
+
+        /// <summary>
+        /// 尝试获取模型实例，仅执行查找不自动创建。
+        /// 如果模型未注册则返回 null。
+        /// </summary>
+        /// <param name="modelType">模型类型。</param>
+        /// <returns>模型实例，如果未注册则返回 null。</returns>
+        public ModelBase TryGetModel(Type modelType)
+        {
+            if (modelType == null)
+            {
+                throw new ArgumentNullException(nameof(modelType));
+            }
+
+            lock (_syncRoot)
+            {
+                if (_models.TryGetValue(modelType, out IModelInternal internalModel))
+                {
+                    return (ModelBase)internalModel;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 尝试获取只读数据接口。
+        /// </summary>
+        public bool TryGet<TData>(out TData data) where TData : class
+        {
+            if (TryGet(typeof(TData), out object dataInstance))
+            {
+                data = (TData)dataInstance;
+                return true;
+            }
+
+            data = null;
+            return false;
+        }
+
+        /// <summary>
+        /// 尝试获取只读数据接口。
+        /// </summary>
+        public bool TryGet(Type dataType, out object data)
+        {
+            if (dataType == null)
+            {
+                throw new ArgumentNullException(nameof(dataType));
+            }
+
+            lock (_syncRoot)
+            {
+                if (_viewToModel.TryGetValue(dataType, out Type modelType) &&
+                    _models.TryGetValue(modelType, out IModelInternal model))
+                {
+                    data = model.ViewInstance;
+                    return true;
+                }
+            }
+
+            data = null;
+            return false;
+        }
+
+        /// <summary>
+        /// 尝试获取只读数据接口，若未注册则返回 null。
+        /// </summary>
+        public TData TryGet<TData>() where TData : class
+        {
+            TryGet(out TData data);
+            return data;
+        }
+
+        /// <summary>
+        /// 尝试获取只读数据接口，若未注册则返回 null。
+        /// </summary>
+        public object TryGet(Type dataType)
+        {
+            TryGet(dataType, out object data);
+            return data;
+        }
+
+        /// <summary>
+        /// 尝试通过数据接口类型获取模型实例。
+        /// </summary>
+        public bool TryGetModelByData<TData>(out ModelBase model) where TData : class
+        {
+            return TryGetModelByData(typeof(TData), out model);
+        }
+
+        /// <summary>
+        /// 尝试通过数据接口类型获取模型实例。
+        /// </summary>
+        public bool TryGetModelByData(Type dataType, out ModelBase model)
+        {
+            if (dataType == null)
+            {
+                throw new ArgumentNullException(nameof(dataType));
+            }
+
+            lock (_syncRoot)
+            {
+                if (_viewToModel.TryGetValue(dataType, out Type modelType) &&
+                    _models.TryGetValue(modelType, out IModelInternal internalModel))
+                {
+                    model = (ModelBase)internalModel;
                     return true;
                 }
             }
 
             model = null;
-            return false;
-        }
-
-        /// <summary>
-        /// 尝试获取只读视图。
-        /// </summary>
-        public bool TryGet<TView>(out TView view) where TView : class
-        {
-            lock (_syncRoot)
-            {
-                if (_viewToModel.TryGetValue(typeof(TView), out Type modelType) &&
-                    _models.TryGetValue(modelType, out IModelInternal model))
-                {
-                    view = (TView)model.ViewInstance;
-                    return true;
-                }
-            }
-
-            view = null;
             return false;
         }
 

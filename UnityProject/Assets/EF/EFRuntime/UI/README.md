@@ -34,8 +34,8 @@
 
 | 层级 | 组件 | 职责 | 可访问 |
 |------|------|------|--------|
-| **Model** | `ModelBase<TView>` | 数据存储和业务逻辑 | 无 UI 层引用 |
-| **View** | `UIView` | UI 展示和用户交互 | ModelManager 只读视图 |
+| **Model** | `ModelBase<TData>` | 数据存储和业务逻辑 | 无 UI 层引用 |
+| **View** | `UIView` | UI 展示和用户交互 | ModelManager 只读数据接口 |
 | **Controller** | `UIController` | 协调 Model 和 View | ModelManager 完整 Model + View |
 
 ### 数据流
@@ -59,12 +59,12 @@ UI 更新
 ```
 ModelManager (全局数据管理)
     │
-    ├── ModelBase<TView> (数据层)
-    │       └── TView (只读视图接口)
+    ├── ModelBase<TData> (数据层)
+    │       └── TData (只读数据接口)
     │
 UIManager (UI 管理)
     │
-    ├── UIView (通过 ModelManager.Get<TView>() 获取只读数据)
+    ├── UIView (通过 ModelManager.Get<TData>() 获取只读数据)
     │
     └── UIController (通过 ModelManager.GetModel<T>() 获取完整 Model)
 ```
@@ -104,14 +104,14 @@ public abstract class UIController : IDisposable
 
 ### UIView
 
-所有 UI 视图的基类（MonoBehaviour），只能通过 ModelManager 获取只读数据视图。
+所有 UI 视图的基类（MonoBehaviour），只能通过 ModelManager 获取只读数据接口。
 
 ```csharp
 public abstract class UIView : MonoBehaviour
 {
-    // 通过 ModelManager 获取只读数据视图
-    protected TView GetModelView<TView>() where TView : class;
-    protected bool TryGetModelView<TView>(out TView view) where TView : class;
+    // 通过 ModelManager 获取只读数据接口
+    protected TData GetModelData<TData>() where TData : class;
+    protected bool TryGetModelData<TData>(out TData data) where TData : class;
     
     // 访问运行时上下文
     protected UIRuntimeContext Context { get; }
@@ -226,13 +226,13 @@ UIBindingCollection 收到通知
 #### 1. Model 定义（自动触发通知）
 
 ```csharp
-public interface IPlayerView
+public interface IPlayerData
 {
     int Gold { get; }
     int Level { get; }
 }
 
-public class PlayerModel : ModelBase<IPlayerView>, IPlayerView
+public class PlayerModel : ModelBase<IPlayerData>, IPlayerData
 {
     private readonly ModelValue<int> _gold;
     private readonly ModelValue<int> _level;
@@ -246,7 +246,7 @@ public class PlayerModel : ModelBase<IPlayerView>, IPlayerView
         _level = CreateValue(1);
     }
 
-    protected override IPlayerView CreateView() => this;
+    protected override IPlayerData CreateData() => this;
 
     // SetValue 会自动触发 PropertyChanged("Gold")
     public void AddGold(int amount) => SetValue(_gold, Gold + amount);
@@ -300,7 +300,7 @@ public class PlayerInfoController : UIController
 如果需要手动触发属性变更通知（例如计算属性），可以使用 `RaisePropertyChanged`：
 
 ```csharp
-public class PlayerModel : ModelBase<IPlayerView>, IPlayerView
+public class PlayerModel : ModelBase<IPlayerData>, IPlayerData
 {
     public int TotalPower => Attack + Defense;  // 计算属性
 
@@ -329,8 +329,8 @@ public class PlayerModel : ModelBase<IPlayerView>, IPlayerView
 ```csharp
 using EF.Model;
 
-// 定义只读视图接口
-public interface IPlayerView
+// 定义只读数据接口
+public interface IPlayerData
 {
     string Name { get; }
     int Level { get; }
@@ -338,7 +338,7 @@ public interface IPlayerView
 }
 
 // 实现 Model
-public class PlayerModel : ModelBase<IPlayerView>, IPlayerView
+public class PlayerModel : ModelBase<IPlayerData>, IPlayerData
 {
     private readonly ModelValue<string> _name;
     private readonly ModelValue<int> _level;
@@ -355,7 +355,7 @@ public class PlayerModel : ModelBase<IPlayerView>, IPlayerView
         _gold = CreateValue(0);
     }
     
-    protected override IPlayerView CreateView() => this;
+    protected override IPlayerData CreateData() => this;
     
     // 修改数据的方法（只有 Controller 可以调用）
     public void SetName(string name) => SetValue(_name, name);
@@ -423,17 +423,17 @@ public class MainMenuView : UIView
     
     protected override void OnBindings()
     {
-        // 获取只读视图并绑定
-        var playerView = GetModelView<IPlayerView>();
-        
+        // 获取只读数据接口并绑定
+        var playerData = GetModelData<IPlayerData>();
+
         // 如果 Model 实现了 INotifyPropertyChanged，可以使用数据绑定
         // 否则在 OnRefresh 中手动更新
     }
-    
+
     protected override void OnRefresh(object userData)
     {
         // 刷新 UI 显示
-        if (TryGetModelView<IPlayerView>(out var player))
+        if (TryGetModelData<IPlayerData>(out var player))
         {
             playerNameText.text = player.Name;
             levelText.text = $"Lv.{player.Level}";
@@ -645,7 +645,7 @@ public class ShopView : UIView
     
     public void RefreshGoldDisplay()
     {
-        if (TryGetModelView<IPlayerView>(out var player))
+        if (TryGetModelData<IPlayerData>(out var player))
         {
             goldText.text = $"Gold: {player.Gold}";
         }
@@ -681,8 +681,8 @@ public class GoodView : UIView
 {
     protected override void OnRefresh(object userData)
     {
-        var playerView = GetModelView<IPlayerView>();  // ✓ 只获取只读视图
-        goldText.text = $"Gold: {playerView.Gold}";   // ✓ 只读取数据
+        var playerData = GetModelData<IPlayerData>();  // ✓ 只获取只读数据接口
+        goldText.text = $"Gold: {playerData.Gold}";   // ✓ 只读取数据
     }
 }
 
@@ -724,8 +724,8 @@ public class GoodController : UIController
 |-----------|------|
 | `protected UIRuntimeContext Context` | 运行时上下文 |
 | `protected UIBindingCollection Bindings` | 绑定集合 |
-| `protected TView GetModelView<TView>()` | 获取 ModelManager 只读视图 |
-| `protected bool TryGetModelView<TView>(out TView)` | 尝试获取只读视图 |
+| `protected TData GetModelData<TData>()` | 获取 ModelManager 只读数据接口 |
+| `protected bool TryGetModelData<TData>(out TData)` | 尝试获取只读数据接口 |
 | `protected void BindProperty<TSource, TValue>(...)` | 绑定属性 |
 | `protected virtual void OnInitialize()` | 初始化 |
 | `protected virtual void OnBindings()` | 注册绑定 |

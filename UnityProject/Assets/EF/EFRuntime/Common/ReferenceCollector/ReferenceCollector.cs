@@ -147,6 +147,7 @@ public class ReferenceCollector : MonoBehaviour, ISerializationCallbackReceiver
 			"Input", "InputField",     // InputField 组件
 			"Dropdown",                // Dropdown 组件
 			"Go", "Obj", // GameObject
+			"SpriteRenderer"    // SpriteRenderer 组件
 		};
 
 		foreach (var suffix in supportedSuffixes)
@@ -207,6 +208,10 @@ public class ReferenceCollector : MonoBehaviour, ISerializationCallbackReceiver
 		{
 			var dropdown = transform.GetComponent<UnityEngine.UI.Dropdown>();
 			if (dropdown != null) return dropdown;
+		}else if (objectName.EndsWith("SpriteRenderer", StringComparison.OrdinalIgnoreCase))
+		{
+			var spriteRenderer = transform.GetComponent<SpriteRenderer>();
+			if (spriteRenderer != null) return spriteRenderer;
 		}
 
 		// 如果没有找到特定组件，返回 GameObject

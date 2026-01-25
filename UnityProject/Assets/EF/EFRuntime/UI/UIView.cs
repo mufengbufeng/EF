@@ -10,7 +10,8 @@ namespace EF.UI
 {
     /// <summary>
     /// UI 视图基类，负责处理生命周期与数据绑定。
-    /// View 层通过 ModelManager 获取只读数据视图，不可访问 Controller。
+    /// View 可以从 Model Manager 获取只读数据 , 不能t修改数据。
+    /// View 不可以 直接与 Controller 交互，应通过事件或数据模型进行通信。
     /// </summary>
     public abstract class UIView : MonoBehaviour
     {
@@ -44,19 +45,19 @@ namespace EF.UI
         }
 
         /// <summary>
-        /// 获取 ModelManager 中注册的只读数据视图。
+        /// 获取 ModelManager 中注册的只读数据接口。
         /// </summary>
-        protected TView GetModelView<TView>() where TView : class
+        protected TData GetModelData<TData>() where TData : class
         {
-            return Context.ModelManager.Get<TView>();
+            return Context.ModelManager.Get<TData>();
         }
 
         /// <summary>
-        /// 尝试获取 ModelManager 中注册的只读数据视图。
+        /// 尝试获取 ModelManager 中注册的只读数据接口。
         /// </summary>
-        protected bool TryGetModelView<TView>(out TView view) where TView : class
+        protected bool TryGetModelData<TData>(out TData data) where TData : class
         {
-            return Context.ModelManager.TryGet(out view);
+            return Context.ModelManager.TryGet(out data);
         }
 
         /// <summary>

@@ -177,7 +177,7 @@ namespace EF.UI
             where TController : UIController, new()
         {
             // 使用类型全名作为窗口标识符
-            string windowName = typeof(TView).FullName;
+            string windowName = typeof(TView).Name;
 
             // 创建窗口描述符
             var descriptor = new UIWindowDescriptor(

@@ -1,21 +1,23 @@
-<!-- OPENSPEC:START -->
-# OpenSpec Instructions
+<!-- OPENCE:START -->
+# opence Instructions
 
 These instructions are for AI assistants working in this project.
 
-Always open `@/openspec/AGENTS.md` when the request:
-- Mentions planning or proposals (words like proposal, spec, change, plan)
+Always open `@/opence/AGENTS.md` when the request:
+- Mentions planning or the workflow stages (plan/work/review/compound/archive) or words like proposal, spec, change
 - Introduces new capabilities, breaking changes, architecture shifts, or big performance/security work
 - Sounds ambiguous and you need the authoritative spec before coding
 
-Use `@/openspec/AGENTS.md` to learn:
-- How to create and apply change proposals
+Use `@/opence/AGENTS.md` to learn:
+- How to run the Plan/Work/Review/Compound/Archive workflow
 - Spec format and conventions
 - Project structure and guidelines
 
-Keep this managed block so 'openspec update' can refresh the instructions.
+Keep this managed block so 'opence update' can refresh the instructions.
 
-<!-- OPENSPEC:END -->
+<!-- OPENCE:END -->
+
+
 
 # CLAUDE.md
 

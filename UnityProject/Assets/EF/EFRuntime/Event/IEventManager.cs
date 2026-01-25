@@ -31,21 +31,21 @@ namespace EF.Event
         /// <summary>
         /// 注册事件监听器。
         /// </summary>
-        void Subscribe<T>(EventHandler<T> listener);
+        void Subscribe<T>(EventHandler<T> listener) where T : BaseEventArgs;
 
         /// <summary>
         /// 反注册事件监听器。
         /// </summary>
-        void Unsubscribe<T>(EventHandler<T> listener);
+        void Unsubscribe<T>(EventHandler<T> listener) where T : BaseEventArgs;
 
         /// <summary>
         /// 异步派发事件，事件将进入下一帧的分发队列。
         /// </summary>
-        void Publish<T>(T eventData);
+        void Publish<T>(T eventData) where T : BaseEventArgs;
 
         /// <summary>
         /// 同步立即派发事件，立刻执行所有监听器。
         /// </summary>
-        void PublishNow<T>(T eventData);
+        void PublishNow<T>(T eventData) where T : BaseEventArgs;
     }
 }

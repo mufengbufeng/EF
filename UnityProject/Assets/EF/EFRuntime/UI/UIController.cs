@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using EF.Debugger;
 using EF.Model;
 
 namespace EF.UI
@@ -12,6 +13,7 @@ namespace EF.UI
     public abstract class UIController : IDisposable
     {
         private bool _isDisposed;
+        private ControllerEventBinder _eventBinder;
 
         /// <summary>
         /// 当前绑定的 View。
@@ -24,7 +26,14 @@ namespace EF.UI
         protected internal UIRuntimeContext Context { get; private set; }
 
         /// <summary>
+        /// 事件绑定器，用于管理 Controller 订阅的事件生命周期。
+        /// 通过此绑定器订阅的事件会在 OnExit 时自动取消订阅，防止内存泄漏。
+        /// </summary>
+        protected ControllerEventBinder EventBinder => _eventBinder ??= new ControllerEventBinder();
+
+        /// <summary>
         /// 获取 ModelManager 中注册的数据 Model。
+        /// 如果模型未注册将抛出异常。
         /// </summary>
         protected TModel GetModel<TModel>() where TModel : ModelBase
         {
@@ -32,11 +41,14 @@ namespace EF.UI
         }
 
         /// <summary>
-        /// 尝试获取 ModelManager 中注册的数据 Model。
+        /// 尝试获取 ModelManager 中的数据 Model，如果未注册则自动创建并注册。
+        /// 该方法保证返回非空实例。
         /// </summary>
-        protected bool TryGetModel<TModel>(out TModel model) where TModel : ModelBase
+        /// <typeparam name="TModel">模型类型，必须有无参构造函数。</typeparam>
+        /// <returns>模型实例（保证非空）。</returns>
+        protected TModel TryGetModel<TModel>() where TModel : ModelBase, new()
         {
-            return Context.ModelManager.TryGetModel(out model);
+            return Context.ModelManager.TryGetModel<TModel>();
         }
 
         /// <summary>
@@ -45,6 +57,25 @@ namespace EF.UI
         protected TView GetView<TView>() where TView : UIView
         {
             return View as TView;
+        }
+
+        /// <summary>
+        /// 绑定 C# 事件，自动管理生命周期。
+        /// 使用此方法订阅的事件会在 OnExit 时自动取消订阅。
+        /// </summary>
+        /// <typeparam name="THandler">事件处理器类型</typeparam>
+        /// <param name="addHandler">订阅事件（+=）的操作</param>
+        /// <param name="removeHandler">取消订阅（-=）的操作</param>
+        /// <param name="handler">事件处理器</param>
+        /// <example>
+        /// 示例用法：
+        /// <code>
+        /// BindEvent(ref _mainView.OnStartGameRequested, HandleStartGame);
+        /// </code>
+        /// </example>
+        protected void BindEvent<THandler>(Action<THandler> addHandler, Action<THandler> removeHandler, THandler handler)
+        {
+            EventBinder.BindEvent(addHandler, removeHandler, handler);
         }
 
         /// <summary>
@@ -129,6 +160,9 @@ namespace EF.UI
         internal void InternalExit()
         {
             OnExit();
+            // 清理所有事件绑定
+            Log.Info("[UIController] 清理事件绑定");
+            _eventBinder?.ClearAllBindings();
         }
 
         internal void InternalRelease()
@@ -147,8 +181,14 @@ namespace EF.UI
             {
                 return;
             }
+            Log.Info("[UIController] 释放 Controller 资源");
 
             _isDisposed = true;
+
+            // 清理事件绑定器
+            _eventBinder?.Dispose();
+            _eventBinder = null;
+
             OnDispose();
             View = null;
             Context = null;

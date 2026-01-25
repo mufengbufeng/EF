@@ -42,7 +42,7 @@
     <UnityVersion>6000.2.6f2</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Analyzer Include="C:\Users\mfbf\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.2.0\Analyzers\Microsoft.Unity.Analyzers.dll" />
+    <Analyzer Include="C:\Users\mfbf\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.2.1\Analyzers\Microsoft.Unity.Analyzers.dll" />
     <Analyzer Include="D:\DocApp\UnityEditor\6000.2.6f2\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="D:\DocApp\UnityEditor\6000.2.6f2\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
     <Analyzer Include="D:\DocApp\UnityEditor\6000.2.6f2\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
@@ -50,29 +50,38 @@
   <ItemGroup>
     <Compile Include="Assets\EF\EFRuntime\UI\UHub\UHubComponent.cs" />
     <Compile Include="Assets\EF\EFRuntime\Event\BaseEventArgs.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Feature\AllowMultipleAttribute.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UIWindowDescriptor.cs" />
     <Compile Include="Assets\EF\EFRuntime\Timer\TimerMode.cs" />
     <Compile Include="Assets\EF\EFRuntime\Debugger\LogLevelAttribute.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UIWindowState.cs" />
     <Compile Include="Assets\EF\EFRuntime\Debugger\IDebuggerManager.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Entity\EntityBase.cs" />
     <Compile Include="Assets\EF\EFRuntime\Event\IEventManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Fsm\Fsm.cs" />
     <Compile Include="Assets\EF\EFRuntime\Debugger\DebuggerManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Scene\SceneInfo.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UIRuntimeContext.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Entity\EntityGroup.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Entity\DefaultEntityHelper.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Entity\EntityGroupOptions.cs" />
     <Compile Include="Assets\EF\EFRuntime\Sound\SoundManagerExtensions.cs" />
     <Compile Include="Assets\EF\EFRuntime\Event\EventPoolModel.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Procedure\ProcedureManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UHub\Attributes.cs" />
     <Compile Include="Assets\EF\EFRuntime\Debugger\Editor\DebuggerMenu.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Feature\IFeatureContainer.cs" />
     <Compile Include="Assets\EF\EFRuntime\Fsm\FsmManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Save\SaveManager.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Feature\IFeature.cs" />
     <Compile Include="Assets\EF\EFRuntime\Common\Manager\ModuleSystem.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UHub\EventBindings.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UIManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Common\ReferenceCollector\ReferenceCollector.cs" />
-    <Compile Include="Assets\EF\EFRuntime\FrifloEcs\FrifloEcsManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Resource\DefaultResourceRemoteServices.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Entity\IEntityManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Timer\ITimerManager.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Entity\Examples\ExampleEntity.cs" />
     <Compile Include="Assets\EF\EFRuntime\Sound\SoundConstant.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UIBindingCollection.cs" />
     <Compile Include="Assets\EF\EFRuntime\Resource\ResourceModeConfig.cs" />
@@ -87,6 +96,7 @@
     <Compile Include="Assets\EF\EFRuntime\Sound\SoundConfig.cs" />
     <Compile Include="Assets\EF\EFRuntime\ObjectPool\IObjectPoolManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\ObjectPool\ObjectPool.cs" />
+    <Compile Include="Assets\EF\EFRuntime\UI\ControllerEventBinder.cs" />
     <Compile Include="Assets\EF\EFRuntime\Event\EventTypeResolver.cs" />
     <Compile Include="Assets\EF\EFRuntime\Fsm\FsmState.cs" />
     <Compile Include="Assets\EF\EFRuntime\Save\ISaveStrategy.cs" />
@@ -98,6 +108,10 @@
     <Compile Include="Assets\EF\EFRuntime\Sound\ISoundManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UHub\UHubBindingConfig.cs" />
     <Compile Include="Assets\EF\EFRuntime\Sound\SoundAgentPool.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Feature\Examples\ExampleFeatures.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Procedure\IProcedureManager.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Feature\Examples\ExampleFeatureUsage.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Entity\IEntityGroup.cs" />
     <Compile Include="Assets\EF\EFRuntime\Timer\TimerManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Event\EventHandlerRegistry.cs" />
     <Compile Include="Assets\EF\EFRuntime\Model\ModelBase.cs" />
@@ -109,9 +123,9 @@
     <Compile Include="Assets\EF\EFRuntime\Fsm\IFsmManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Timer\TimerTaskCollection.cs" />
     <Compile Include="Assets\EF\EFRuntime\Debugger\LogExample.cs" />
-    <Compile Include="Assets\EF\EFRuntime\FrifloEcs\IFrifloEcsManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UIController.cs" />
     <Compile Include="Assets\EF\EFRuntime\Sound\SoundExample.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Feature\RequireFeatureAttribute.cs" />
     <Compile Include="Assets\EF\EFRuntime\Scene\SceneManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Fsm\IFsmGeneric.cs" />
     <Compile Include="Assets\EF\EFRuntime\Timer\TimerTask.cs" />
@@ -120,18 +134,25 @@
     <Compile Include="Assets\EF\EFRuntime\UI\UHub\IEventBinding.cs" />
     <Compile Include="Assets\EF\EFRuntime\Common\Manager\IEFManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UIWindowHandle.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Entity\IEntityHelper.cs" />
     <Compile Include="Assets\EF\EFRuntime\Save\PlayerPrefsSaveStrategy.cs" />
     <Compile Include="Assets\EF\EFRuntime\ObjectPool\PooledObject.cs" />
     <Compile Include="Assets\EF\EFRuntime\Common\Manager\AEFManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UIView.cs" />
     <Compile Include="Assets\EF\EFRuntime\Event\EventManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Fsm\FsmDataCollection.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Entity\EntityManager.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Feature\FeatureContainer.cs" />
     <Compile Include="Assets\EF\EFRuntime\Common\Update\IUpdate.cs" />
     <Compile Include="Assets\EF\EFRuntime\Event\PendingEventQueue.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Entity\IEntity.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Feature\FeatureBase.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\IUIManager.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Procedure\ProcedureBase.cs" />
     <Compile Include="Assets\EF\EFRuntime\Save\ISaveManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Event\PendingEvent.cs" />
     <Compile Include="Assets\EF\EFRuntime\Timer\TimerClock.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Entity\Examples\ExampleEntityUsage.cs" />
     <Compile Include="Assets\EF\EFRuntime\Save\JsonSaveStrategy.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -682,10 +703,6 @@
       <HintPath>Library\PackageCache\com.unity.collab-proxy@ab839cc7d2ad\Lib\Editor\unityplastic.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Friflo.Json.Fliox">
-      <HintPath>Assets\Plugins\Friflo\Friflo.Json.Fliox.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System.IO.Hashing">
       <HintPath>Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.IO.Hashing\System.IO.Hashing.dll</HintPath>
       <Private>False</Private>
@@ -702,10 +719,6 @@
       <HintPath>Library\PackageCache\com.unity.visualscripting@191c0d7e3b69\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Friflo.Json.Fliox.Annotation">
-      <HintPath>Assets\Plugins\Friflo\Friflo.Json.Fliox.Annotation.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="LZ4">
       <HintPath>Library\PackageCache\com.code-philosophy.hybridclr@01754c8fb47b\Plugins\LZ4.dll</HintPath>
       <Private>False</Private>
@@ -720,14 +733,6 @@
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe">
       <HintPath>Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Friflo.Engine.ECS">
-      <HintPath>Assets\Plugins\Friflo\Friflo.Engine.ECS.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Friflo.Json.Burst">
-      <HintPath>Assets\Plugins\Friflo\Friflo.Json.Burst.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Android.Types">

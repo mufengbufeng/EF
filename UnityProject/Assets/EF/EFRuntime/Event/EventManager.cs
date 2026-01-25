@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using EF.Common;
+using EF.Debugger;
 
 namespace EF.Event
 {
@@ -40,7 +41,7 @@ namespace EF.Event
         public bool Check(int id, EventHandler<object> listener) => _handlerRegistry.Contains(id, listener);
 
         /// <inheritdoc />
-        public void Subscribe<T>(EventHandler<T> listener)
+        public void Subscribe<T>(EventHandler<T> listener) where T : BaseEventArgs
         {
             if (listener == null)
             {
@@ -52,7 +53,7 @@ namespace EF.Event
         }
 
         /// <inheritdoc />
-        public void Unsubscribe<T>(EventHandler<T> listener)
+        public void Unsubscribe<T>(EventHandler<T> listener) where T : BaseEventArgs
         {
             if (listener == null)
             {
@@ -64,14 +65,14 @@ namespace EF.Event
         }
 
         /// <inheritdoc />
-        public void Publish<T>(T eventData)
+        public void Publish<T>(T eventData) where T : BaseEventArgs
         {
             BaseEventArgs eventArgs = _eventTypeResolver.ConvertToEventArgs(eventData);
             _pendingEventQueue.Enqueue(new PendingEvent(this, eventArgs));
         }
 
         /// <inheritdoc />
-        public void PublishNow<T>(T eventData)
+        public void PublishNow<T>(T eventData) where T : BaseEventArgs
         {
             BaseEventArgs eventArgs = _eventTypeResolver.ConvertToEventArgs(eventData);
             Dispatch(new PendingEvent(this, eventArgs));
@@ -110,7 +111,7 @@ namespace EF.Event
             {
                 if ((PoolModel & EventPoolModel.AllowNoHandler) == 0)
                 {
-                    throw new InvalidOperationException($"事件 {pendingEvent.EventArgs.EventId} 没有任何处理器");
+                    Log.Warning($"[EventManager] 事件 {pendingEvent.EventArgs.EventId} 没有注册任何监听器");
                 }
 
                 return;
