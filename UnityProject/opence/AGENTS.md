@@ -1,21 +1,25 @@
-# OpenSpec Instructions
+# opence Instructions
 
-Instructions for AI coding assistants using OpenSpec for spec-driven development.
+Instructions for AI coding assistants using opence for spec-driven development.
 
 ## TL;DR Quick Checklist
 
-- Search existing work: `openspec spec list --long`, `openspec list` (use `rg` only for full-text search)
+- Search existing work: `opence spec list --long`, `opence list` (use `rg` only for full-text search)
 - Decide scope: new capability vs modify existing capability
 - Pick a unique `change-id`: kebab-case, verb-led (`add-`, `update-`, `remove-`, `refactor-`)
-- Scaffold: `proposal.md`, `tasks.md`, `design.md` (only if needed), and delta specs per affected capability
+- **Plan**: Scaffold `proposal.md`, `tasks.md`, `design.md` (only if needed), and delta specs per affected capability
+- **Work**: Implement tasks sequentially, keeping edits focused
+- **Review**: Report issues ordered by severity with file paths
+- **Compound**: Document learnings in `docs/solutions/` and capture repeatable workflows as skills
+- **Archive**: Run `opence archive <change-id>` to apply spec deltas and mark complete
 - Write deltas: use `## ADDED|MODIFIED|REMOVED|RENAMED Requirements`; include at least one `#### Scenario:` per requirement
-- Validate: `openspec validate [change-id] --strict` and fix issues
-- Request approval: Do not start implementation until proposal is approved
+- Validate: `opence validate [change-id] --strict` and fix issues
+- Request approval: Do not start work until the plan is approved
 
-## Three-Stage Workflow
+## Plan/Work/Review/Compound/Archive Workflow
 
-### Stage 1: Creating Changes
-Create proposal when you need to:
+### Plan
+Create a plan when you need to:
 - Add features or functionality
 - Make breaking changes (API, schema)
 - Change architecture or patterns  
@@ -23,17 +27,16 @@ Create proposal when you need to:
 - Update security patterns
 
 Triggers (examples):
-- "Help me create a change proposal"
+- "Help me create a change plan"
 - "Help me plan a change"
-- "Help me create a proposal"
 - "I want to create a spec proposal"
 - "I want to create a spec"
 
 Loose matching guidance:
-- Contains one of: `proposal`, `change`, `spec`
+- Contains one of: `plan`, `proposal`, `change`, `spec`
 - With one of: `create`, `plan`, `make`, `start`, `help`
 
-Skip proposal for:
+Skip planning for:
 - Bug fixes (restore intended behavior)
 - Typos, formatting, comments
 - Dependency updates (non-breaking)
@@ -41,12 +44,12 @@ Skip proposal for:
 - Tests for existing behavior
 
 **Workflow**
-1. Review `openspec/project.md`, `openspec list`, and `openspec list --specs` to understand current context.
-2. Choose a unique verb-led `change-id` and scaffold `proposal.md`, `tasks.md`, optional `design.md`, and spec deltas under `openspec/changes/<id>/`.
+1. Review `opence/project.md`, `opence list`, and `opence list --specs` to understand current context.
+2. Choose a unique verb-led `change-id` and scaffold `proposal.md`, `tasks.md`, optional `design.md`, and spec deltas under `opence/changes/<id>/`.
 3. Draft spec deltas using `## ADDED|MODIFIED|REMOVED Requirements` with at least one `#### Scenario:` per requirement.
-4. Run `openspec validate <id> --strict` and resolve any issues before sharing the proposal.
+4. Run `opence validate <id> --strict` and resolve any issues before sharing the plan.
 
-### Stage 2: Implementing Changes
+### Work
 Track these steps as TODOs and complete them one by one.
 1. **Read proposal.md** - Understand what's being built
 2. **Read design.md** (if exists) - Review technical decisions
@@ -54,61 +57,85 @@ Track these steps as TODOs and complete them one by one.
 4. **Implement tasks sequentially** - Complete in order
 5. **Confirm completion** - Ensure every item in `tasks.md` is finished before updating statuses
 6. **Update checklist** - After all work is done, set every task to `- [x]` so the list reflects reality
-7. **Approval gate** - Do not start implementation until the proposal is reviewed and approved
+7. **Approval gate** - Do not start work until the plan is reviewed and approved
 
-### Stage 3: Archiving Changes
-After deployment, create separate PR to:
-- Move `changes/[name]/` → `changes/archive/YYYY-MM-DD-[name]/`
-- Update `specs/` if capabilities changed
-- Use `openspec archive <change-id> --skip-specs --yes` for tooling-only changes (always pass the change ID explicitly)
-- Run `openspec validate --strict` to confirm the archived change passes checks
+### Review
+Provide a review when changes are ready for validation.
+1. Report issues ordered by severity with file paths.
+2. Note remaining risks, edge cases, and testing gaps.
+
+### Compound
+After the change is complete:
+- Capture the problem, root cause, and fix in `docs/solutions/`.
+- If the change reveals a repeatable workflow or recurring manual checks, create/update a skill to capture it (follow the skill-creator guidance: keep SKILL.md concise with name/description frontmatter; use `references/` and `scripts/` for longer content).
+- Consult the `opence-archive` skill to finalize the change.
+
+### Archive
+Finalize the change and apply spec updates:
+1. Complete pre-archive verification:
+   - Run `opence validate <change-id> --strict` and ensure it passes
+   - Verify all tasks in `tasks.md` are marked [x] and reflect reality
+   - Confirm proposal matches implementation
+2. Run `opence archive <change-id>` to move the change to archive and apply spec deltas
+3. Verify specs in `opence/specs/` are updated correctly
+4. Update spec Purpose sections if needed
+
+**Archive command flags:**
+- `--yes`/`-y` - Skip confirmation prompts (for automation)
+- `--skip-specs` - Archive without applying spec updates (use rarely)
+- `--no-validate` - Skip pre-archive validation (not recommended)
 
 ## Before Any Task
 
 **Context Checklist:**
 - [ ] Read relevant specs in `specs/[capability]/spec.md`
 - [ ] Check pending changes in `changes/` for conflicts
-- [ ] Read `openspec/project.md` for conventions
-- [ ] Run `openspec list` to see active changes
-- [ ] Run `openspec list --specs` to see existing capabilities
+- [ ] Read `opence/project.md` for conventions
+- [ ] Run `opence list` to see active changes
+- [ ] Run `opence list --specs` to see existing capabilities
 
 **Before Creating Specs:**
 - Always check if capability already exists
 - Prefer modifying existing specs over creating duplicates
-- Use `openspec show [spec]` to review current state
+- Use `opence show [spec]` to review current state
 - If request is ambiguous, ask 1–2 clarifying questions before scaffolding
 
 ### Search Guidance
-- Enumerate specs: `openspec spec list --long` (or `--json` for scripts)
-- Enumerate changes: `openspec list` (or `openspec change list --json` - deprecated but available)
+- Enumerate specs: `opence spec list --long` (or `--json` for scripts)
+- Enumerate changes: `opence list` (or `opence change list --json` - deprecated but available)
 - Show details:
-  - Spec: `openspec show <spec-id> --type spec` (use `--json` for filters)
-  - Change: `openspec show <change-id> --json --deltas-only`
-- Full-text search (use ripgrep): `rg -n "Requirement:|Scenario:" openspec/specs`
+  - Spec: `opence show <spec-id> --type spec` (use `--json` for filters)
+  - Change: `opence show <change-id> --json --deltas-only`
+- Full-text search (use ripgrep): `rg -n "Requirement:|Scenario:" opence/specs`
 
 ## Quick Start
 
 ### CLI Commands
 
 ```bash
-# Essential commands
-openspec list                  # List active changes
-openspec list --specs          # List specifications
-openspec show [item]           # Display change or spec
-openspec validate [item]       # Validate changes or specs
-openspec archive <change-id> [--yes|-y]   # Archive after deployment (add --yes for non-interactive runs)
+# Workflow commands (correspond to Plan/Work/Review/Compound/Archive stages)
+opence list                  # List active changes
+opence list --specs          # List specifications
+opence show [item]           # Display change or spec details
+opence validate [item]       # Validate changes or specs
+opence archive <change-id>   # Finalize change and apply spec deltas
+
+# Archive flags
+opence archive <change-id> --yes|-y     # Skip confirmation prompts
+opence archive <change-id> --skip-specs # Archive without applying spec updates
+opence archive <change-id> --no-validate # Skip pre-archive validation (not recommended)
 
 # Project management
-openspec init [path]           # Initialize OpenSpec
-openspec update [path]         # Update instruction files
+opence init [path]           # Initialize opence in a project
+opence update [path]         # Update instruction files
 
 # Interactive mode
-openspec show                  # Prompts for selection
-openspec validate              # Bulk validation mode
+opence show                  # Prompts for item selection
+opence validate              # Bulk validation mode
 
 # Debugging
-openspec show [change] --json --deltas-only
-openspec validate [change] --strict
+opence show [change] --json --deltas-only  # Show spec deltas in JSON
+opence validate [change] --strict          # Comprehensive validation
 ```
 
 ### Command Flags
@@ -116,14 +143,14 @@ openspec validate [change] --strict
 - `--json` - Machine-readable output
 - `--type change|spec` - Disambiguate items
 - `--strict` - Comprehensive validation
-- `--no-interactive` - Disable prompts
-- `--skip-specs` - Archive without spec updates
-- `--yes`/`-y` - Skip confirmation prompts (non-interactive archive)
+- `--yes`/`-y` - Skip confirmation prompts (archive command)
+- `--skip-specs` - Archive without applying spec updates
+- `--no-validate` - Skip pre-archive validation (archive command)
 
 ## Directory Structure
 
 ```
-openspec/
+opence/
 ├── project.md              # Project conventions
 ├── specs/                  # Current truth - what IS built
 │   └── [capability]/       # Single focused capability
@@ -274,7 +301,7 @@ Headers matched with `trim(header)` - whitespace ignored.
 Common pitfall: Using MODIFIED to add a new concern without including the previous text. This causes loss of detail at archive time. If you aren’t explicitly changing the existing requirement, add a new requirement under ADDED instead.
 
 Authoring a MODIFIED requirement correctly:
-1) Locate the existing requirement in `openspec/specs/<capability>/spec.md`.
+1) Locate the existing requirement in `opence/specs/<capability>/spec.md`.
 2) Copy the entire requirement block (from `### Requirement: ...` through its scenarios).
 3) Paste it under `## MODIFIED Requirements` and edit to reflect the new behavior.
 4) Ensure the header text matches exactly (whitespace-insensitive) and keep at least one `#### Scenario:`.
@@ -300,39 +327,39 @@ Example for RENAMED:
 
 **Silent scenario parsing failures**
 - Exact format required: `#### Scenario: Name`
-- Debug with: `openspec show [change] --json --deltas-only`
+- Debug with: `opence show [change] --json --deltas-only`
 
 ### Validation Tips
 
 ```bash
 # Always use strict mode for comprehensive checks
-openspec validate [change] --strict
+opence validate [change] --strict
 
 # Debug delta parsing
-openspec show [change] --json | jq '.deltas'
+opence show [change] --json | jq '.deltas'
 
 # Check specific requirement
-openspec show [spec] --json -r 1
+opence show [spec] --json -r 1
 ```
 
 ## Happy Path Script
 
 ```bash
 # 1) Explore current state
-openspec spec list --long
-openspec list
+opence spec list --long
+opence list
 # Optional full-text search:
-# rg -n "Requirement:|Scenario:" openspec/specs
-# rg -n "^#|Requirement:" openspec/changes
+# rg -n "Requirement:|Scenario:" opence/specs
+# rg -n "^#|Requirement:" opence/changes
 
 # 2) Choose change id and scaffold
 CHANGE=add-two-factor-auth
-mkdir -p openspec/changes/$CHANGE/{specs/auth}
-printf "## Why\n...\n\n## What Changes\n- ...\n\n## Impact\n- ...\n" > openspec/changes/$CHANGE/proposal.md
-printf "## 1. Implementation\n- [ ] 1.1 ...\n" > openspec/changes/$CHANGE/tasks.md
+mkdir -p opence/changes/$CHANGE/{specs/auth}
+printf "## Why\n...\n\n## What Changes\n- ...\n\n## Impact\n- ...\n" > opence/changes/$CHANGE/proposal.md
+printf "## 1. Implementation\n- [ ] 1.1 ...\n" > opence/changes/$CHANGE/tasks.md
 
 # 3) Add deltas (example)
-cat > openspec/changes/$CHANGE/specs/auth/spec.md << 'EOF'
+cat > opence/changes/$CHANGE/specs/auth/spec.md << 'EOF'
 ## ADDED Requirements
 ### Requirement: Two-Factor Authentication
 Users MUST provide a second factor during login.
@@ -343,13 +370,13 @@ Users MUST provide a second factor during login.
 EOF
 
 # 4) Validate
-openspec validate $CHANGE --strict
+opence validate $CHANGE --strict
 ```
 
 ## Multi-Capability Example
 
 ```
-openspec/changes/add-2fa-notify/
+opence/changes/add-2fa-notify/
 ├── proposal.md
 ├── tasks.md
 └── specs/
@@ -415,7 +442,7 @@ Only add complexity with:
 ## Error Recovery
 
 ### Change Conflicts
-1. Run `openspec list` to see active changes
+1. Run `opence list` to see active changes
 2. Check for overlapping specs
 3. Coordinate with change owners
 4. Consider combining proposals
@@ -447,10 +474,10 @@ Only add complexity with:
 
 ### CLI Essentials
 ```bash
-openspec list              # What's in progress?
-openspec show [item]       # View details
-openspec validate --strict # Is it correct?
-openspec archive <change-id> [--yes|-y]  # Mark complete (add --yes for automation)
+opence list              # What's in progress?
+opence show [item]       # View details
+opence validate --strict # Is it correct?
+opence archive <change-id> [--yes|-y]  # Mark complete (add --yes for automation)
 ```
 
 Remember: Specs are truth. Changes are proposals. Keep them in sync.
