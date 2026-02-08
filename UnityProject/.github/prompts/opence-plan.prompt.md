@@ -10,6 +10,7 @@ $ARGUMENTS
 - Refer to `opence/AGENTS.md` (located inside the `opence/` directory—run `ls opence` or `opence update` if you don't see it) if you need additional opence conventions or clarifications.
 - Identify any vague or ambiguous details and ask the necessary follow-up questions before editing files.
 - Do not write any code during the planning stage. Only create design documents (proposal.md, tasks.md, design.md, and spec deltas). Implementation happens in the work stage after approval.
+- **Stage boundary**: This stage ends when plan artifacts are complete and validated. Do NOT automatically proceed to the work stage.
 
 **Steps**
 1. Review `opence/project.md`, run `opence list` and `opence list --specs`, and inspect related code or docs (e.g., via `rg`/`ls`) to ground the plan in current behaviour; note any gaps that require clarification.
@@ -24,4 +25,7 @@ $ARGUMENTS
 - Use `opence show <id> --json --deltas-only` or `opence show <spec> --type spec` to inspect details when validation fails.
 - Search existing requirements with `rg -n "Requirement:|Scenario:" opence/specs` before writing new ones.
 - Explore the codebase with `rg <keyword>`, `ls`, or direct file reads so plans align with current implementation realities.
+
+**Stage Complete**
+When the plan is validated, report: "Plan phase complete. When ready, invoke `/opence-work` to proceed."
 <!-- OPENCE:END -->

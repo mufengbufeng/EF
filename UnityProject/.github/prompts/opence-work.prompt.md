@@ -8,6 +8,7 @@ $ARGUMENTS
 - Favor straightforward, minimal implementations first and add complexity only when it is requested or clearly required.
 - Keep changes tightly scoped to the requested outcome.
 - Refer to `opence/AGENTS.md` (located inside the `opence/` directory—run `ls opence` or `opence update` if you don't see it) if you need additional opence conventions or clarifications.
+- **Stage boundary**: This stage ends when all tasks are implemented and marked complete. Do NOT automatically proceed to the review stage.
 
 **Steps**
 Track these steps as TODOs and complete them one by one.
@@ -19,4 +20,7 @@ Track these steps as TODOs and complete them one by one.
 
 **Reference**
 - Use `opence show <id> --json --deltas-only` if you need additional context from the plan while implementing.
+
+**Stage Complete**
+When all tasks are marked `[x]`, report: "Work phase complete. When ready, invoke `/opence-review` to proceed."
 <!-- OPENCE:END -->

@@ -22,7 +22,7 @@ namespace EF.Entity.Examples
         public override GameObject Handle
         {
             get => _handle;
-            internal set => _handle = value;
+             set => _handle = value;
         }
 
         /// <summary>

@@ -121,5 +121,12 @@ namespace EF.Entity
         /// <param name="childEntityId">子实体标识符。</param>
         /// <param name="userData">用户自定义数据。</param>
         void DetachEntity(int childEntityId, object userData = null);
+
+        /// <summary>
+        /// 生成唯一实体 ID。
+        /// 用于外部模块在调用 ShowEntityAsync 之前获取唯一标识符。
+        /// </summary>
+        /// <returns>唯一的实体 ID。</returns>
+        int GenerateEntityId();
     }
 }

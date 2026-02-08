@@ -19,7 +19,6 @@ namespace GameLogic
     public sealed class GameBackgroundModule : AEFManager, IGameBackgroundModule
     {
         private const string DefaultPrefabName = "BackgroundPrefab";
-        private const string BackgroundRootName = "BackgroundRoot";
         private const string SegmentPoolNamePrefix = "BackgroundSegmentPool";
 
         private readonly IResourceManager _resourceManager;
@@ -39,6 +38,7 @@ namespace GameLogic
         private bool _spawnedClone;
         private float _segmentHeight;
         private float _totalHeight;
+        private Transform _backgroundRoot;
         private string _segmentPoolName;
         private IObjectPool<GameObject> _segmentPool;
         private GameObject _segmentTemplate;
@@ -63,6 +63,11 @@ namespace GameLogic
         public void SetSpeed(float speed)
         {
             _speed = speed;
+        }
+
+        public void SetBackgroundRoot(Transform backgroundRoot)
+        {
+            _backgroundRoot = backgroundRoot;
         }
 
         public void SetSprite(Sprite sprite)
@@ -132,14 +137,13 @@ namespace GameLogic
                 GameObject instance = UnityEngine.Object.Instantiate(prefab);
                 instance.name = "Background";
 
-                GameObject root = GameObject.Find(BackgroundRootName);
-                if (root != null)
+                if (_backgroundRoot != null)
                 {
-                    instance.transform.SetParent(root.transform, false);
+                    instance.transform.SetParent(_backgroundRoot, false);
                 }
                 else
                 {
-                    Log.Warning($"[GameBackgroundModule] 未找到 {BackgroundRootName}，背景将挂在场景根节点。");
+                    Log.Warning("[GameBackgroundModule] 未设置 BackgroundRoot，背景将挂在场景根节点。");
                 }
 
                 _handle = handle;

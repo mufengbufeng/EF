@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using Cysharp.Threading.Tasks;
 using EF.Common;
 using EF.ObjectPool;
 using EF.Resource;
+using UnityEngine;
+using YooAsset;
 
 namespace EF.Entity
 {
@@ -23,6 +24,7 @@ namespace EF.Entity
         private readonly Dictionary<int, IEntity> _entities;
         private readonly Dictionary<int, int> _childEntityIndices;
         private readonly Dictionary<int, List<int>> _parentEntityIndices;
+        private readonly Dictionary<string, AssetHandle> _assetHandleCache;
         private int _serialId;
         private Queue<IEntity> _entityUpdateQueue;
 
@@ -45,6 +47,7 @@ namespace EF.Entity
             _entities = new Dictionary<int, IEntity>();
             _childEntityIndices = new Dictionary<int, int>();
             _parentEntityIndices = new Dictionary<int, List<int>>();
+            _assetHandleCache = new Dictionary<string, AssetHandle>(StringComparer.Ordinal);
             _entityUpdateQueue = new Queue<IEntity>();
         }
 
@@ -126,6 +129,16 @@ namespace EF.Entity
             _childEntityIndices.Clear();
             _parentEntityIndices.Clear();
             _entityUpdateQueue?.Clear();
+
+            // 释放所有缓存的资源句柄
+            foreach (var handle in _assetHandleCache.Values)
+            {
+                if (handle != null)
+                {
+                    handle.Release();
+                }
+            }
+            _assetHandleCache.Clear();
         }
 
         /// <summary>
@@ -303,21 +316,30 @@ namespace EF.Entity
             // 从对象池生成实体
             var entity = entityGroup.SpawnEntity();
 
-            // 加载实体资源
-            GameObject entityAsset = await LoadEntityAssetAsync(entityAssetName);
-
-            // 实例化实体
-            GameObject instance = await _entityHelper.InstantiateEntityAsync(entityAsset, userData);
-
-            // 设置实体 Handle（必须在 OnInit 之前设置）
-            if (entity is EntityBase entityBase)
+            // 判断对象池返回的实体是否已有 Handle（复用回收的实体）
+            if (entity.Handle != null)
             {
-                SetEntityHandle(entityBase, instance);
+                // 复用已有 Handle，无需重新加载和实例化
+            }
+            else
+            {
+                // 加载实体资源（使用缓存）
+                AssetHandle assetHandle = await LoadEntityAssetAsync(entityAssetName);
+                GameObject entityAsset = assetHandle.AssetObject as GameObject;
+
+                // 实例化实体
+                GameObject instance = await _entityHelper.InstantiateEntityAsync(entityAsset, userData);
+
+                // 设置实体 Handle（必须在 OnInit 之前设置）
+                if (entity is EntityBase entityBase)
+                {
+                    SetEntityHandle(entityBase, instance);
+                }
             }
 
             // 初始化实体
             var isNewInstance = entity.EntityAssetName == null;
-            entity.OnInit(entityId, entityAssetName, entityGroup, isNewInstance, userData)
+            entity.OnInit(entityId, entityAssetName, entityGroup, isNewInstance, userData);
 
             // 注册实体
             _entities[entityId] = entity;
@@ -468,21 +490,30 @@ namespace EF.Entity
         }
 
         /// <summary>
-        /// 异步加载实体资源。
+        /// 异步加载实体资源，使用缓存避免重复加载。
         /// </summary>
         /// <param name="entityAssetName">实体资源名称。</param>
-        /// <returns>实体资源 GameObject。</returns>
-        private async UniTask<GameObject> LoadEntityAssetAsync(string entityAssetName)
+        /// <returns>资源句柄（包含 AssetObject）。</returns>
+        private async UniTask<AssetHandle> LoadEntityAssetAsync(string entityAssetName)
         {
+            // 优先从缓存中获取
+            if (_assetHandleCache.TryGetValue(entityAssetName, out var cachedHandle))
+            {
+                return cachedHandle;
+            }
+
             var handle = await _resourceManager.LoadAssetAsync<GameObject>(entityAssetName);
             var asset = handle.AssetObject as GameObject;
 
             if (asset == null)
             {
+                handle.Release();
                 throw new InvalidOperationException($"实体资源 '{entityAssetName}' 加载失败或不是 GameObject");
             }
 
-            return asset;
+            // 缓存资源句柄
+            _assetHandleCache[entityAssetName] = handle;
+            return handle;
         }
 
         /// <summary>
@@ -560,12 +591,10 @@ namespace EF.Entity
         /// <summary>
         /// 生成唯一实体 ID。
         /// </summary>
-        /// <param name="groupIndex">实体组索引。</param>
         /// <returns>实体 ID。</returns>
-        private int GenerateEntityId(int groupIndex)
+        public int GenerateEntityId()
         {
-            var serialId = ++_serialId;
-            return (serialId << 16) | (groupIndex & 0xFFFF);
+            return ++_serialId;
         }
     }
 
@@ -579,7 +608,7 @@ namespace EF.Entity
         public override GameObject Handle
         {
             get => _handle;
-             set => _handle = value;
+            set => _handle = value;
         }
     }
 }

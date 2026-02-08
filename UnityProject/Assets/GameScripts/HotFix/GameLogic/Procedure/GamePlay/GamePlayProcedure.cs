@@ -1,6 +1,9 @@
+using Cysharp.Threading.Tasks;
 using EF.Common;
 using EF.Debugger;
 using EF.Procedure;
+using EF.UI;
+using UnityEngine;
 using ProcedureOwner = EF.Fsm.IFsm<EF.Procedure.IProcedureManager>;
 
 namespace GameLogic
@@ -13,10 +16,18 @@ namespace GameLogic
     {
         private const int GamePlayScope = 1001;
         private const string BackgroundPrefabName = "BackgroundPrefab";
+        private const string EnemyPrefabName = "EnemyPlane";
+        private const string BulletPrefabName = "BulletCommon";
+        private const string GameRootName = "Root";
 
         private IGameSceneManager _gameSceneManager;
-        private IGameEnemyModule _gameEnemyModule;
         private IGameBackgroundModule _gameBackgroundModule;
+        private IEnemySpawnerModule _enemySpawnerModule;
+        private IBulletModule _bulletModule;
+        private Transform _backgroundRoot;
+        private Transform _playerPoint;
+        [UHubBind("EnemyPont")]
+        private Transform _enemyPoint;
 
         protected override void OnInit(ProcedureOwner procedureOwner)
         {
@@ -25,11 +36,18 @@ namespace GameLogic
             Log.Info("[GamePlayProcedure] OnInit");
         }
 
-        protected override async void OnEnter(ProcedureOwner procedureOwner)
+        protected override void OnEnter(ProcedureOwner procedureOwner)
         {
             base.OnEnter(procedureOwner);
             Log.Info("[GamePlayProcedure] OnEnter - 进入游戏玩法流程");
+            OnEnterAsync(procedureOwner).Forget();
+        }
 
+        /// <summary>
+        /// OnEnter 的异步实现，使用 UniTaskVoid 避免 async void 问题。
+        /// </summary>
+        private async UniTaskVoid OnEnterAsync(ProcedureOwner procedureOwner)
+        {
             try
             {
                 // 进入玩法前，清理上一次遗留的玩法作用域模块（幂等）。
@@ -39,14 +57,24 @@ namespace GameLogic
                     Log.Info($"[GamePlayProcedure] 已清理遗留玩法模块数量：{cleanedCount}");
                 }
 
-                // 注册玩法模块（当前仅敌机模块）。
-                _gameEnemyModule = new GameEnemyModule(GameLogicEntry.Entity);
-                ModuleSystem.Register<IGameEnemyModule>(_gameEnemyModule, replace: true, scope: GamePlayScope);
-
                 // 注册背景模块。
                 _gameBackgroundModule = new GameBackgroundModule(GameLogicEntry.Resource, GameLogicEntry.ObjectPool);
                 _gameBackgroundModule.Configure(BackgroundPrefabName, speed: 1f);
                 ModuleSystem.Register(_gameBackgroundModule, replace: true, scope: GamePlayScope);
+
+                // 注册子弹模块（先注册并初始化，确保敌人攻击前子弹系统就绪）。
+                _bulletModule = new BulletModule(GameLogicEntry.Resource, GameLogicEntry.ObjectPool);
+                _bulletModule.Configure(BulletPrefabName);
+                ModuleSystem.Register(_bulletModule, replace: true, scope: GamePlayScope);
+                await _bulletModule.InitializeAsync();
+                Log.Info("[GamePlayProcedure] 子弹模块已注册并初始化完成");
+
+                // 注册敌人生成器模块。
+                _enemySpawnerModule = new EnemySpawnerModule(GameLogicEntry.Entity);
+                _enemySpawnerModule.Configure(EnemyPrefabName, spawnInterval: 2f, maxEnemyCount: 10);
+                _enemySpawnerModule.Initialize();
+                ModuleSystem.Register(_enemySpawnerModule, replace: true, scope: GamePlayScope);
+                Log.Info("[GamePlayProcedure] 敌人生成器模块已注册");
 
                 // 进入玩法场景（复用现有 GameSceneManager）。
                 if (_gameSceneManager != null)
@@ -54,13 +82,32 @@ namespace GameLogic
                     await _gameSceneManager.EnterGamePlaySceneAsync();
                     Log.Info("[GamePlayProcedure] 游戏场景加载完成");
 
+                    TryResolveSceneReferences();
+
                     if (_gameBackgroundModule != null)
                     {
+                        _gameBackgroundModule.SetBackgroundRoot(_backgroundRoot);
                         await _gameBackgroundModule.LoadAsync();
                     }
 
-                    // TODO：外部配置敌机的 entityAssetName / groupName 后再启动刷怪。
-                    _gameEnemyModule.StartSpawning();
+                    // 将场景中的敌人生成区域锚点传递给敌人生成器模块
+                    if (_enemySpawnerModule != null && _enemyPoint != null)
+                    {
+                        // 使用 EnemyPoint 作为生成中心，半宽度为摄像机可见宽度的 40%
+                        float halfWidth = 3f;
+                        Camera mainCamera = Camera.main;
+                        if (mainCamera != null)
+                        {
+                            halfWidth = mainCamera.orthographicSize * mainCamera.aspect * 0.8f;
+                        }
+                        _enemySpawnerModule.SetSpawnArea(_enemyPoint, halfWidth);
+                        Log.Info("[GamePlayProcedure] 已将敌人生成区域传递给生成器模块");
+                    }
+                    else if (_enemyPoint == null)
+                    {
+                        Log.Warning("[GamePlayProcedure] EnemyPoint 未找到，敌人生成器将使用后备位置计算");
+                    }
+
                 }
                 else
                 {
@@ -86,8 +133,12 @@ namespace GameLogic
 
             int cleanedCount = ModuleSystem.ShutdownScope(GamePlayScope);
             Log.Info($"[GamePlayProcedure] 已清理玩法模块数量：{cleanedCount}");
-            _gameEnemyModule = null;
             _gameBackgroundModule = null;
+            _enemySpawnerModule = null;
+            _bulletModule = null;
+            _backgroundRoot = null;
+            _playerPoint = null;
+            _enemyPoint = null;
 
         }
 
@@ -104,6 +155,48 @@ namespace GameLogic
         {
             Log.Info("[GamePlayProcedure] 返回主菜单");
             ChangeState<MainMenuProcedure>(procedureOwner);
+        }
+
+        private void TryResolveSceneReferences()
+        {
+            _backgroundRoot = null;
+            _playerPoint = null;
+            _enemyPoint = null;
+
+            GameObject rootObject = GameObject.Find(GameRootName);
+            if (rootObject == null)
+            {
+                Log.Warning($"[GamePlayProcedure] 未找到场景节点 {GameRootName}，无法解析玩法引用。");
+                return;
+            }
+
+            ReferenceCollector collector = rootObject.GetComponent<ReferenceCollector>();
+            if (collector == null)
+            {
+                Log.Warning($"[GamePlayProcedure] 节点 {GameRootName} 未挂载 ReferenceCollector，无法解析玩法引用。");
+                return;
+            }
+
+            ComponentBinder binder = new ComponentBinder();
+            int bindCount = binder.BindComponents(this, collector);
+            Log.Info($"[GamePlayProcedure] UHub 自动绑定完成，成功数量：{bindCount}");
+
+            if (_backgroundRoot == null)
+            {
+                Log.Warning("[GamePlayProcedure] ReferenceCollector 缺少 BackgroundRoot。");
+            }
+
+            if (_playerPoint == null)
+            {
+                Log.Warning("[GamePlayProcedure] ReferenceCollector 缺少 PlayerPoint。");
+            }
+
+            if (_enemyPoint == null)
+            {
+                Log.Warning("[GamePlayProcedure] ReferenceCollector 缺少 EnemyPont。");
+            }
+
+            Log.Info($"[GamePlayProcedure] 场景引用解析完成 - BackgroundRoot:{(_backgroundRoot != null)}, PlayerPoint:{(_playerPoint != null)}, EnemyPont:{(_enemyPoint != null)}");
         }
     }
 }

@@ -32,9 +32,21 @@ namespace EF.UI
         /// <returns>绑定成功的组件数量</returns>
         public int BindComponents(UIView view, ReferenceCollector referenceCollector)
         {
-            if (view == null)
+            return BindComponents((object)view, referenceCollector);
+        }
+
+        /// <summary>
+        /// 为指定目标对象绑定组件引用。
+        /// 支持任何普通对象，不局限于 UIView。
+        /// </summary>
+        /// <param name="target">目标对象实例。</param>
+        /// <param name="referenceCollector">组件引用收集器。</param>
+        /// <returns>绑定成功的组件数量。</returns>
+        public int BindComponents(object target, ReferenceCollector referenceCollector)
+        {
+            if (target == null)
             {
-                LogError("UIView 实例不能为空");
+                LogError("目标对象实例不能为空");
                 return 0;
             }
 
@@ -45,7 +57,7 @@ namespace EF.UI
             }
 
             int bindCount = 0;
-            var viewType = view.GetType();
+            var targetType = target.GetType();
 
             // 先获取 ReferenceCollector 中所有可用的组件
             var availableComponents = GetAvailableComponents(referenceCollector);
@@ -56,10 +68,10 @@ namespace EF.UI
             }
 
             // 然后通过反射查找需要绑定的字段和属性
-            bindCount += BindFieldsWithAvailableComponents(view, viewType, availableComponents);
-            // bindCount += BindPropertiesWithAvailableComponents(view, viewType, availableComponents);
+            bindCount += BindFieldsWithAvailableComponents(target, targetType, availableComponents);
+            // bindCount += BindPropertiesWithAvailableComponents(target, targetType, availableComponents);
 
-            LogMessage($"[UHub] {view.GetType().Name} 组件绑定完成，成功绑定 {bindCount} 个组件", BindingFailureMode.Silent);
+            LogMessage($"[UHub] {targetType.Name} 组件绑定完成，成功绑定 {bindCount} 个组件", BindingFailureMode.Silent);
             return bindCount;
         }
 
@@ -145,10 +157,10 @@ namespace EF.UI
         /// <summary>
         /// 使用可用组件列表绑定字段
         /// </summary>
-        private int BindFieldsWithAvailableComponents(UIView view, Type viewType, Dictionary<string, UnityEngine.Object> availableComponents)
+        private int BindFieldsWithAvailableComponents(object target, Type targetType, Dictionary<string, UnityEngine.Object> availableComponents)
         {
             int bindCount = 0;
-            var fields = viewType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            var fields = targetType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
 
             // 遍历可用的组件，而不是所有字段
             foreach (var componentItem in availableComponents)
@@ -165,7 +177,7 @@ namespace EF.UI
                         continue;
 
                     // 尝试绑定字段
-                    if (TryBindFieldDirectly(view, matchingField, componentName, componentObject))
+                    if (TryBindFieldDirectly(target, matchingField, componentName, componentObject))
                         bindCount++;
                 }
             }
@@ -176,10 +188,10 @@ namespace EF.UI
         /// <summary>
         /// 使用可用组件列表绑定属性
         /// </summary>
-        private int BindPropertiesWithAvailableComponents(UIView view, Type viewType, Dictionary<string, UnityEngine.Object> availableComponents)
+        private int BindPropertiesWithAvailableComponents(object target, Type targetType, Dictionary<string, UnityEngine.Object> availableComponents)
         {
             int bindCount = 0;
-            var properties = viewType.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            var properties = targetType.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
 
             // 遍历可用的组件，而不是所有属性
             foreach (var componentItem in availableComponents)
@@ -200,7 +212,7 @@ namespace EF.UI
                         continue;
 
                     // 尝试绑定属性
-                    if (TryBindPropertyDirectly(view, matchingProperty, componentName, componentObject))
+                    if (TryBindPropertyDirectly(target, matchingProperty, componentName, componentObject))
                         bindCount++;
                 }
             }
@@ -249,7 +261,7 @@ namespace EF.UI
         /// <summary>
         /// 直接绑定字段
         /// </summary>
-        private bool TryBindFieldDirectly(UIView view, FieldInfo field, string componentName, UnityEngine.Object componentObject)
+        private bool TryBindFieldDirectly(object target, FieldInfo field, string componentName, UnityEngine.Object componentObject)
         {
             // 获取自定义绑定信息
             var bindAttr = field.GetCustomAttribute<UHubBindAttribute>();
@@ -291,7 +303,7 @@ namespace EF.UI
 
             try
             {
-                field.SetValue(view, targetComponent);
+                field.SetValue(target, targetComponent);
                 return true;
             }
             catch (Exception ex)
@@ -304,7 +316,7 @@ namespace EF.UI
         /// <summary>
         /// 直接绑定属性
         /// </summary>
-        private bool TryBindPropertyDirectly(UIView view, PropertyInfo property, string componentName, UnityEngine.Object componentObject)
+        private bool TryBindPropertyDirectly(object target, PropertyInfo property, string componentName, UnityEngine.Object componentObject)
         {
             // 获取自定义绑定信息
             var bindAttr = property.GetCustomAttribute<UHubBindAttribute>();
@@ -346,7 +358,7 @@ namespace EF.UI
 
             try
             {
-                property.SetValue(view, targetComponent);
+                property.SetValue(target, targetComponent);
                 return true;
             }
             catch (Exception ex)

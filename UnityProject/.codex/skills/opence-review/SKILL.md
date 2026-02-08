@@ -10,6 +10,7 @@ metadata:
 - Favor straightforward, minimal implementations first and add complexity only when it is requested or clearly required.
 - Keep changes tightly scoped to the requested outcome.
 - Refer to `opence/AGENTS.md` (located inside the `opence/` directory—run `ls opence` or `opence update` if you don't see it) if you need additional opence conventions or clarifications.
+- **Stage boundary**: This stage ends when the review findings are reported. Do NOT automatically proceed to the compound stage.
 
 **Steps**
 1. Inspect the change outputs and identify issues in priority order (severity high to low).
@@ -18,4 +19,7 @@ metadata:
 
 **Reference**
 - Use `opence show <id>`, `opence list`, and targeted file reads to ground the review.
+
+**Stage Complete**
+When findings are reported, conclude with: "Review phase complete. When ready, invoke `/opence-compound` to proceed."
 <!-- OPENCE:END -->

@@ -19,6 +19,12 @@ namespace GameLogic
         void Configure(string prefabName, float speed = 1f, bool autoCloneIfSingle = true);
 
         /// <summary>
+        /// 设置背景挂载根节点。
+        /// </summary>
+        /// <param name="backgroundRoot">背景根节点（为空时挂载到场景根节点）。</param>
+        void SetBackgroundRoot(Transform backgroundRoot);
+
+        /// <summary>
         /// 加载并初始化背景。
         /// </summary>
         UniTask LoadAsync();

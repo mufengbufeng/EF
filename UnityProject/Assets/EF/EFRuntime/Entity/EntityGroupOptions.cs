@@ -1,3 +1,5 @@
+using System;
+
 namespace EF.Entity
 {
     /// <summary>
@@ -5,6 +7,12 @@ namespace EF.Entity
     /// </summary>
     public sealed class EntityGroupOptions
     {
+        /// <summary>
+        /// 自定义实体工厂方法。
+        /// 若为 null，则使用默认的 DefaultEntity。
+        /// </summary>
+        public Func<IEntity> EntityFactory { get; set; }
+
         /// <summary>
         /// 实体组中实体实例的优先级。
         /// </summary>

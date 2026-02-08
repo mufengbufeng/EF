@@ -68,6 +68,35 @@ The CLI automatically:
 **Valid**: `api-testing`, `error-recovery`, `db-migration`
 **Invalid**: `api testing` (spaces), `api_testing` (underscores), `opence-custom` (reserved)
 
+## Writing Effective Descriptions
+
+The `description` field determines when Claude automatically loads your skill. Write it carefully.
+
+**Good description patterns:**
+- Start with an action verb: Explains, Creates, Reviews, Validates, Deploys, Fixes
+- Include keywords users naturally say
+- List specific trigger scenarios
+- Be specific but not overly narrow
+
+**Examples of good descriptions:**
+```
+"Explains code with visual diagrams and analogies. Use when explaining how code works, teaching about a codebase, or when the user asks 'how does this work?'"
+
+"Fix a GitHub issue following our coding standards. Use when working on issues or bugs."
+
+"Research a topic thoroughly using multiple sources. Use for deep dives or comprehensive analysis."
+```
+
+**Anti-patterns to avoid:**
+- Too abstract: `"Helps with development tasks"` — Claude can't decide when to use it
+- Too specific: `"Fix the login button CSS on mobile Safari 15.4"` — Won't match future requests
+- Missing scenarios: `"API testing utility"` — No trigger context
+
+**Trigger phrase checklist:**
+- [ ] Does it include words users would naturally say?
+- [ ] Would Claude know when to load it automatically?
+- [ ] Is it distinct from other skills' triggers?
+
 ## Next Steps
 
 After creating a skill:
@@ -78,6 +107,7 @@ After creating a skill:
 5. Commit to version control
 
 See references/ for detailed guidance on:
+- [Skill evaluation checklist](references/skill-evaluation-checklist.md) — Four-question framework and "is it worth creating" criteria
 - Directory structure and sizing
 - Frontmatter formats for different tools
 - Best practices and anti-patterns

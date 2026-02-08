@@ -26,7 +26,7 @@ namespace EF.Entity
         /// <summary>
         /// 实体关联的 GameObject。
         /// </summary>
-        public abstract GameObject Handle { get; internal set; }
+        public abstract GameObject Handle { get;  set; }
 
         /// <summary>
         /// 实体所属的实体组。
