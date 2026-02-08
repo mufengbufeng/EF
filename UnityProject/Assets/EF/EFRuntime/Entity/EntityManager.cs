@@ -88,10 +88,21 @@ namespace EF.Entity
                 entityGroup.EntityPool.Update(elapseSeconds, realElapseSeconds);
             }
 
-            // 更新所有已显示的实体
+            // 将需要更新的实体加入队列，避免迭代中修改集合
+            _entityUpdateQueue.Clear();
             foreach (var entity in _entities.Values)
             {
                 if (entity.Handle != null && entity.Handle.activeInHierarchy)
+                {
+                    _entityUpdateQueue.Enqueue(entity);
+                }
+            }
+
+            while (_entityUpdateQueue.Count > 0)
+            {
+                var entity = _entityUpdateQueue.Dequeue();
+                // 实体可能在前一个实体的 OnUpdate 中被隐藏，需要二次检查
+                if (_entities.ContainsKey(entity.Id))
                 {
                     entity.OnUpdate(elapseSeconds, realElapseSeconds);
                 }
@@ -298,15 +309,15 @@ namespace EF.Entity
             // 实例化实体
             GameObject instance = await _entityHelper.InstantiateEntityAsync(entityAsset, userData);
 
-            // 初始化实体
-            var isNewInstance = entity.EntityAssetName == null;
-            entity.OnInit(entityId, entityAssetName, entityGroup, isNewInstance, userData);
-
-            // 设置实体 Handle
+            // 设置实体 Handle（必须在 OnInit 之前设置）
             if (entity is EntityBase entityBase)
             {
                 SetEntityHandle(entityBase, instance);
             }
+
+            // 初始化实体
+            var isNewInstance = entity.EntityAssetName == null;
+            entity.OnInit(entityId, entityAssetName, entityGroup, isNewInstance, userData)
 
             // 注册实体
             _entities[entityId] = entity;
@@ -482,8 +493,12 @@ namespace EF.Entity
         /// <returns>新创建的实体实例。</returns>
         private IEntity CreateEntityInstance(string groupName, EntityGroupOptions options)
         {
-            // 这里需要根据实际需求创建实体实例
-            // 默认创建一个简单的实体，实际使用时应该由配置指定实体类型
+            // 若配置了自定义实体工厂，则使用工厂创建；否则使用默认实体。
+            if (options.EntityFactory != null)
+            {
+                return options.EntityFactory();
+            }
+
             var entity = new DefaultEntity();
             return entity;
         }
@@ -564,7 +579,7 @@ namespace EF.Entity
         public override GameObject Handle
         {
             get => _handle;
-            internal set => _handle = value;
+             set => _handle = value;
         }
     }
 }
