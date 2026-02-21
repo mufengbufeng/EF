@@ -5,6 +5,7 @@
     <_TargetFrameworkDirectories>non_empty_path_generated_by_unity.rider.package</_TargetFrameworkDirectories>
     <_FullFrameworkReferenceAssemblyPaths>non_empty_path_generated_by_unity.rider.package</_FullFrameworkReferenceAssemblyPaths>
     <DisableHandlePackageFileConflicts>true</DisableHandlePackageFileConflicts>
+    <ResolveNuGetPackages>false</ResolveNuGetPackages>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -108,6 +109,7 @@
     <Compile Include="Assets\EF\EFRuntime\Sound\SoundAgentPool.cs" />
     <Compile Include="Assets\EF\EFRuntime\Feature\Examples\ExampleFeatures.cs" />
     <Compile Include="Assets\EF\EFRuntime\Procedure\IProcedureManager.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Entity\ICollisionHandler.cs" />
     <Compile Include="Assets\EF\EFRuntime\Feature\Examples\ExampleFeatureUsage.cs" />
     <Compile Include="Assets\EF\EFRuntime\Entity\IEntityGroup.cs" />
     <Compile Include="Assets\EF\EFRuntime\Timer\TimerManager.cs" />
@@ -123,6 +125,7 @@
     <Compile Include="Assets\EF\EFRuntime\Debugger\LogExample.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UIController.cs" />
     <Compile Include="Assets\EF\EFRuntime\Sound\SoundExample.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Entity\EntityView.cs" />
     <Compile Include="Assets\EF\EFRuntime\Feature\RequireFeatureAttribute.cs" />
     <Compile Include="Assets\EF\EFRuntime\Scene\SceneManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Fsm\IFsmGeneric.cs" />

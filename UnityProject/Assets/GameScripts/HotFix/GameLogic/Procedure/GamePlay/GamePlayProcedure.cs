@@ -17,14 +17,21 @@ namespace GameLogic
         private const int GamePlayScope = 1001;
         private const string BackgroundPrefabName = "BackgroundPrefab";
         private const string EnemyPrefabName = "EnemyPlane";
+        private const string AvatarPrefabName = "Avatar";
         private const string BulletPrefabName = "BulletCommon";
+        private const string AvatarGroupName = "PlayerAvatar";
+        private const float AvatarAttackInterval = 0.2f;
+        private const float AvatarBulletSpeed = 8f;
+        private const float AvatarDragBoundaryPadding = 0.25f;
         private const string GameRootName = "Root";
 
         private IGameSceneManager _gameSceneManager;
         private IGameBackgroundModule _gameBackgroundModule;
         private IEnemySpawnerModule _enemySpawnerModule;
+        private IPlayerAvatarModule _playerAvatarModule;
         private IBulletModule _bulletModule;
         private Transform _backgroundRoot;
+        [UHubBind("PlayerPoint")]
         private Transform _playerPoint;
         [UHubBind("EnemyPont")]
         private Transform _enemyPoint;
@@ -63,7 +70,7 @@ namespace GameLogic
                 ModuleSystem.Register(_gameBackgroundModule, replace: true, scope: GamePlayScope);
 
                 // 注册子弹模块（先注册并初始化，确保敌人攻击前子弹系统就绪）。
-                _bulletModule = new BulletModule(GameLogicEntry.Resource, GameLogicEntry.ObjectPool);
+                _bulletModule = new BulletModule(GameLogicEntry.Entity);
                 _bulletModule.Configure(BulletPrefabName);
                 ModuleSystem.Register(_bulletModule, replace: true, scope: GamePlayScope);
                 await _bulletModule.InitializeAsync();
@@ -88,6 +95,24 @@ namespace GameLogic
                     {
                         _gameBackgroundModule.SetBackgroundRoot(_backgroundRoot);
                         await _gameBackgroundModule.LoadAsync();
+                    }
+
+                    // 注册玩家 Avatar 模块并生成玩家实体（依赖场景锚点和子弹模块已就绪）。
+                    _playerAvatarModule = new PlayerAvatarModule(GameLogicEntry.Entity);
+                    _playerAvatarModule.Configure(
+                        AvatarPrefabName,
+                        AvatarGroupName,
+                        AvatarAttackInterval,
+                        AvatarBulletSpeed,
+                        AvatarDragBoundaryPadding);
+                    _playerAvatarModule.SetSpawnAnchor(_playerPoint);
+                    ModuleSystem.Register(_playerAvatarModule, replace: true, scope: GamePlayScope);
+                    await _playerAvatarModule.InitializeAsync();
+                    Log.Info("[GamePlayProcedure] 玩家 Avatar 模块已注册并初始化完成");
+
+                    if (_playerPoint == null)
+                    {
+                        Log.Warning("[GamePlayProcedure] PlayerPoint 未找到，玩家出生位置使用后备方案");
                     }
 
                     // 将场景中的敌人生成区域锚点传递给敌人生成器模块
@@ -135,6 +160,7 @@ namespace GameLogic
             Log.Info($"[GamePlayProcedure] 已清理玩法模块数量：{cleanedCount}");
             _gameBackgroundModule = null;
             _enemySpawnerModule = null;
+            _playerAvatarModule = null;
             _bulletModule = null;
             _backgroundRoot = null;
             _playerPoint = null;

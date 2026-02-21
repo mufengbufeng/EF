@@ -5,6 +5,7 @@
     <_TargetFrameworkDirectories>non_empty_path_generated_by_unity.rider.package</_TargetFrameworkDirectories>
     <_FullFrameworkReferenceAssemblyPaths>non_empty_path_generated_by_unity.rider.package</_FullFrameworkReferenceAssemblyPaths>
     <DisableHandlePackageFileConflicts>true</DisableHandlePackageFileConflicts>
+    <ResolveNuGetPackages>false</ResolveNuGetPackages>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -67,9 +68,13 @@
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\Enum\EGameEvent.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Model\GamePlayModel.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Bullet\BulletModule.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Bullet\BulletEntity.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Background\IGameBackgroundModule.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Avatar\PlayerAvatarEntity.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Avatar\PlayerAvatarModule.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Main\MainController.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\Procedure\Main\LoginProcedure.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Avatar\PlayerAvatarBehaviorData.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\Procedure\Main\InitProcedure.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Enemy\EnemyEntity.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Bullet\IBulletModule.cs" />
@@ -80,6 +85,8 @@
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\Enum\ModuleScope.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GameLogicEntry.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\Procedure\GamePlay\GamePlayProcedure.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Avatar\IPlayerAvatarModule.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Common\IHealth.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Entry\EntryView.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Bullet\BulletData.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Scene\GameSceneEvents.cs" />
@@ -915,6 +922,9 @@
     </Reference>
     <Reference Include="VContainer">
       <HintPath>D:\UnityGame\Self\EasyFramework\UnityProject\Library\ScriptAssemblies\VContainer.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.InputSystem">
+      <HintPath>D:\UnityGame\Self\EasyFramework\UnityProject\Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>D:\UnityGame\Self\EasyFramework\UnityProject\Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>

@@ -14,22 +14,22 @@ namespace GameLogic
     public class EnemySpawnerModule : AEFManager, IEnemySpawnerModule
     {
         private readonly IEntityManager _entityManager;
-        
+
         private string _enemyPrefabName;
         private float _spawnInterval;
         private int _maxEnemyCount;
         private float _spawnTimer;
-        
+
         // 生成区域参数
         private Transform _spawnAreaCenter;
         private float _spawnAreaHalfWidth;
-        
+
         // 存活敌人列表
         private readonly List<int> _aliveEnemies = new List<int>();
-        
+
         // 实体组名称
         private const string EnemyGroupName = "Enemy";
-        
+
         /// <summary>
         /// 初始化敌人生成器模块。
         /// </summary>
@@ -48,8 +48,8 @@ namespace GameLogic
             _spawnInterval = spawnInterval;
             _maxEnemyCount = maxEnemyCount;
             _spawnTimer = 0f;
-            
-            Log.Info($"[EnemySpawnerModule] 已配置 - 预制体: {enemyPrefabName}, 间隔: {spawnInterval}s, 最大数量: {maxEnemyCount}");
+
+            // Log.Info($"[EnemySpawnerModule] 已配置 - 预制体: {enemyPrefabName}, 间隔: {spawnInterval}s, 最大数量: {maxEnemyCount}");
         }
 
         /// <summary>
@@ -62,10 +62,10 @@ namespace GameLogic
         {
             _spawnAreaCenter = spawnAreaCenter;
             _spawnAreaHalfWidth = spawnAreaHalfWidth;
-            
+
             if (spawnAreaCenter != null)
             {
-                Log.Info($"[EnemySpawnerModule] 已设置生成区域 - 中心: {spawnAreaCenter.position}, 半宽度: {spawnAreaHalfWidth}");
+                // Log.Info($"[EnemySpawnerModule] 已设置生成区域 - 中心: {spawnAreaCenter.position}, 半宽度: {spawnAreaHalfWidth}");
             }
             else
             {
@@ -79,7 +79,7 @@ namespace GameLogic
         public void SetSpawnInterval(float interval)
         {
             _spawnInterval = interval;
-            Log.Info($"[EnemySpawnerModule] 生成间隔已更新为: {interval}s");
+            // Log.Info($"[EnemySpawnerModule] 生成间隔已更新为: {interval}s");
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace GameLogic
         public void SetMaxEnemyCount(int maxCount)
         {
             _maxEnemyCount = maxCount;
-            Log.Info($"[EnemySpawnerModule] 最大敌人数量已更新为: {maxCount}");
+            // Log.Info($"[EnemySpawnerModule] 最大敌人数量已更新为: {maxCount}");
         }
 
         /// <summary>
@@ -104,10 +104,10 @@ namespace GameLogic
                     _aliveEnemies.RemoveAt(i);
                 }
             }
-            
+
             // 累加生成计时器
             _spawnTimer += elapseSeconds;
-            
+
             // 检查是否达到生成条件
             if (_spawnTimer >= _spawnInterval && _aliveEnemies.Count < _maxEnemyCount)
             {
@@ -129,7 +129,7 @@ namespace GameLogic
 
             // 计算生成位置（基于生成区域锚点的随机位置）
             Vector3 spawnPosition = GetRandomSpawnPosition();
-            
+
             // 创建敌人行为数据
             var behaviorData = new EnemyBehaviorData
             {
@@ -144,10 +144,11 @@ namespace GameLogic
             try
             {
                 int enemyId = _entityManager.GenerateEntityId();
-                var entity = await _entityManager.ShowEntityAsync(enemyId, _enemyPrefabName, EnemyGroupName, behaviorData);
-                
+                var entity =
+                    await _entityManager.ShowEntityAsync(enemyId, _enemyPrefabName, EnemyGroupName, behaviorData);
+
                 _aliveEnemies.Add(enemyId);
-                Log.Info($"[EnemySpawnerModule] 生成敌人 ID: {enemyId}, 位置: {spawnPosition}, 当前存活数量: {_aliveEnemies.Count}");
+                // Log.Info($"[EnemySpawnerModule] 生成敌人 ID: {enemyId}, 位置: {spawnPosition}, 当前存活数量: {_aliveEnemies.Count}");
             }
             catch (System.Exception e)
             {
@@ -189,8 +190,8 @@ namespace GameLogic
         /// </summary>
         public void Initialize()
         {
-            Log.Info("[EnemySpawnerModule] Initialize");
-            
+            // Log.Info("[EnemySpawnerModule] Initialize");
+
             // 确保实体组存在
             if (!_entityManager.HasEntityGroup(EnemyGroupName))
             {
@@ -205,7 +206,7 @@ namespace GameLogic
                     EntityFactory = () => new EnemyEntity()
                 };
                 _entityManager.AddEntityGroup(EnemyGroupName, options);
-                Log.Info($"[EnemySpawnerModule] 已创建实体组: {EnemyGroupName}（使用 EnemyEntity 工厂）");
+                // Log.Info($"[EnemySpawnerModule] 已创建实体组: {EnemyGroupName}（使用 EnemyEntity 工厂）");
             }
         }
 
@@ -214,8 +215,8 @@ namespace GameLogic
         /// </summary>
         public override void Shutdown()
         {
-            Log.Info($"[EnemySpawnerModule] OnShutdown - 清理 {_aliveEnemies.Count} 个存活敌人");
-            
+            // Log.Info($"[EnemySpawnerModule] OnShutdown - 清理 {_aliveEnemies.Count} 个存活敌人");
+
             // 隐藏所有存活的敌人
             foreach (int enemyId in _aliveEnemies)
             {
@@ -224,7 +225,7 @@ namespace GameLogic
                     _entityManager.HideEntity(enemyId);
                 }
             }
-            
+
             _aliveEnemies.Clear();
             _spawnTimer = 0f;
             _spawnAreaCenter = null;

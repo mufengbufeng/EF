@@ -9,46 +9,69 @@ namespace GameLogic
     /// 敌人实体。
     /// 负责敌人的移动、停留和攻击行为逻辑，以及动画状态控制。
     /// </summary>
-    public class EnemyEntity : EntityBase
+    public class EnemyEntity : EntityBase, IHealth
     {
         /// <summary>
         /// 敌人行为状态。
         /// </summary>
         private enum EnemyState
         {
-            Moving,     // 移动中
-            Staying     // 停留中
+            Moving, // 移动中
+            Staying, // 停留中
+            Dead // 死亡
         }
 
         private GameObject _handleField;
         private EnemyState _currentState;
-        
+
         // 移动参数
         private float _moveSpeed;
         private Vector3 _moveDirection;
-        
+
         // 停留参数
         private Vector3 _stayPosition;
         private float _stayDuration;
         private float _stayTimer;
         private bool _hasStayed; // 是否已经完成过停留
-        
+
         // 攻击参数
         private float _attackInterval;
         private float _attackTimer;
-        
+
         // 动画控制
         private Animator _animator;
+        private Collider2D _collider2D;
         private static readonly int IsDeadParam = Animator.StringToHash("IsDead");
         private const string EnemyIdelState = "EnemyIdel";
         private const string EnemyDeadState = "EnemyDead";
-        
+
         // 边界检测
         private const float BottomBoundary = -6f;
 
         // 缓存的模块引用，避免每帧查询 ModuleSystem
         private IBulletModule _bulletModule;
         private IEntityManager _entityManager;
+        private int _lifecycleToken;
+
+        // 生命值系统
+        private float _currentHealth;
+        private float _maxHealth;
+        private bool _isDead;
+
+        /// <summary>
+        /// 当前生命值。
+        /// </summary>
+        public float CurrentHealth => _currentHealth;
+
+        /// <summary>
+        /// 最大生命值。
+        /// </summary>
+        public float MaxHealth => _maxHealth;
+
+        /// <summary>
+        /// 是否已死亡。
+        /// </summary>
+        public bool IsDead => _isDead;
 
         /// <summary>
         /// 实体关联的 GameObject。
@@ -56,29 +79,28 @@ namespace GameLogic
         /// </summary>
         public override GameObject Handle
         {
-            get
-            {
-                return _handleField;
-            }
-             set
-            {
-                _handleField = value;
-            }
+            get { return _handleField; }
+            set { _handleField = value; }
         }
 
         /// <summary>
         /// 初始化实体。
         /// </summary>
-        public override void OnInit(int entityId, string entityAssetName, IEntityGroup entityGroup, bool isNewInstance, object userData)
+        public override void OnInit(int entityId, string entityAssetName, IEntityGroup entityGroup, bool isNewInstance,
+            object userData)
         {
             base.OnInit(entityId, entityAssetName, entityGroup, isNewInstance, userData);
-            
+
             // 重置状态
             _currentState = EnemyState.Moving;
             _stayTimer = 0f;
             _attackTimer = 0f;
             _hasStayed = false;
             _animator = null;
+            _collider2D = null;
+            _currentHealth = 0f;
+            _maxHealth = 0f;
+            _isDead = false;
         }
 
         /// <summary>
@@ -87,23 +109,31 @@ namespace GameLogic
         public override void OnShow(object userData)
         {
             base.OnShow(userData);
-            
+
+            _lifecycleToken++;
+
             // 缓存模块引用，避免每帧查询
             _bulletModule = ModuleSystem.Get<IBulletModule>();
             _entityManager = ModuleSystem.Get<IEntityManager>();
-            
+
             // 激活 GameObject
             if (Handle != null)
             {
                 Handle.SetActive(true);
-                
+
                 // 获取 Animator 组件
                 _animator = Handle.GetComponent<Animator>();
+                _collider2D = Handle.GetComponent<Collider2D>();
                 if (_animator != null)
                 {
                     // 播放待机动画
                     _animator.Play(EnemyIdelState);
                     _animator.SetBool(IsDeadParam, false);
+                }
+
+                if (_collider2D != null)
+                {
+                    _collider2D.enabled = true;
                 }
             }
 
@@ -127,13 +157,18 @@ namespace GameLogic
                 // 初始化攻击参数
                 _attackInterval = behaviorData.AttackInterval;
 
+                // 初始化生命值
+                _maxHealth = 50f;
+                _currentHealth = _maxHealth;
+                _isDead = false;
+
                 // 设置初始状态为移动
                 _currentState = EnemyState.Moving;
                 _stayTimer = 0f;
                 _attackTimer = 0f;
                 _hasStayed = false;
 
-                Log.Info($"[EnemyEntity] ID {Id} 已显示，位置: {behaviorData.SpawnPosition}, 停留目标: {_stayPosition}");
+                // Log.Info($"[EnemyEntity] ID {Id} 已显示，位置: {behaviorData.SpawnPosition}, 停留目标: {_stayPosition}");
             }
             else
             {
@@ -153,6 +188,11 @@ namespace GameLogic
                 return;
             }
 
+            if (_isDead || _currentState == EnemyState.Dead)
+            {
+                return;
+            }
+
             switch (_currentState)
             {
                 case EnemyState.Moving:
@@ -162,6 +202,9 @@ namespace GameLogic
                 case EnemyState.Staying:
                     UpdateStaying(elapseSeconds);
                     break;
+
+                case EnemyState.Dead:
+                    return;
             }
 
             // 更新攻击逻辑（移动和停留状态都可以攻击）
@@ -207,7 +250,7 @@ namespace GameLogic
                 // 标记已完成停留，切换回移动状态继续向下
                 _hasStayed = true;
                 _currentState = EnemyState.Moving;
-                Log.Info($"[EnemyEntity] ID {Id} 停留结束，继续向下移动");
+                // Log.Info($"[EnemyEntity] ID {Id} 停留结束，继续向下移动");
             }
         }
 
@@ -221,7 +264,7 @@ namespace GameLogic
             {
                 return;
             }
-            
+
             _attackTimer += elapseSeconds;
 
             // 检查攻击间隔
@@ -248,11 +291,13 @@ namespace GameLogic
                 SpawnPosition = Handle.transform.position,
                 Direction = Vector3.down,
                 Speed = 5f,
-                OwnerTag = "Enemy"
+                OwnerType = BulletOwnerType.Enemy,
+                Damage = 20f,
+                SourceEntityId = Id
             };
 
             _bulletModule.Fire(bulletData);
-            Log.Info($"[EnemyEntity] ID {Id} 发射子弹，位置: {Handle.transform.position}");
+            // Log.Info($"[EnemyEntity] ID {Id} 发射子弹，位置: {Handle.transform.position}");
         }
 
         /// <summary>
@@ -262,8 +307,8 @@ namespace GameLogic
         {
             if (Handle.transform.position.y < BottomBoundary)
             {
-                Log.Info($"[EnemyEntity] ID {Id} 超出边界，自动销毁");
-                
+                // Log.Info($"[EnemyEntity] ID {Id} 超出边界，自动销毁");
+
                 // 使用缓存的 EntityManager 销毁自己
                 if (_entityManager != null)
                 {
@@ -281,8 +326,73 @@ namespace GameLogic
             {
                 _animator.SetBool(IsDeadParam, true);
                 _animator.Play(EnemyDeadState);
-                Log.Info($"[EnemyEntity] ID {Id} 播放死亡动画");
+                // Log.Info($"[EnemyEntity] ID {Id} 播放死亡动画");
             }
+        }
+
+        /// <summary>
+        /// 接受伤害。
+        /// </summary>
+        /// <param name="damage">伤害值。</param>
+        public void TakeDamage(float damage)
+        {
+            if (_isDead)
+            {
+                return;
+            }
+
+            _currentHealth -= damage;
+            // Log.Info($"[EnemyEntity] ID {Id} 受到伤害 {damage}，当前生命值: {_currentHealth}/{_maxHealth}");
+
+            if (_currentHealth <= 0)
+            {
+                _isDead = true;
+                _currentHealth = 0;
+                _currentState = EnemyState.Dead;
+                // Log.Info($"[EnemyEntity] ID {Id} 已死亡");
+
+                if (_collider2D != null)
+                {
+                    _collider2D.enabled = false;
+                }
+
+                ClearOwnedBullets();
+
+                // 播放死亡动画
+                PlayDeadAnimation();
+
+                // 延迟隐藏实体(等待动画播放)
+                DelayedHide(1.0f, _lifecycleToken, Id);
+            }
+        }
+
+        /// <summary>
+        /// 延迟隐藏实体。
+        /// </summary>
+        private async void DelayedHide(float delay, int expectedToken, int expectedEntityId)
+        {
+            await Cysharp.Threading.Tasks.UniTask.Delay(System.TimeSpan.FromSeconds(delay));
+
+            if (expectedToken != _lifecycleToken || !_isDead || Id != expectedEntityId)
+            {
+                return;
+            }
+
+            if (Handle != null && _entityManager != null)
+            {
+                _entityManager.HideEntity(expectedEntityId);
+                // Log.Info($"[EnemyEntity] ID {expectedEntityId} 已隐藏");
+            }
+        }
+
+        private void ClearOwnedBullets()
+        {
+            if (_bulletModule == null)
+            {
+                _bulletModule = ModuleSystem.Get<IBulletModule>();
+            }
+
+            _bulletModule?.ClearBulletsBySource(Id);
         }
 
         /// <summary>
@@ -291,6 +401,8 @@ namespace GameLogic
         public override void OnHide(bool isShutdown, object userData)
         {
             base.OnHide(isShutdown, userData);
+
+            _lifecycleToken++;
 
             // 停用 GameObject
             if (Handle != null)
@@ -304,12 +416,16 @@ namespace GameLogic
             _attackTimer = 0f;
             _hasStayed = false;
             _animator = null;
-            
+            _collider2D = null;
+            _currentHealth = 0f;
+            _maxHealth = 0f;
+            _isDead = false;
+
             // 清理缓存的模块引用
             _bulletModule = null;
             _entityManager = null;
 
-            Log.Info($"[EnemyEntity] ID {Id} 已隐藏");
+            // Log.Info($"[EnemyEntity] ID {Id} 已隐藏");
         }
 
         /// <summary>
@@ -318,6 +434,8 @@ namespace GameLogic
         public override void OnRecycle()
         {
             base.OnRecycle();
+
+            _lifecycleToken++;
 
             // 重置所有数据
             _moveSpeed = 0f;
@@ -330,6 +448,10 @@ namespace GameLogic
             _hasStayed = false;
             _currentState = EnemyState.Moving;
             _animator = null;
+            _collider2D = null;
+            _currentHealth = 0f;
+            _maxHealth = 0f;
+            _isDead = false;
         }
     }
 }
