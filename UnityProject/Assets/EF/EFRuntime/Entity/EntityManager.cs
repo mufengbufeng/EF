@@ -319,7 +319,11 @@ namespace EF.Entity
             // 判断对象池返回的实体是否已有 Handle（复用回收的实体）
             if (entity.Handle != null)
             {
-                // 复用已有 Handle，无需重新加载和实例化
+                var entityView = entity.Handle.GetComponent<EntityView>();
+                if (entityView != null && entity is EntityBase entityBase)
+                {
+                    entityView.SetEntity(entityBase);
+                }
             }
             else
             {
@@ -540,6 +544,14 @@ namespace EF.Entity
         /// <param name="entity">被回收的实体。</param>
         private void OnEntityRecycle(IEntity entity)
         {
+            if (entity.Handle != null)
+            {
+                var entityView = entity.Handle.GetComponent<EntityView>();
+                if (entityView != null)
+                {
+                    entityView.ClearEntity();
+                }
+            }
             entity.OnRecycle();
         }
 
@@ -563,6 +575,8 @@ namespace EF.Entity
         private void SetEntityHandle(EntityBase entity, GameObject handle)
         {
             entity.Handle = handle;
+            var entityView = handle.GetComponent<EntityView>() ?? handle.AddComponent<EntityView>();
+            entityView.SetEntity(entity);
         }
 
         /// <summary>
