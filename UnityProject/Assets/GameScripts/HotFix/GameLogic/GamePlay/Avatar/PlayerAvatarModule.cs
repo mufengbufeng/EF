@@ -25,6 +25,8 @@ namespace GameLogic
         private int _avatarEntityId;
         private bool _isInitialized;
 
+        public event Action OnPlayerDied;
+
         /// <summary>
         /// 初始化玩家模块。
         /// </summary>
@@ -93,7 +95,8 @@ namespace GameLogic
                 SpawnPosition = spawnPosition,
                 AttackInterval = _attackInterval,
                 BulletSpeed = _bulletSpeed,
-                DragBoundaryPadding = _dragBoundaryPadding
+                DragBoundaryPadding = _dragBoundaryPadding,
+                OnDead = HandlePlayerDied
             };
 
             try
@@ -129,6 +132,18 @@ namespace GameLogic
             _avatarEntityId = 0;
             _isInitialized = false;
             _spawnAnchor = null;
+            OnPlayerDied = null;
+        }
+
+        private void HandlePlayerDied()
+        {
+            if (!_isInitialized)
+            {
+                return;
+            }
+
+            Log.Info($"[PlayerAvatarModule] 收到玩家死亡通知，EntityId:{_avatarEntityId}");
+            OnPlayerDied?.Invoke();
         }
 
         private void EnsureAvatarEntityGroup()

@@ -67,11 +67,13 @@
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Enemy\IEnemySpawnerModule.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\Enum\EGameEvent.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Model\GamePlayModel.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Game\GamePlayController.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Bullet\BulletModule.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Bullet\BulletEntity.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Background\IGameBackgroundModule.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Avatar\PlayerAvatarEntity.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Avatar\PlayerAvatarModule.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Game\GamePlayView.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Main\MainController.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\Procedure\Main\LoginProcedure.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Avatar\PlayerAvatarBehaviorData.cs" />
@@ -92,7 +94,9 @@
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Scene\GameSceneEvents.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Scene\IGameSceneManager.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GameScope.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Game\GameMenuController.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Main\MainModel.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Game\GameMenuView.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Enemy\EnemySpawnerModule.cs" />
     <None Include="Assets\GameScripts\HotFix\GameLogic\GameLogic.asmdef" />
     <Reference Include="UnityEngine">
@@ -481,6 +485,9 @@
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="SingularityGroup.HotReload.EditorDependencies">
+      <HintPath>D:\UnityGame\Self\EasyFramework\UnityProject\Packages\com.singularitygroup.hotreload\Editor\SingularityGroup.HotReload.EditorDependencies.dll</HintPath>
     </Reference>
     <Reference Include="ReportGeneratorMerged">
       <HintPath>D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.testtools.codecoverage@205a02cbcb39\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
@@ -925,6 +932,9 @@
     </Reference>
     <Reference Include="Unity.InputSystem">
       <HintPath>D:\UnityGame\Self\EasyFramework\UnityProject\Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Universal.Runtime">
+      <HintPath>D:\UnityGame\Self\EasyFramework\UnityProject\Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>D:\UnityGame\Self\EasyFramework\UnityProject\Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>

@@ -460,6 +460,9 @@
     <Reference Include="nunit.framework">
       <HintPath>D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="SingularityGroup.HotReload.EditorDependencies">
+      <HintPath>D:\UnityGame\Self\EasyFramework\UnityProject\Packages\com.singularitygroup.hotreload\Editor\SingularityGroup.HotReload.EditorDependencies.dll</HintPath>
+    </Reference>
     <Reference Include="ReportGeneratorMerged">
       <HintPath>D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.testtools.codecoverage@205a02cbcb39\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
     </Reference>
@@ -1231,6 +1234,10 @@
     <ProjectReference Include="GameProto.csproj">
       <Project>{edac4524-94b2-d82b-51fd-0d97f3cacc05}</Project>
       <Name>GameProto</Name>
+    </ProjectReference>
+    <ProjectReference Include="SingularityGroup.HotReload.Runtime.Public.csproj">
+      <Project>{f1d74e2c-7385-5a69-2d73-4be9d746654c}</Project>
+      <Name>SingularityGroup.HotReload.Runtime.Public</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -119,9 +119,9 @@ namespace EF.Entity
         {
             HideAllLoadedEntities();
 
-            foreach (var entityGroup in _entityGroups.Values)
+            foreach (var kvp in _entityGroups)
             {
-                entityGroup.Release();
+                _objectPoolManager.DestroyPool<IEntity>(kvp.Key);
             }
 
             _entityGroups.Clear();
@@ -240,7 +240,7 @@ namespace EF.Entity
                 HideEntity(entity.Id);
             }
 
-            entityGroup.Release();
+            _objectPoolManager.DestroyPool<IEntity>(name);
             _entityGroups.Remove(name);
         }
 

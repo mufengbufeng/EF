@@ -1177,6 +1177,10 @@
       <Project>{edac4524-94b2-d82b-51fd-0d97f3cacc05}</Project>
       <Name>GameProto</Name>
     </ProjectReference>
+    <ProjectReference Include="SingularityGroup.HotReload.Runtime.Public.csproj">
+      <Project>{f1d74e2c-7385-5a69-2d73-4be9d746654c}</Project>
+      <Name>SingularityGroup.HotReload.Runtime.Public</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

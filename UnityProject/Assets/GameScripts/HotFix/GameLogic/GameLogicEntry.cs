@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Cysharp.Threading.Tasks;
 using EF.Common;
 using EF.Debugger;
 using EF.Entity;
@@ -40,6 +39,9 @@ namespace GameLogic
         private static ModelManager _modelManager;
         private static IEntityManager _entityManager;
         private static IGameSceneManager _gameSceneManager;
+
+        // UI 摄像机引用（DontDestroyOnLoad，用于 URP Camera Stack）
+        private static Camera _uiCamera;
 
         // 游戏配置系统
         private static ConfigSystem _configSystem;
@@ -115,6 +117,11 @@ namespace GameLogic
         public static IGameSceneManager GameScene => _gameSceneManager;
 
         /// <summary>
+        /// UI 摄像机（DontDestroyOnLoad，用于 URP Camera Stack）
+        /// </summary>
+        public static Camera UICamera => _uiCamera;
+
+        /// <summary>
         /// 热更新代码入口点
         /// </summary>
         public static void Init()
@@ -178,6 +185,21 @@ namespace GameLogic
             var normal = rc.Get<GameObject>("Normal");
             var popup = rc.Get<GameObject>("Popup");
             var overlay = rc.Get<GameObject>("Overlay");
+            var uiCamera =  rc.Get<GameObject>("UICamera");
+            
+            // 缓存 UI 摄像机引用，用于 URP Camera Stack
+            if (uiCamera != null)
+            {
+                _uiCamera = uiCamera.GetComponent<Camera>();
+                if (_uiCamera == null)
+                {
+                    Log.Warning("[GameLogicEntry] UICamera 游戏对象上未找到 Camera 组件。");
+                }
+            }
+            else
+            {
+                Log.Warning("[GameLogicEntry] ReferenceCollector 中未找到 UICamera 引用。");
+            }
 
             _uiManager.RegisterLayerRoot(UILayer.Background, background.transform);
             _uiManager.RegisterLayerRoot(UILayer.Normal, normal.transform);
@@ -201,7 +223,7 @@ namespace GameLogic
                 _modelManager.Register<MainModel>();
 
                 // 注册游戏玩法数据模型
-                // _modelManager.Register<GamePlayModel>();
+                _modelManager.Register<GamePlayModel>();
 
                 Log.Info("[GameLogicEntry] 游戏数据模型初始化完成");
             }

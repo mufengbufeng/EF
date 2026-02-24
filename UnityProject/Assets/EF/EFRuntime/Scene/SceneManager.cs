@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using EF.Common;
 using EF.Debugger;
@@ -18,6 +19,7 @@ namespace EF.Scene
         private IResourceManager _resourceManager;
         private SceneHandle _currentSceneHandle;
         private SceneInfo? _currentScene;
+        private readonly SemaphoreSlim _sceneOperationLock = new(1, 1);
 
         #endregion
 
@@ -114,6 +116,7 @@ namespace EF.Scene
                 return false;
             }
 
+            await _sceneOperationLock.WaitAsync();
             try
             {
                 Log.Info($"[SceneManager] 开始加载场景：{sceneName}");
@@ -136,7 +139,9 @@ namespace EF.Scene
                     // 卸载之前的场景
                     if (_currentSceneHandle != null && sceneMode == LoadSceneMode.Single)
                     {
-                        await UnloadCurrentSceneInternal();
+                        SceneHandle previousHandle = _currentSceneHandle;
+                        string previousSceneName = _currentScene?.Name ?? "Unknown";
+                        await UnloadSceneHandleInternal(previousHandle, previousSceneName);
                     }
 
                     // 设置新场景
@@ -162,18 +167,46 @@ namespace EF.Scene
                 OnSceneError?.Invoke(ex);
                 return false;
             }
+            finally
+            {
+                _sceneOperationLock.Release();
+            }
         }
 
         /// <inheritdoc />
         public async UniTask<bool> UnloadSceneAsync()
         {
-            if (_currentSceneHandle == null || !_currentScene.HasValue)
-            {
-                Log.Warning("[SceneManager] 没有场景需要卸载");
-                return false;
-            }
+            return await UnloadSceneAsync(null);
+        }
 
-            return await UnloadCurrentSceneInternal();
+        /// <inheritdoc />
+        public async UniTask<bool> UnloadSceneAsync(SceneInfo? expectedScene)
+        {
+            await _sceneOperationLock.WaitAsync();
+            try
+            {
+                SceneHandle targetHandle = _currentSceneHandle;
+                if (targetHandle == null || !_currentScene.HasValue)
+                {
+                    Log.Warning("[SceneManager] 没有场景需要卸载");
+                    return false;
+                }
+
+                SceneInfo currentScene = _currentScene.Value;
+                if (expectedScene.HasValue && !IsSameSceneSnapshot(currentScene, expectedScene.Value))
+                {
+                    Log.Info(
+                        $"[SceneManager] 跳过场景卸载，当前场景已变化。期望:{expectedScene.Value.Name}@{expectedScene.Value.LoadStartTime:O}，当前:{currentScene.Name}@{currentScene.LoadStartTime:O}");
+                    return false;
+                }
+
+                string targetSceneName = currentScene.Name;
+                return await UnloadSceneHandleInternal(targetHandle, targetSceneName);
+            }
+            finally
+            {
+                _sceneOperationLock.Release();
+            }
         }
 
         /// <inheritdoc />
@@ -187,19 +220,18 @@ namespace EF.Scene
         #region 私有方法
 
         /// <summary>
-        /// 卸载当前场景的内部实现
+        /// 卸载指定场景句柄的内部实现。
         /// </summary>
-        private async UniTask<bool> UnloadCurrentSceneInternal()
+        private async UniTask<bool> UnloadSceneHandleInternal(SceneHandle sceneHandle, string sceneName)
         {
-            if (_currentSceneHandle == null)
+            if (sceneHandle == null)
                 return false;
 
             try
             {
-                var sceneName = _currentScene?.Name ?? "Unknown";
                 Log.Info($"[SceneManager] 开始卸载场景：{sceneName}");
 
-                var unloadOperation = _currentSceneHandle.UnloadAsync();
+                var unloadOperation = sceneHandle.UnloadAsync();
                 
                 while (!unloadOperation.IsDone)
                 {
@@ -209,8 +241,13 @@ namespace EF.Scene
                 if (unloadOperation.Status == EOperationStatus.Succeed)
                 {
                     OnSceneUnloaded?.Invoke(sceneName);
-                    _currentSceneHandle = null;
-                    _currentScene = null;
+
+                    // 仅在当前跟踪句柄仍是本次目标时才清空状态，避免并发切场景时误清理新场景记录。
+                    if (ReferenceEquals(_currentSceneHandle, sceneHandle))
+                    {
+                        _currentSceneHandle = null;
+                        _currentScene = null;
+                    }
                     
                     Log.Info($"[SceneManager] 场景 '{sceneName}' 卸载成功");
                     return true;
@@ -228,6 +265,15 @@ namespace EF.Scene
                 OnSceneError?.Invoke(ex);
                 return false;
             }
+        }
+
+        /// <summary>
+        /// 判断当前场景是否与期望快照一致。
+        /// </summary>
+        private static bool IsSameSceneSnapshot(SceneInfo currentScene, SceneInfo expectedScene)
+        {
+            return string.Equals(currentScene.Name, expectedScene.Name, StringComparison.Ordinal) &&
+                   currentScene.LoadStartTime == expectedScene.LoadStartTime;
         }
 
         #endregion

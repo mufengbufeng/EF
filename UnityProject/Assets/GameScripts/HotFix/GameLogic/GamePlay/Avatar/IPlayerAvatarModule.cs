@@ -11,6 +11,11 @@ namespace GameLogic
     public interface IPlayerAvatarModule : IEFManager
     {
         /// <summary>
+        /// 玩家死亡流程完成后的通知事件。
+        /// </summary>
+        event System.Action OnPlayerDied;
+
+        /// <summary>
         /// 配置玩家实体参数。
         /// </summary>
         /// <param name="avatarPrefabName">玩家预制体资源名称。</param>

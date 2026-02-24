@@ -44,6 +44,7 @@ namespace GameLogic
         private static readonly int IsDeadParam = Animator.StringToHash("IsDead");
         private const string EnemyIdelState = "EnemyIdel";
         private const string EnemyDeadState = "EnemyDead";
+        private const int KillScore = 1;
 
         // 边界检测
         private const float BottomBoundary = -6f;
@@ -51,12 +52,14 @@ namespace GameLogic
         // 缓存的模块引用，避免每帧查询 ModuleSystem
         private IBulletModule _bulletModule;
         private IEntityManager _entityManager;
+        private GamePlayModel _gamePlayModel;
         private int _lifecycleToken;
 
         // 生命值系统
         private float _currentHealth;
         private float _maxHealth;
         private bool _isDead;
+        private bool _hasAwardedKillScore;
 
         /// <summary>
         /// 当前生命值。
@@ -101,6 +104,8 @@ namespace GameLogic
             _currentHealth = 0f;
             _maxHealth = 0f;
             _isDead = false;
+            _hasAwardedKillScore = false;
+            _gamePlayModel = null;
         }
 
         /// <summary>
@@ -115,6 +120,8 @@ namespace GameLogic
             // 缓存模块引用，避免每帧查询
             _bulletModule = ModuleSystem.Get<IBulletModule>();
             _entityManager = ModuleSystem.Get<IEntityManager>();
+            ResolveGamePlayModel();
+            _hasAwardedKillScore = false;
 
             // 激活 GameObject
             if (Handle != null)
@@ -351,6 +358,8 @@ namespace GameLogic
                 _currentState = EnemyState.Dead;
                 // Log.Info($"[EnemyEntity] ID {Id} 已死亡");
 
+                TryAwardKillScore();
+
                 if (_collider2D != null)
                 {
                     _collider2D.enabled = false;
@@ -378,6 +387,9 @@ namespace GameLogic
                 return;
             }
 
+            // 兜底重试：避免异常时序导致本次击败未结算积分。
+            TryAwardKillScore();
+
             if (Handle != null && _entityManager != null)
             {
                 _entityManager.HideEntity(expectedEntityId);
@@ -393,6 +405,43 @@ namespace GameLogic
             }
 
             _bulletModule?.ClearBulletsBySource(Id);
+        }
+
+        private void TryAwardKillScore()
+        {
+            if (_hasAwardedKillScore)
+            {
+                return;
+            }
+
+            // 每次重新解析，避免使用已释放的缓存引用
+            var model = ResolveGamePlayModel();
+
+            if (model == null)
+            {
+                Log.Warning($"[EnemyEntity] ID {Id} 结算击败积分失败，GamePlayModel 不可用");
+                return;
+            }
+
+            model.AddScore(KillScore);
+            _hasAwardedKillScore = true;
+        }
+
+        /// <summary>
+        /// 解析并缓存玩法模型。
+        /// 使用非泛型 TryGetModel(Type) 规避热更新环境下的泛型校验问题。
+        /// </summary>
+        private GamePlayModel ResolveGamePlayModel()
+        {
+            var modelManager = GameLogicEntry.Model;
+            if (modelManager == null)
+            {
+                _gamePlayModel = null;
+                return null;
+            }
+
+            _gamePlayModel = modelManager.TryGetModel(typeof(GamePlayModel)) as GamePlayModel;
+            return _gamePlayModel;
         }
 
         /// <summary>
@@ -420,10 +469,12 @@ namespace GameLogic
             _currentHealth = 0f;
             _maxHealth = 0f;
             _isDead = false;
+            _hasAwardedKillScore = false;
 
             // 清理缓存的模块引用
             _bulletModule = null;
             _entityManager = null;
+            _gamePlayModel = null;
 
             // Log.Info($"[EnemyEntity] ID {Id} 已隐藏");
         }
@@ -452,6 +503,8 @@ namespace GameLogic
             _currentHealth = 0f;
             _maxHealth = 0f;
             _isDead = false;
+            _hasAwardedKillScore = false;
+            _gamePlayModel = null;
         }
     }
 }

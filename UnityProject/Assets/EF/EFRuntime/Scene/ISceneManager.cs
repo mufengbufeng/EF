@@ -51,6 +51,13 @@ namespace EF.Scene
         /// </summary>
         /// <returns>卸载是否成功</returns>
         UniTask<bool> UnloadSceneAsync();
+
+        /// <summary>
+        /// 异步卸载当前场景（仅当当前场景与期望快照一致时执行）。
+        /// </summary>
+        /// <param name="expectedScene">期望卸载的场景快照。</param>
+        /// <returns>卸载是否成功。</returns>
+        UniTask<bool> UnloadSceneAsync(SceneInfo? expectedScene);
         
         /// <summary>
         /// 获取当前场景信息

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace GameLogic
@@ -26,5 +27,10 @@ namespace GameLogic
         /// 拖拽边界内边距（世界单位）。
         /// </summary>
         public float DragBoundaryPadding { get; set; }
+
+        /// <summary>
+        /// 玩家死亡流程完成后的回调。
+        /// </summary>
+        public Action OnDead { get; set; }
     }
 }

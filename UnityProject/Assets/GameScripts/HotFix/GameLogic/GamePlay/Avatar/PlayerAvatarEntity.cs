@@ -24,6 +24,7 @@ namespace GameLogic
 
         private const string MoveAnimationState = "Move";
         private const string BoomAnimationState = "Boom";
+        private const float DragOffsetAlignSpeed = 4f;
 
         private GameObject _handleField;
         private IBulletModule _bulletModule;
@@ -44,6 +45,8 @@ namespace GameLogic
         private bool _cameraWarningLogged;
         private bool _bulletWarningLogged;
         private int _lifecycleToken;
+        private Action _onDead;
+        private bool _deathNotified;
 
         // 生命值系统
         private float _currentHealth;
@@ -146,6 +149,8 @@ namespace GameLogic
                 return;
             }
 
+            NotifyDeathOnce();
+
             if (Handle != null && _entityManager != null)
             {
                 _entityManager.HideEntity(expectedEntityId);
@@ -213,6 +218,7 @@ namespace GameLogic
                 _attackInterval = behaviorData.AttackInterval;
                 _bulletSpeed = behaviorData.BulletSpeed;
                 _dragBoundaryPadding = Mathf.Max(0f, behaviorData.DragBoundaryPadding);
+                _onDead = behaviorData.OnDead;
                 
                 // 初始化生命值
                 _maxHealth = 100f;
@@ -226,6 +232,7 @@ namespace GameLogic
                 _attackInterval = 0.2f;
                 _bulletSpeed = 8f;
                 _dragBoundaryPadding = 0.25f;
+                _onDead = null;
                 
                 // 初始化生命值
                 _maxHealth = 100f;
@@ -258,7 +265,7 @@ namespace GameLogic
                 return;
             }
 
-            UpdateDragInput();
+            UpdateDragInput(elapseSeconds);
             ClampCurrentPosition();
             UpdateAttack(elapseSeconds);
         }
@@ -287,7 +294,7 @@ namespace GameLogic
             ResetRuntimeState();
         }
 
-        private void UpdateDragInput()
+        private void UpdateDragInput(float elapseSeconds)
         {
             Camera camera = GetMainCamera();
             if (camera == null)
@@ -308,11 +315,11 @@ namespace GameLogic
 
             if (_activePointerType == ActivePointerType.Mouse)
             {
-                UpdateMouseDrag(camera);
+                UpdateMouseDrag(camera, elapseSeconds);
                 return;
             }
 
-            UpdateTouchDrag(camera);
+            UpdateTouchDrag(camera, elapseSeconds);
         }
 
         private bool TryBeginTouchDrag(Camera camera)
@@ -387,7 +394,7 @@ namespace GameLogic
             _dragOffset = Handle.transform.position - mouseWorldPosition;
         }
 
-        private void UpdateMouseDrag(Camera camera)
+        private void UpdateMouseDrag(Camera camera, float elapseSeconds)
         {
             if (!TryGetMouseHeldPosition(out Vector2 mouseScreenPosition))
             {
@@ -396,11 +403,11 @@ namespace GameLogic
             }
 
             Vector3 mouseWorldPosition = ScreenToWorld(camera, mouseScreenPosition, _fixedZ);
-            Vector3 targetPosition = mouseWorldPosition + _dragOffset;
+            Vector3 targetPosition = BuildDragTargetPosition(mouseWorldPosition, elapseSeconds);
             SetClampedPosition(camera, targetPosition);
         }
 
-        private void UpdateTouchDrag(Camera camera)
+        private void UpdateTouchDrag(Camera camera, float elapseSeconds)
         {
             if (!TryGetTouchPosition(_activeTouchId, out Vector2 touchScreenPosition, out bool isPressed))
             {
@@ -415,8 +422,30 @@ namespace GameLogic
             }
 
             Vector3 touchWorldPosition = ScreenToWorld(camera, touchScreenPosition, _fixedZ);
-            Vector3 targetPosition = touchWorldPosition + _dragOffset;
+            Vector3 targetPosition = BuildDragTargetPosition(touchWorldPosition, elapseSeconds);
             SetClampedPosition(camera, targetPosition);
+        }
+
+        private Vector3 BuildDragTargetPosition(Vector3 pointerWorldPosition, float elapseSeconds)
+        {
+            UpdateDragOffset(elapseSeconds);
+            return pointerWorldPosition + _dragOffset;
+        }
+
+        private void UpdateDragOffset(float elapseSeconds)
+        {
+            if (_dragOffset == Vector3.zero)
+            {
+                return;
+            }
+
+            float maxDelta = Mathf.Max(0f, elapseSeconds) * DragOffsetAlignSpeed;
+            if (maxDelta <= 0f)
+            {
+                return;
+            }
+
+            _dragOffset = Vector3.MoveTowards(_dragOffset, Vector3.zero, maxDelta);
         }
 
         private void UpdateAttack(float elapseSeconds)
@@ -494,6 +523,29 @@ namespace GameLogic
             }
 
             _bulletModule.ClearBulletsBySource(Id);
+        }
+
+        private void NotifyDeathOnce()
+        {
+            if (_deathNotified)
+            {
+                return;
+            }
+
+            _deathNotified = true;
+            if (_onDead == null)
+            {
+                return;
+            }
+
+            try
+            {
+                _onDead.Invoke();
+            }
+            catch (Exception e)
+            {
+                Log.Error($"[PlayerAvatarEntity] 死亡回调执行异常: {e.Message}");
+            }
         }
 
         private void PlayMoveAnimation()
@@ -708,6 +760,8 @@ namespace GameLogic
             _bulletWarningLogged = false;
             _entityManager = null;
             _customAttackExecutor = null;
+            _onDead = null;
+            _deathNotified = false;
             _currentHealth = 0f;
             _maxHealth = 0f;
             _isDead = false;
