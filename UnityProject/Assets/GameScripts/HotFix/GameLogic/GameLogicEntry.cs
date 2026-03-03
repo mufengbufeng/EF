@@ -113,15 +113,14 @@ namespace GameLogic
                 ModuleSystem.Register<ILevelModule>(levelModule);
                 Log.Info("[GameLogicEntry] LevelModule registered");
 
-                // Check if EnergyModule exists
-                var energyModule = ModuleSystem.Get<IEnergyModule>();
-                if (energyModule != null)
+                // Check if EnergyModule exists (optional module)
+                if (ModuleSystem.TryGet<IEnergyModule>(out var energyModule))
                 {
                     Log.Info("[GameLogicEntry] EnergyModule already registered");
                 }
                 else
                 {
-                    Log.Warning("[GameLogicEntry] EnergyModule not registered");
+                    Log.Warning("[GameLogicEntry] EnergyModule not registered (optional)");
                 }
             }
             catch (System.Exception ex)
