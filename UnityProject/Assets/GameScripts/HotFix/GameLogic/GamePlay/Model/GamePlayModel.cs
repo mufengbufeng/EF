@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using EF.Debugger;
 using EF.Model;
 
@@ -13,6 +14,21 @@ namespace GameLogic
         /// 当前积分。
         /// </summary>
         int CurrentScore { get; }
+
+        /// <summary>
+        /// 当前关卡ID。
+        /// </summary>
+        int CurrentLevelId { get; }
+
+        /// <summary>
+        /// 当前关卡进度。
+        /// </summary>
+        int CurrentLevelProgress { get; }
+
+        /// <summary>
+        /// 当前关卡星级。
+        /// </summary>
+        int CurrentLevelStars { get; }
     }
 
     /// <summary>
@@ -22,15 +38,36 @@ namespace GameLogic
     public class GamePlayModel : ModelBase<IGamePlayModelData>
     {
         private readonly ModelValue<int> _currentScore;
+        private readonly ModelValue<int> _currentLevelId;
+        private readonly ModelValue<int> _currentLevelProgress;
+        private readonly ModelValue<int> _currentLevelStars;
 
         /// <summary>
         /// 当前积分。
         /// </summary>
         public int CurrentScore => GetValue(_currentScore);
 
+        /// <summary>
+        /// 当前关卡ID。
+        /// </summary>
+        public int CurrentLevelId => GetValue(_currentLevelId);
+
+        /// <summary>
+        /// 当前关卡进度。
+        /// </summary>
+        public int CurrentLevelProgress => GetValue(_currentLevelProgress);
+
+        /// <summary>
+        /// 当前关卡星级。
+        /// </summary>
+        public int CurrentLevelStars => GetValue(_currentLevelStars);
+
         public GamePlayModel()
         {
             _currentScore = CreateValue(0);
+            _currentLevelId = CreateValue(0);
+            _currentLevelProgress = CreateValue(0);
+            _currentLevelStars = CreateValue(0);
         }
 
         protected override IGamePlayModelData CreateData()
@@ -42,7 +79,10 @@ namespace GameLogic
         {
             base.OnModelInitialized();
             SetValue(_currentScore, 0, nameof(CurrentScore));
-            Log.Info("[GamePlayModel] 玩法模型初始化完成，积分已重置为 0");
+            SetValue(_currentLevelId, 0, nameof(CurrentLevelId));
+            SetValue(_currentLevelProgress, 0, nameof(CurrentLevelProgress));
+            SetValue(_currentLevelStars, 0, nameof(CurrentLevelStars));
+            Log.Info("[GamePlayModel] 玩法模型初始化完成");
         }
 
         /// <summary>
@@ -78,9 +118,63 @@ namespace GameLogic
             SetScore(CurrentScore + delta);
         }
 
+        /// <summary>
+        /// 设置当前关卡ID。
+        /// </summary>
+        /// <param name="levelId">关卡ID。</param>
+        public void SetCurrentLevel(int levelId)
+        {
+            SetValue(_currentLevelId, levelId, nameof(CurrentLevelId));
+            SetValue(_currentLevelStars, 0, nameof(CurrentLevelStars));
+        }
+
+        /// <summary>
+        /// 设置当前关卡进度。
+        /// </summary>
+        /// <param name="progress">进度值。</param>
+        public void SetLevelProgress(int progress)
+        {
+            int safeProgress = progress < 0 ? 0 : progress;
+            SetValue(_currentLevelProgress, safeProgress, nameof(CurrentLevelProgress));
+        }
+
+        /// <summary>
+        /// 增加关卡进度。
+        /// </summary>
+        /// <param name="delta">增量。</param>
+        public void AddLevelProgress(int delta)
+        {
+            if (delta <= 0)
+            {
+                return;
+            }
+            SetLevelProgress(CurrentLevelProgress + delta);
+        }
+
+        /// <summary>
+        /// 设置关卡星级。
+        /// </summary>
+        /// <param name="stars">星级（1-3）。</param>
+        public void SetLevelStars(int stars)
+        {
+            int safeStars = Math.Clamp(stars, 0, 3);
+            SetValue(_currentLevelStars, safeStars, nameof(CurrentLevelStars));
+        }
+
+        /// <summary>
+        /// 重置关卡数据。
+        /// </summary>
+        public void ResetLevelData()
+        {
+            SetValue(_currentLevelId, 0, nameof(CurrentLevelId));
+            SetValue(_currentLevelProgress, 0, nameof(CurrentLevelProgress));
+            SetValue(_currentLevelStars, 0, nameof(CurrentLevelStars));
+        }
+
         protected override void OnModelReleased()
         {
             SetValue(_currentScore, 0, nameof(CurrentScore));
+            ResetLevelData();
             Log.Info("[GamePlayModel] 释放游戏玩法模型资源");
             base.OnModelReleased();
         }
@@ -95,6 +189,9 @@ namespace GameLogic
             }
 
             public int CurrentScore => _model.CurrentScore;
+            public int CurrentLevelId => _model.CurrentLevelId;
+            public int CurrentLevelProgress => _model.CurrentLevelProgress;
+            public int CurrentLevelStars => _model.CurrentLevelStars;
         }
     }
 }

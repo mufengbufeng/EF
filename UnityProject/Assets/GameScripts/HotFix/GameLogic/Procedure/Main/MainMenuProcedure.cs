@@ -68,11 +68,11 @@ namespace GameLogic
         }
 
         /// <summary>
-        /// 开始游戏，切换到游戏玩法流程
+        /// 开始游戏，进入关卡选择流程。
         /// </summary>
         public void StartGame()
         {
-            ChangeState<GamePlayProcedure>(_procedureOwner);
+            ChangeState<LevelSelectProcedure>(_procedureOwner);
         }
     }
 }
