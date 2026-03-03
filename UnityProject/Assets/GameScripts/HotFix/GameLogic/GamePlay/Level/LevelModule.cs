@@ -67,17 +67,19 @@ namespace GameLogic
                 return false;
             }
 
+            // EnergyModule is optional - skip energy check if not registered
             IEnergyModule energy = ModuleSystem.Get<IEnergyModule>();
-            if (energy == null)
+            if (energy != null)
             {
-                Log.Warning("[LevelModule] EnergyModule not found");
-                return false;
+                if (!energy.Consume(energy.CostPerLevel))
+                {
+                    Log.Info("[LevelModule] Not enough energy to enter level");
+                    return false;
+                }
             }
-
-            if (!energy.Consume(energy.CostPerLevel))
+            else
             {
-                Log.Info("[LevelModule] Not enough energy to enter level");
-                return false;
+                Log.Warning("[LevelModule] EnergyModule not found, skipping energy check");
             }
 
             _currentLevelId = levelId;
