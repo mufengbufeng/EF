@@ -68,8 +68,7 @@ namespace GameLogic
             }
 
             // EnergyModule is optional - skip energy check if not registered
-            IEnergyModule energy = ModuleSystem.Get<IEnergyModule>();
-            if (energy != null)
+            if (ModuleSystem.TryGet<IEnergyModule>(out IEnergyModule energy))
             {
                 if (!energy.Consume(energy.CostPerLevel))
                 {
