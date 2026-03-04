@@ -1,4 +1,5 @@
 using System;
+using EF.Common;
 using EF.Debugger;
 using EF.UI;
 
@@ -9,8 +10,11 @@ namespace GameLogic
     /// </summary>
     public class MainController : UIController
     {
+        private const int StartGameEnergyCost = 1;
+
         private MainView _mainView;
         private MainModel _mainModel;
+        private IEnergyModule _energyModule;
 
         protected override void OnInitialize()
         {
@@ -43,7 +47,10 @@ namespace GameLogic
             {
                 _mainModel.SetGameStarted(false);
                 _mainModel.SetInteractable(true);
+                _mainModel.SetEnergy(0, 0);
             }
+
+            InitializeEnergyBindings();
 
             Log.Info("[MainController] 主界面已打开");
         }
@@ -64,15 +71,104 @@ namespace GameLogic
         }
 
         /// <summary>
-        /// 开始游戏
+        /// 开始游戏（带体力校验）。
         /// </summary>
-        public async void StartGame()
+        public void StartGame()
         {
             Log.Info("[MainController] 用户点击开始游戏按钮");
 
-            GameLogicEntry.Procedure.GetProcedure<MainMenuProcedure>().StartGame();
+            if (_energyModule == null)
+            {
+                _mainView?.SetFeedbackText("体力模块未就绪，请稍后重试");
+                Log.Warning("[MainController] 体力模块未就绪，阻止进入游戏");
+                return;
+            }
 
+            if (!_energyModule.TryConsume(StartGameEnergyCost))
+            {
+                _mainView?.SetFeedbackText($"体力不足，至少需要 {StartGameEnergyCost} 点");
+                _mainView?.SetStartButtonInteractable(false);
+                Log.Info("[MainController] 体力不足，阻止进入游戏");
+                return;
+            }
+
+            if (!TryGetMainMenuProcedure(out MainMenuProcedure mainMenuProcedure))
+            {
+                // 流程不可用时回滚体力，避免错误扣除。
+                _energyModule.Recover(StartGameEnergyCost);
+                _mainView?.SetFeedbackText("流程未就绪，请稍后再试");
+                Log.Warning("[MainController] MainMenuProcedure 不可用，已回滚体力消耗");
+                return;
+            }
+
+            bool changed = mainMenuProcedure.StartGame();
+            if (!changed)
+            {
+                _energyModule.Recover(StartGameEnergyCost);
+                _mainView?.SetFeedbackText("进入玩法失败，请重试");
+                Log.Warning("[MainController] 状态切换失败，已回滚体力消耗");
+                return;
+            }
+
+            _mainView?.SetFeedbackText(string.Empty);
+            _mainModel?.SetGameStarted(true);
         }
 
+        private void InitializeEnergyBindings()
+        {
+            if (!ModuleSystem.TryGet<IEnergyModule>(out _energyModule))
+            {
+                _energyModule = null;
+                _mainView?.SetEnergyDisplayUnavailable();
+                _mainView?.SetFeedbackText("体力系统未初始化");
+                _mainView?.SetStartButtonInteractable(false);
+                _mainModel?.SetInteractable(false);
+                _mainModel?.SetEnergy(0, 0);
+                Log.Warning("[MainController] 未找到 IEnergyModule，主界面仅显示占位信息");
+                return;
+            }
+
+            BindEvent<Action<int, int>>(
+                h => _energyModule.OnEnergyChanged += h,
+                h => _energyModule.OnEnergyChanged -= h,
+                HandleEnergyChanged);
+
+            HandleEnergyChanged(_energyModule.CurrentEnergy, _energyModule.MaxEnergy);
+        }
+
+        private void HandleEnergyChanged(int currentEnergy, int maxEnergy)
+        {
+            _mainView?.SetEnergyText(currentEnergy, maxEnergy);
+
+            bool canStart = currentEnergy >= StartGameEnergyCost;
+            _mainView?.SetStartButtonInteractable(canStart);
+
+            _mainModel?.SetInteractable(canStart);
+            _mainModel?.SetEnergy(currentEnergy, maxEnergy);
+
+            if (canStart)
+            {
+                _mainView?.SetFeedbackText(string.Empty);
+            }
+        }
+
+        private bool TryGetMainMenuProcedure(out MainMenuProcedure procedure)
+        {
+            procedure = null;
+
+            var procedureManager = GameLogicEntry.Procedure;
+            if (procedureManager == null)
+            {
+                return false;
+            }
+
+            if (!procedureManager.HasProcedure<MainMenuProcedure>())
+            {
+                return false;
+            }
+
+            procedure = procedureManager.GetProcedure<MainMenuProcedure>();
+            return procedure != null;
+        }
     }
 }

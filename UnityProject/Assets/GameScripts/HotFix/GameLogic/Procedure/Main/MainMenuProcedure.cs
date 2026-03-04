@@ -70,9 +70,16 @@ namespace GameLogic
         /// <summary>
         /// 开始游戏，切换到游戏玩法流程
         /// </summary>
-        public void StartGame()
+        public bool StartGame()
         {
+            if (_procedureOwner == null)
+            {
+                Log.Error("[MainMenuProcedure] ProcedureOwner 为空，无法切换到玩法流程");
+                return false;
+            }
+
             ChangeState<GamePlayProcedure>(_procedureOwner);
+            return true;
         }
     }
 }
