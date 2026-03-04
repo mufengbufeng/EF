@@ -14,16 +14,19 @@ namespace GameConfig
 public partial class Tables
 {
     public item.TbItem TbItem {get; }
+    public level.TbLevel TbLevel {get; }
 
     public Tables(System.Func<string, ByteBuf> loader)
     {
         TbItem = new item.TbItem(loader("item_tbitem"));
+        TbLevel = new level.TbLevel(loader("level_tblevel"));
         ResolveRef();
     }
     
     private void ResolveRef()
     {
         TbItem.ResolveRef(this);
+        TbLevel.ResolveRef(this);
     }
 }
 

@@ -36,6 +36,7 @@ namespace GameLogic
         private IEnemySpawnerModule _enemySpawnerModule;
         private IPlayerAvatarModule _playerAvatarModule;
         private IBulletModule _bulletModule;
+    private ILevelModule _levelModule;
         private Transform _backgroundRoot;
         private Camera _gameCamera;
         private bool _isReturningToMainMenu;
@@ -91,6 +92,15 @@ namespace GameLogic
                 _bulletModule.Configure(BulletPrefabName);
                 ModuleSystem.Register(_bulletModule, replace: true, scope: GamePlayScope);
                 await _bulletModule.InitializeAsync();
+
+                // 注册关卡模块
+                _levelModule = ModuleSystem.Get<ILevelModule>();
+                if (_levelModule != null)
+                {
+                    _levelModule.ResetCurrentLevel();
+                    var levelConfig = _levelModule.GetLevelConfig(_levelModule.GetCurrentLevelId());
+                    Log.Info($"[GamePlayProcedure] 当前关卡: {_levelModule.GetCurrentLevelId()}, 目标杀敌数: {levelConfig?.KillTarget}");
+                }
                 if (!IsEnterSequenceActive(enterSequence, "子弹模块初始化完成"))
                 {
                     return;

@@ -10,17 +10,12 @@
 using Luban;
 
 
-namespace GameConfig.test
+namespace GameConfig.level
 {
-/// <summary>
-/// 这是一个矩形
-/// </summary>
-public sealed partial class Rectangle : Shape
+public sealed partial class Level : Luban.BeanBase
 {
-    public Rectangle(ByteBuf _buf)  : base(_buf) 
+    public Level(ByteBuf _buf) 
     {
-        Width = _buf.ReadFloat();
-        Height = _buf.ReadFloat();
         Id = _buf.ReadInt();
         Name = _buf.ReadString();
         KillTarget = _buf.ReadInt();
@@ -28,53 +23,42 @@ public sealed partial class Rectangle : Shape
         EnemySpawnInterval = _buf.ReadFloat();
     }
 
-    public static Rectangle DeserializeRectangle(ByteBuf _buf)
+    public static Level DeserializeLevel(ByteBuf _buf)
     {
-        return new test.Rectangle(_buf);
+        return new level.Level(_buf);
     }
 
     /// <summary>
-    /// 宽度
-    /// </summary>
-    public readonly float Width;
-    /// <summary>
-    /// 高度
-    /// </summary>
-    public readonly float Height;
-    /// <summary>
-    /// Level ID
+    /// level_id
     /// </summary>
     public readonly int Id;
     /// <summary>
-    /// Level name
+    /// level_name
     /// </summary>
     public readonly string Name;
     /// <summary>
-    /// Kill target to pass level
+    /// kill_target
     /// </summary>
     public readonly int KillTarget;
     /// <summary>
-    /// Enemy speed multiplier
+    /// enemy_speed
     /// </summary>
     public readonly float EnemySpeed;
     /// <summary>
-    /// Enemy spawn interval
+    /// spawn_interval
     /// </summary>
     public readonly float EnemySpawnInterval;
    
-    public const int __ID__ = -31893773;
+    public const int __ID__ = 685080698;
     public override int GetTypeId() => __ID__;
 
-    public override void ResolveRef(Tables tables)
+    public  void ResolveRef(Tables tables)
     {
-        base.ResolveRef(tables);
     }
 
     public override string ToString()
     {
         return "{ "
-        + "width:" + Width + ","
-        + "height:" + Height + ","
         + "id:" + Id + ","
         + "name:" + Name + ","
         + "killTarget:" + KillTarget + ","
