@@ -424,6 +424,14 @@ namespace GameLogic
             }
 
             model.AddScore(KillScore);
+            
+            // Record kill for level system
+            var levelModule = ModuleSystem.Get<ILevelModule>();
+            if (levelModule != null)
+            {
+                levelModule.RecordKill();
+            }
+            
             _hasAwardedKillScore = true;
         }
 
