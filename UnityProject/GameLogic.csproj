@@ -98,6 +98,8 @@
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Main\MainModel.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Game\GameMenuView.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Enemy\EnemySpawnerModule.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Energy\IEnergyModule.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Energy\EnergyModule.cs" />
     <None Include="Assets\GameScripts\HotFix\GameLogic\GameLogic.asmdef" />
     <Reference Include="UnityEngine">
       <HintPath>D:\DocApp\UnityEditor\6000.2.6f2\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>

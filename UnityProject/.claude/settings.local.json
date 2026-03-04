@@ -25,7 +25,16 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(opence archive fix-entity-handle-initialization:*)",
-      "Bash(opence change show:*)"
+      "Bash(opence change show:*)",
+      "mcp__mcp-router__list_dir",
+      "mcp__mcp-router__activate_project",
+      "Bash(node:*)",
+      "Bash(echo:*)",
+      "Bash(xargs:*)",
+      "Bash(test:*)",
+      "Bash(python:*)",
+      "Bash(git reset:*)",
+      "Bash(git push:*)"
     ]
   }
 }

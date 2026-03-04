@@ -39,7 +39,20 @@ namespace GameLogic
                 _saveManager.SetSaveStrategy(EF.Save.SaveStrategyType.Json);
                 Log.Info("[InitProcedure] 保存策略已设置");
 
-                // 2. 初始化配置系统
+                // 2. 注册体力模块（全局模块，仅在未注册时创建）
+                if (!ModuleSystem.TryGet<IEnergyModule>(out _))
+                {
+                    ModuleSystem.Register<IEnergyModule>(
+                        new EnergyModule(_saveManager),
+                        scope: (int)GameScope.Global);
+                    Log.Info("[InitProcedure] 体力模块注册完成");
+                }
+                else
+                {
+                    Log.Info("[InitProcedure] 体力模块已存在，跳过重复注册");
+                }
+
+                // 3. 初始化配置系统
                 _configSystem.Load();
                 Log.Info("[InitProcedure] 配置系统加载完成");
 

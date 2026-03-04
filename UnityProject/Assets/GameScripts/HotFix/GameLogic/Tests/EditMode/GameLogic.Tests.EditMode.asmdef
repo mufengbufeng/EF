@@ -1,0 +1,23 @@
+{
+    "name": "GameLogic.Tests.EditMode",
+    "rootNamespace": "GameLogic.Tests",
+    "references": [
+        "GUID:7db8d1283300ba84fb00ce1b81c52367",
+        "GUID:901fdfb0b8ece28439b245be1b1f16b0"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "testAssemblies": true
+}

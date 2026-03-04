@@ -1,6 +1,7 @@
 using System;
 using EF.Debugger;
 using EF.UI;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,6 +15,16 @@ namespace GameLogic
     {
         // 使用 UHub 自动绑定，字段名 _startGameBtn 映射到 ReferenceCollector 中的 "StartGameBtn"
         public Button _startGameBtn;
+
+        /// <summary>
+        /// 体力显示文本，可在 Prefab 绑定；未绑定时会在运行时自动创建。
+        /// </summary>
+        public TextMeshProUGUI _energyText;
+
+        /// <summary>
+        /// 反馈文本，可在 Prefab 绑定；未绑定时会在运行时自动创建。
+        /// </summary>
+        public TextMeshProUGUI _feedbackText;
 
         /// <summary>
         /// 开始游戏事件
@@ -46,6 +57,8 @@ namespace GameLogic
         {
             base.OnOpen(userData);
 
+            EnsureRuntimeTextComponents();
+
             // 验证组件绑定结果
             if (_startGameBtn != null)
             {
@@ -55,6 +68,8 @@ namespace GameLogic
             {
                 Log.Warning("[MainView] 开始游戏按钮组件绑定失败，请检查 ReferenceCollector 配置");
             }
+
+            SetFeedbackText(string.Empty);
         }
 
         protected override void OnRefresh(object userData)
@@ -65,10 +80,42 @@ namespace GameLogic
             if (TryGetModelData<IMainModelData>(out var modelData))
             {
                 // 更新按钮可交互状态
-                if (_startGameBtn != null)
-                {
-                    _startGameBtn.interactable = modelData.IsInteractable;
-                }
+                SetStartButtonInteractable(modelData.IsInteractable);
+            }
+        }
+
+        public void SetEnergyText(int currentEnergy, int maxEnergy)
+        {
+            EnsureRuntimeTextComponents();
+            if (_energyText != null)
+            {
+                _energyText.text = $"体力：{currentEnergy}/{maxEnergy}";
+            }
+        }
+
+        public void SetEnergyDisplayUnavailable()
+        {
+            EnsureRuntimeTextComponents();
+            if (_energyText != null)
+            {
+                _energyText.text = "体力：--/--";
+            }
+        }
+
+        public void SetFeedbackText(string message)
+        {
+            EnsureRuntimeTextComponents();
+            if (_feedbackText != null)
+            {
+                _feedbackText.text = message ?? string.Empty;
+            }
+        }
+
+        public void SetStartButtonInteractable(bool interactable)
+        {
+            if (_startGameBtn != null)
+            {
+                _startGameBtn.interactable = interactable;
             }
         }
 
@@ -78,7 +125,72 @@ namespace GameLogic
 
             // 触发开始游戏事件，让Controller处理具体逻辑
             OnStartGameRequested?.Invoke();
+        }
 
+        private void EnsureRuntimeTextComponents()
+        {
+            RectTransform root = transform as RectTransform;
+            if (root == null)
+            {
+                return;
+            }
+
+            if (_energyText == null)
+            {
+                _energyText = CreateRuntimeText(
+                    root,
+                    "EnergyTextRuntime",
+                    new Vector2(0f, 1f),
+                    new Vector2(0f, 1f),
+                    new Vector2(24f, -24f),
+                    new Vector2(300f, 40f),
+                    26,
+                    Color.white,
+                    TextAlignmentOptions.TopLeft);
+            }
+
+            if (_feedbackText == null)
+            {
+                _feedbackText = CreateRuntimeText(
+                    root,
+                    "FeedbackTextRuntime",
+                    new Vector2(0.5f, 0f),
+                    new Vector2(0.5f, 0f),
+                    new Vector2(0f, 120f),
+                    new Vector2(500f, 48f),
+                    28,
+                    new Color(1f, 0.35f, 0.35f, 1f),
+                    TextAlignmentOptions.Center);
+            }
+        }
+
+        private static TextMeshProUGUI CreateRuntimeText(
+            RectTransform parent,
+            string objectName,
+            Vector2 anchorMin,
+            Vector2 anchorMax,
+            Vector2 anchoredPosition,
+            Vector2 sizeDelta,
+            float fontSize,
+            Color color,
+            TextAlignmentOptions alignment)
+        {
+            GameObject textObject = new GameObject(objectName, typeof(RectTransform), typeof(TextMeshProUGUI));
+            RectTransform rectTransform = textObject.GetComponent<RectTransform>();
+            rectTransform.SetParent(parent, false);
+            rectTransform.anchorMin = anchorMin;
+            rectTransform.anchorMax = anchorMax;
+            rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            rectTransform.anchoredPosition = anchoredPosition;
+            rectTransform.sizeDelta = sizeDelta;
+
+            TextMeshProUGUI text = textObject.GetComponent<TextMeshProUGUI>();
+            text.fontSize = fontSize;
+            text.color = color;
+            text.alignment = alignment;
+            text.raycastTarget = false;
+            text.text = string.Empty;
+            return text;
         }
 
         protected override void OnRelease()
