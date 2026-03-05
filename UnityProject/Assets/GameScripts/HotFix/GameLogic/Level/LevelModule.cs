@@ -19,6 +19,9 @@ namespace GameLogic
         public int KillCount => _killCount;
         public int RequiredKills => _requiredKills;
         
+        public event Action<int, int, int> OnProgressChanged;
+        public event Action OnLevelComplete;
+        
         public LevelModule(ISaveManager saveManager = null)
         {
             _saveManager = saveManager;
@@ -30,6 +33,16 @@ namespace GameLogic
         {
             _killCount++;
             Log.Info($"[LevelModule] Kill recorded: {_killCount}/{_requiredKills}");
+            
+            // 触发进度变化事件
+            OnProgressChanged?.Invoke(_currentLevelId, _killCount, _requiredKills);
+            
+            // 检测通关
+            if (CheckLevelComplete())
+            {
+                Log.Info($"[LevelModule] Level {_currentLevelId} complete!");
+                OnLevelComplete?.Invoke();
+            }
         }
         
         public bool CheckLevelComplete()
@@ -69,6 +82,8 @@ namespace GameLogic
         public override void Shutdown()
         {
             SaveProgress();
+            OnProgressChanged = null;
+            OnLevelComplete = null;
             Log.Info("[LevelModule] Shutdown");
         }
         

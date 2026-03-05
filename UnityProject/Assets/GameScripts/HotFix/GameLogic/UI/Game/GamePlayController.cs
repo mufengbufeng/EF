@@ -242,7 +242,34 @@ namespace GameLogic
                 return;
             }
 
-            RefreshLevelDisplay();
+            // 订阅进度变化事件
+            BindEvent<Action<int, int, int>>(
+                h => _levelModule.OnProgressChanged += h,
+                h => _levelModule.OnProgressChanged -= h,
+                HandleLevelProgressChanged);
+
+            // 订阅通关事件
+            BindEvent<Action>(
+                h => _levelModule.OnLevelComplete += h,
+                h => _levelModule.OnLevelComplete -= h,
+                HandleLevelCompleteEvent);
+
+            // 初始显示
+            HandleLevelProgressChanged(_levelModule.CurrentLevelId, _levelModule.KillCount, _levelModule.RequiredKills);
+        }
+
+        private void HandleLevelProgressChanged(int levelId, int killCount, int requiredKills)
+        {
+            _gamePlayView?.UpdateLevel(levelId, killCount, requiredKills);
+        }
+
+        private void HandleLevelCompleteEvent()
+        {
+            if (_levelCompleted) return;
+            _levelCompleted = true;
+            
+            Log.Info("[GamePlayController] 关卡通关!");
+            HandleLevelComplete();
         }
 
         private void HandleEnergyChanged(int currentEnergy, int maxEnergy)
