@@ -12,6 +12,7 @@ namespace GameLogic
     public class GamePlayView : UIView
     {
         public TextMeshProUGUI _pointText;
+        public TextMeshProUGUI _levelText;
         public Button _pauseButton;
 
         public event Action OnPauseClicked;
@@ -40,6 +41,7 @@ namespace GameLogic
         {
             base.OnOpen(userData);
             UpdateScore(0);
+            UpdateLevel(1, 0, 10);
         }
 
         /// <summary>
@@ -56,6 +58,20 @@ namespace GameLogic
 
             int safeScore = score < 0 ? 0 : score;
             _pointText.text = $"击败积分: {safeScore}";
+        }
+
+        /// <summary>
+        /// 刷新关卡信息显示。
+        /// </summary>
+        /// <param name="levelId">关卡ID。</param>
+        /// <param name="killCount">当前击杀数。</param>
+        /// <param name="requiredKills">目标击杀数。</param>
+        public void UpdateLevel(int levelId, int killCount, int requiredKills)
+        {
+            if (_levelText != null)
+            {
+                _levelText.text = $"关卡 {levelId} | 击杀: {killCount}/{requiredKills}";
+            }
         }
 
         protected override void OnRelease()

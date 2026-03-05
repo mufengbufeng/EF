@@ -52,7 +52,20 @@ namespace GameLogic
                     Log.Info("[InitProcedure] 体力模块已存在，跳过重复注册");
                 }
 
-                // 3. 初始化配置系统
+                // 3. 注册关卡模块（全局模块，仅在未注册时创建）
+                if (!ModuleSystem.TryGet<ILevelModule>(out _))
+                {
+                    ModuleSystem.Register<ILevelModule>(
+                        new LevelModule(_saveManager),
+                        scope: (int)GameScope.Global);
+                    Log.Info("[InitProcedure] 关卡模块注册完成");
+                }
+                else
+                {
+                    Log.Info("[InitProcedure] 关卡模块已存在，跳过重复注册");
+                }
+
+                // 4. 初始化配置系统
                 _configSystem.Load();
                 Log.Info("[InitProcedure] 配置系统加载完成");
 
