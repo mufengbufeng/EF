@@ -1,13 +1,8 @@
 ---
 name: opence-work
 description: Implement an opence change and keep tasks in sync.
-allowed-tools:
-  - Read
-  - Write
-  - Bash
-  - Grep
-  - Glob
-user-invocable: true
+metadata:
+  short-description: Implement opence tasks.
 ---
 
 <!-- OPENCE:START -->

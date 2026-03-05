@@ -1,11 +1,8 @@
 ---
 name: opence-archive
 description: Archive a completed change and apply spec updates to the main specifications.
-allowed-tools:
-  - Read
-  - Write
-  - Bash
-user-invocable: true
+metadata:
+  short-description: Archive changes and apply spec updates.
 ---
 
 <!-- OPENCE:START -->

@@ -1,156 +1,394 @@
-<!-- OPENCE:START -->
-# opence Instructions
+# compound-engineering-plugin - Claude Code Plugin Marketplace
 
-These instructions are for AI assistants working in this project.
+This repository is a Claude Code plugin marketplace that distributes the `compound-engineering` plugin to developers building with AI-powered tools.
 
-Always open `@/opence/AGENTS.md` when the request:
-- Mentions planning or the workflow stages (plan/work/review/compound/archive) or words like proposal, spec, change
-- Introduces new capabilities, breaking changes, architecture shifts, or big performance/security work
-- Sounds ambiguous and you need the authoritative spec before coding
+## Repository Structure
 
-Use `@/opence/AGENTS.md` to learn:
-- How to run the Plan/Work/Review/Compound/Archive workflow
-- Spec format and conventions
-- Project structure and guidelines
+```
+compound-engineering-plugin/
+├── .claude-plugin/
+│   └── marketplace.json          # Marketplace catalog (lists available plugins)
+├── docs/                         # Documentation site (GitHub Pages)
+│   ├── index.html                # Landing page
+│   ├── css/                      # Stylesheets
+│   ├── js/                       # JavaScript
+│   └── pages/                    # Reference pages
+└── plugins/
+    └── compound-engineering/   # The actual plugin
+        ├── .claude-plugin/
+        │   └── plugin.json        # Plugin metadata
+        ├── agents/                # 24 specialized AI agents
+        ├── commands/              # 13 slash commands
+        ├── skills/                # 11 skills
+        ├── mcp-servers/           # 2 MCP servers (playwright, context7)
+        ├── README.md              # Plugin documentation
+        └── CHANGELOG.md           # Version history
+```
 
-Keep this managed block so 'opence update' can refresh the instructions.
+## Philosophy: Compounding Engineering
 
-<!-- OPENCE:END -->
+**Each unit of engineering work should make subsequent units of work easier—not harder.**
 
+When working on this repository, follow the compounding engineering process:
 
+1. **Plan** → Understand the change needed and its impact
+2. **Delegate** → Use AI tools to help with implementation
+3. **Assess** → Verify changes work as expected
+4. **Codify** → Update this CLAUDE.md with learnings
 
-# CLAUDE.md
+## Working with This Repository
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## CLI Release Versioning
 
-## Language
+The repository has two separate version surfaces:
 
-中文
+1. **Root CLI package** — `package.json`, root `CHANGELOG.md`, and repo `v*` tags all share one release line managed by semantic-release on `main`.
+2. **Embedded marketplace plugin metadata** — `plugins/compound-engineering/.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` track the distributed Claude plugin metadata and can differ from the root CLI package version.
 
-## 项目环境
+Rules:
 
-系统： Windows 11
-Unity 版本： Unity 6000
+- Do not start a separate root CLI version stream. The root CLI follows the repo tag line.
+- Do not hand-bump the root CLI `package.json` or root `CHANGELOG.md` for routine feature work. Use conventional commits and let semantic-release write the released root version back to git.
+- Keep the root `CHANGELOG.md` header block aligned with `.releaserc.json` `changelogTitle`. If they drift, semantic-release will prepend release notes above the header.
+- Continue updating embedded plugin metadata when the plugin contents themselves change.
 
-## Build Commands
+### Adding a New Plugin
 
-### Unity Editor Build
+1. Create plugin directory: `plugins/new-plugin-name/`
+2. Add plugin structure:
+   ```
+   plugins/new-plugin-name/
+   ├── .claude-plugin/plugin.json
+   ├── agents/
+   ├── commands/
+   └── README.md
+   ```
+3. Update `.claude-plugin/marketplace.json` to include the new plugin
+4. Test locally before committing
+
+### Updating the Compounding Engineering Plugin
+
+When agents, commands, or skills are added/removed, follow this checklist:
+
+#### 1. Count all components accurately
+
 ```bash
-# Build AssetBundles (required before HybridCLR operations)
-# Use Unity menu: YooAsset → AssetBundle Builder → Build AssetBundles
-# Or call programmatically: BuildAssetBundleCommand.BuildAll()
+# Count agents
+ls plugins/compound-engineering/agents/*.md | wc -l
 
-# Build HybridCLR DLLs and copy to AssetRaw/DLL
-# Use Unity menu: HybridCLR → Build → BuildAssets And CopyTo AssemblyTextAssetPath
-# Or call programmatically: BuildDLLCommand.BuildAndCopyDlls()
+# Count commands
+ls plugins/compound-engineering/commands/*.md | wc -l
 
-# Full game build
-# Use Unity menu: File → Build Settings → Build
+# Count skills
+ls -d plugins/compound-engineering/skills/*/ 2>/dev/null | wc -l
 ```
 
-### HybridCLR Commands
+#### 2. Update ALL description strings with correct counts
+
+The description appears in multiple places and must match everywhere:
+
+- [ ] `plugins/compound-engineering/.claude-plugin/plugin.json` → `description` field
+- [ ] `.claude-plugin/marketplace.json` → plugin `description` field
+- [ ] `plugins/compound-engineering/README.md` → intro paragraph
+
+Format: `"Includes X specialized agents, Y commands, and Z skill(s)."`
+
+#### 3. Update version numbers
+
+When adding new functionality, bump the version in:
+
+- [ ] `plugins/compound-engineering/.claude-plugin/plugin.json` → `version`
+- [ ] `.claude-plugin/marketplace.json` → plugin `version`
+
+#### 4. Update documentation
+
+- [ ] `plugins/compound-engineering/README.md` → list all components
+- [ ] `plugins/compound-engineering/CHANGELOG.md` → document changes
+- [ ] `CLAUDE.md` → update structure diagram if needed
+
+#### 5. Rebuild documentation site
+
+Run the release-docs command to update all documentation pages:
+
 ```bash
-# Enable HybridCLR
-Unity Menu: HybridCLR → Define Symbols → Enable HybridCLR
-
-# Disable HybridCLR
-Unity Menu: HybridCLR → Define Symbols → Disable HybridCLR
-
-# Build AOT and HotFix DLLs
-Unity Menu: HybridCLR → Build → BuildAssets And CopyTo AssemblyTextAssetPath
+claude /release-docs
 ```
 
-### Hot Update Package Creation
+This will:
+- Update stats on the landing page
+- Regenerate reference pages (agents, commands, skills, MCP servers)
+- Update the changelog page
+- Validate all counts match actual files
+
+#### 6. Validate JSON files
+
 ```bash
-# Create hot update package (for deployed games)
-# 1. Build AssetBundles first
-# 2. Create hot package in: Bundles/StandaloneWindows64/HotUpdate/
-# Package includes: version.txt, manifest files, and DLLs
+cat .claude-plugin/marketplace.json | jq .
+cat plugins/compound-engineering/.claude-plugin/plugin.json | jq .
 ```
 
-## Architecture Overview
+#### 6. Verify before committing
 
-### Core Framework Structure
-This project uses **EasyFramework (EF)** - a modular Unity framework with **HybridCLR** for hot updates.
-
-
-
-#### Resource Loading Modes
-The framework supports 4 modes via `ResourceModeConfig`:
-1. **EditorSimulate** - Editor debugging with direct asset access
-2. **OfflinePlay** - Local bundled assets
-3. **HostPlay** - Remote CDN assets (for hot updates)
-4. **WebPlay** - WebGL compatible mode
-
-### Hot Update Architecture
-
-#### DLL Separation
-- **Runtime DLLs**: Core framework (`EF.Runtime.dll`)
-- **Hot Update DLLs**: `GameLogic.dll`, `GameProto.dll`
-- **AOT Metadata DLLs**: `mscorlib.dll`, `System.dll`, etc.
-
-#### Critical Files for HybridCLR
-- `HybridCLRGenerate/link.xml` - Preserves type metadata for AOT dlls
-- `HybridCLRGenerate/AOTGenericReferences.cs` - Generic type preservation
-- `HotFixConfig.cs` - DLL loading configuration
-
-
-### Asset Bundle System
-Uses **YooAsset** for advanced asset management:
-- Build output: `Bundles/{Platform}/DefaultPackage/`
-- Auto-generated manifests and version files
-- Support for multiple packages and CDN fallbacks
-- Asset collection via `AssetBundleCollectorSetting.asset`
-
-### Project Structure
-```
-Assets/
-├── EF/                     # EasyFramework core
-│   └── EFRuntime/          # Runtime framework code
-├── GameScripts/            # Game code (Runtime & HotFix)
-│   ├── Runtime/            # Code compiled into game
-│   └── HotFix/             # Hot updateable code
-├── HybridCLRGenerate/      # HybridCLR configuration
-├── AssetRaw/               # Raw assets (DLLs, configs)
-└── Resources/              # Unity resources
+```bash
+# Ensure counts in descriptions match actual files
+grep -o "Includes [0-9]* specialized agents" plugins/compound-engineering/.claude-plugin/plugin.json
+ls plugins/compound-engineering/agents/*.md | wc -l
 ```
 
-## Development Workflow
+### Marketplace.json Structure
 
-### Making Changes to Hot Update Code
-1. Edit code in `GameScripts/HotFix/`
-2. Use HybridCLR menu to rebuild DLLs
-3. Copy DLLs to `AssetRaw/DLL/`
-4. Build AssetBundles if needed
-5. Test with `HostPlay` mode to simulate hot update
+The marketplace.json follows the official Claude Code spec:
 
-### Adding New Managers
-1. Create interface in `EF/EFRuntime/Common/`
-2. Implement manager class
-3. Register in `GameLifetimeScope.cs`
-4. Add to `GameFramework.cs` initialization
+```json
+{
+  "name": "marketplace-identifier",
+  "owner": {
+    "name": "Owner Name",
+    "url": "https://github.com/owner"
+  },
+  "metadata": {
+    "description": "Marketplace description",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "plugin-name",
+      "description": "Plugin description",
+      "version": "1.0.0",
+      "author": { ... },
+      "homepage": "https://...",
+      "tags": ["tag1", "tag2"],
+      "source": "./plugins/plugin-name"
+    }
+  ]
+}
+```
 
-### Resource Loading Best Practices
-- Always use `IResourceManager` instead of direct Unity APIs
-- Release handles when done: `resourceManager.Release(handle)`
-- Use async loading with progress callbacks for UI
-- Configure `ResourceModeConfig.asset` for target environment
+**Only include fields that are in the official spec.** Do not add custom fields like:
 
-### HybridCLR Configuration Rules
-- Add new hot update types to `link.xml`
-- Update `AOTGenericReferences.cs` for new generic types
-- Ensure AOT dlls are included in `AssetRaw/DLL/`
-- Test both AOT and hot update paths
+- `downloads`, `stars`, `rating` (display-only)
+- `categories`, `featured_plugins`, `trending` (not in spec)
+- `type`, `verified`, `featured` (not in spec)
 
-## Key Dependencies
-- **HybridCLR** - Hot update system
-- **YooAsset v2.3.16** - Asset management
-- **UniTask** - Async operations
-- **Luban** - Configuration system
-- **Unity URP** - Rendering pipeline
+### Plugin.json Structure
 
-## Common Issues
-- If DLL copy fails, ensure `AssetRaw/DLL/` directory exists
-- AOT dlls only generate after full game build
-- Always rebuild AssetBundles after HybridCLR changes
-- Use `SyncAssemblyContent.RefreshAssembly()` if assembly loading issues occur
+Each plugin has its own plugin.json with detailed metadata:
+
+```json
+{
+  "name": "plugin-name",
+  "version": "1.0.0",
+  "description": "Plugin description",
+  "author": { ... },
+  "keywords": ["keyword1", "keyword2"],
+  "components": {
+    "agents": 15,
+    "commands": 6,
+    "hooks": 2
+  },
+  "agents": {
+    "category": [
+      {
+        "name": "agent-name",
+        "description": "Agent description",
+        "use_cases": ["use-case-1", "use-case-2"]
+      }
+    ]
+  },
+  "commands": {
+    "category": ["command1", "command2"]
+  }
+}
+```
+
+## Documentation Site
+
+The documentation site is at `/docs` in the repository root (for GitHub Pages). This site is built with plain HTML/CSS/JS (based on Evil Martians' LaunchKit template) and requires no build step to view.
+
+### Documentation Structure
+
+```
+docs/
+├── index.html           # Landing page with stats and philosophy
+├── css/
+│   ├── style.css        # Main styles (LaunchKit-based)
+│   └── docs.css         # Documentation-specific styles
+├── js/
+│   └── main.js          # Interactivity (theme toggle, mobile nav)
+└── pages/
+    ├── getting-started.html  # Installation and quick start
+    ├── agents.html           # All 24 agents reference
+    ├── commands.html         # All 13 commands reference
+    ├── skills.html           # All 11 skills reference
+    ├── mcp-servers.html      # MCP servers reference
+    └── changelog.html        # Version history
+```
+
+### Keeping Docs Up-to-Date
+
+**IMPORTANT:** After ANY change to agents, commands, skills, or MCP servers, run:
+
+```bash
+claude /release-docs
+```
+
+This command:
+1. Counts all current components
+2. Reads all agent/command/skill/MCP files
+3. Regenerates all reference pages
+4. Updates stats on the landing page
+5. Updates the changelog from CHANGELOG.md
+6. Validates counts match across all files
+
+### Manual Updates
+
+If you need to update docs manually:
+
+1. **Landing page stats** - Update the numbers in `docs/index.html`:
+   ```html
+   <span class="stat-number">24</span>  <!-- agents -->
+   <span class="stat-number">13</span>  <!-- commands -->
+   ```
+
+2. **Reference pages** - Each page in `docs/pages/` documents all components in that category
+
+3. **Changelog** - `docs/pages/changelog.html` mirrors `CHANGELOG.md` in HTML format
+
+### Viewing Docs Locally
+
+Since the docs are static HTML, you can view them directly:
+
+```bash
+# Open in browser
+open docs/index.html
+
+# Or start a local server
+cd docs
+python -m http.server 8000
+# Then visit http://localhost:8000
+```
+
+## Testing Changes
+
+### Test Locally
+
+1. Install the marketplace locally:
+
+   ```bash
+   claude /plugin marketplace add /Users/yourusername/compound-engineering-plugin
+   ```
+
+2. Install the plugin:
+
+   ```bash
+   claude /plugin install compound-engineering
+   ```
+
+3. Test agents and commands:
+   ```bash
+   claude /review
+   claude agent kieran-rails-reviewer "test message"
+   ```
+
+### Validate JSON
+
+Before committing, ensure JSON files are valid:
+
+```bash
+cat .claude-plugin/marketplace.json | jq .
+cat plugins/compound-engineering/.claude-plugin/plugin.json | jq .
+```
+
+## Common Tasks
+
+### Adding a New Agent
+
+1. Create `plugins/compound-engineering/agents/new-agent.md`
+2. Update plugin.json agent count and agent list
+3. Update README.md agent list
+4. Test with `claude agent new-agent "test"`
+
+### Adding a New Command
+
+1. Create `plugins/compound-engineering/commands/new-command.md`
+2. Update plugin.json command count and command list
+3. Update README.md command list
+4. Test with `claude /new-command`
+
+### Adding a New Skill
+
+1. Create skill directory: `plugins/compound-engineering/skills/skill-name/`
+2. Add skill structure:
+   ```
+   skills/skill-name/
+   ├── SKILL.md           # Skill definition with frontmatter (name, description)
+   └── scripts/           # Supporting scripts (optional)
+   ```
+3. Update plugin.json description with new skill count
+4. Update marketplace.json description with new skill count
+5. Update README.md with skill documentation
+6. Update CHANGELOG.md with the addition
+7. Test with `claude skill skill-name`
+
+**Skill file format (SKILL.md):**
+```markdown
+---
+name: skill-name
+description: Brief description of what the skill does
+---
+
+# Skill Title
+
+Detailed documentation...
+```
+
+### Updating Tags/Keywords
+
+Tags should reflect the compounding engineering philosophy:
+
+- Use: `ai-powered`, `compound-engineering`, `workflow-automation`, `knowledge-management`
+- Avoid: Framework-specific tags unless the plugin is framework-specific
+
+## Commit Conventions
+
+Follow these patterns for commit messages:
+
+- `Add [agent/command name]` - Adding new functionality
+- `Remove [agent/command name]` - Removing functionality
+- `Update [file] to [what changed]` - Updating existing files
+- `Fix [issue]` - Bug fixes
+- `Simplify [component] to [improvement]` - Refactoring
+
+Include the Claude Code footer:
+
+```
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+## Resources to search for when needing more information
+
+- [Claude Code Plugin Documentation](https://docs.claude.com/en/docs/claude-code/plugins)
+- [Plugin Marketplace Documentation](https://docs.claude.com/en/docs/claude-code/plugin-marketplaces)
+- [Plugin Reference](https://docs.claude.com/en/docs/claude-code/plugins-reference)
+
+## Key Learnings
+
+_This section captures important learnings as we work on this repository._
+
+### 2024-11-22: Added gemini-imagegen skill and fixed component counts
+
+Added the first skill to the plugin and discovered the component counts were wrong (said 15 agents, actually had 17). Created a comprehensive checklist for updating the plugin to prevent this in the future.
+
+**Learning:** Always count actual files before updating descriptions. The counts appear in multiple places (plugin.json, marketplace.json, README.md) and must all match. Use the verification commands in the checklist above.
+
+### 2024-10-09: Simplified marketplace.json to match official spec
+
+The initial marketplace.json included many custom fields (downloads, stars, rating, categories, trending) that aren't part of the Claude Code specification. We simplified to only include:
+
+- Required: `name`, `owner`, `plugins`
+- Optional: `metadata` (with description and version)
+- Plugin entries: `name`, `description`, `version`, `author`, `homepage`, `tags`, `source`
+
+**Learning:** Stick to the official spec. Custom fields may confuse users or break compatibility with future versions.
