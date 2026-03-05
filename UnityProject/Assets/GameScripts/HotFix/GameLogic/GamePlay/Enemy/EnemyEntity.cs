@@ -401,7 +401,7 @@ namespace GameLogic
         {
             if (_bulletModule == null)
             {
-                _bulletModule = ModuleSystem.Get<IBulletModule>();
+                ModuleSystem.TryGet<IBulletModule>(out _bulletModule);
             }
 
             _bulletModule?.ClearBulletsBySource(Id);
