@@ -1,10 +1,8 @@
 ---
 name: opence-skill-creator
 description: Learn how to create effective project skills following opence conventions.
-allowed-tools:
-  - Read
-  - Write
-user-invocable: true
+metadata:
+  short-description: Learn skill creation conventions.
 ---
 
 <!-- OPENCE:START -->

@@ -70,6 +70,7 @@
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Model\GamePlayModel.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Game\GamePlayController.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Bullet\BulletModule.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Level\LevelModule.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Bullet\BulletEntity.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Background\IGameBackgroundModule.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Avatar\PlayerAvatarEntity.cs" />
@@ -95,14 +96,13 @@
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Scene\GameSceneEvents.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Scene\IGameSceneManager.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\Energy\IEnergyModule.cs" />
-    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Level\ILevelModule.cs" />
-    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Level\LevelModule.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GameScope.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Game\GameMenuController.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\Energy\EnergyModule.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Main\MainModel.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Game\GameMenuView.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Enemy\EnemySpawnerModule.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Level\ILevelModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\GameScripts\HotFix\GameLogic\GameLogic.asmdef" />

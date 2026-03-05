@@ -1,11 +1,8 @@
 ---
 name: opence-plan
 description: Create an opence plan and scaffold change artifacts.
-allowed-tools:
-  - Read
-  - Grep
-  - Glob
-user-invocable: true
+metadata:
+  short-description: Plan opence change artifacts.
 ---
 
 <!-- OPENCE:START -->

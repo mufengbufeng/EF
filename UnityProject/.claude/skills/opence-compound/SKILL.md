@@ -2,13 +2,8 @@
 name: opence-compound
 description: Document learnings, capture repeatable workflows as skills, and
   prepare to compound an opence change.
-allowed-tools:
-  - Read
-  - Write
-  - Bash
-  - Grep
-  - Glob
-user-invocable: true
+metadata:
+  short-description: Document learnings, capture skills, and archive.
 ---
 
 <!-- OPENCE:START -->

@@ -1,12 +1,8 @@
 ---
 name: opence-review
 description: Review an opence change with prioritized findings.
-allowed-tools:
-  - Read
-  - Grep
-  - Glob
-user-invocable: true
-context: fork
+metadata:
+  short-description: Review opence changes.
 ---
 
 <!-- OPENCE:START -->
