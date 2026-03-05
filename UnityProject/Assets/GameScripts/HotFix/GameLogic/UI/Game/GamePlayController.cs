@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using Cysharp.Threading.Tasks;
+using EF.Common;
 using EF.Debugger;
 using EF.UI;
 using UnityEngine;
@@ -20,6 +21,9 @@ namespace GameLogic
         private IUIManager _uiManager;
         private bool _isOpeningPauseMenu;
         private GameMenuController _gameMenuController;
+        private IEnergyModule _energyModule;
+        private ILevelModule _levelModule;
+        private bool _levelCompleted;
 
         protected override void OnInitialize()
         {
@@ -33,6 +37,7 @@ namespace GameLogic
         protected override void OnEnter(object userData)
         {
             base.OnEnter(userData);
+            _levelCompleted = false;
 
             if (_gamePlayView != null)
             {
@@ -56,6 +61,12 @@ namespace GameLogic
                 RefreshScore(0);
                 Log.Warning("[GamePlayController] 未找到 GamePlayModel，积分显示将固定为 0");
             }
+
+            // 初始化体力绑定
+            InitializeEnergyBindings();
+
+            // 初始化关卡绑定
+            InitializeLevelBindings();
         }
 
         protected override void OnExit()
@@ -203,6 +214,97 @@ namespace GameLogic
             {
                 gameMenuView.UpdateScore(score);
             }
+        }
+
+        private void InitializeEnergyBindings()
+        {
+            if (!ModuleSystem.TryGet<IEnergyModule>(out _energyModule))
+            {
+                _energyModule = null;
+                Log.Warning("[GamePlayController] 未找到 IEnergyModule");
+                return;
+            }
+
+            BindEvent<Action<int, int>>(
+                h => _energyModule.OnEnergyChanged += h,
+                h => _energyModule.OnEnergyChanged -= h,
+                HandleEnergyChanged);
+
+            HandleEnergyChanged(_energyModule.CurrentEnergy, _energyModule.MaxEnergy);
+        }
+
+        private void InitializeLevelBindings()
+        {
+            if (!ModuleSystem.TryGet<ILevelModule>(out _levelModule))
+            {
+                _levelModule = null;
+                Log.Warning("[GamePlayController] 未找到 ILevelModule");
+                return;
+            }
+
+            // 订阅进度变化事件
+            BindEvent<Action<int, int, int>>(
+                h => _levelModule.OnProgressChanged += h,
+                h => _levelModule.OnProgressChanged -= h,
+                HandleLevelProgressChanged);
+
+            // 订阅通关事件
+            BindEvent<Action>(
+                h => _levelModule.OnLevelComplete += h,
+                h => _levelModule.OnLevelComplete -= h,
+                HandleLevelCompleteEvent);
+
+            // 初始显示
+            HandleLevelProgressChanged(_levelModule.CurrentLevelId, _levelModule.KillCount, _levelModule.RequiredKills);
+        }
+
+        private void HandleLevelProgressChanged(int levelId, int killCount, int requiredKills)
+        {
+            _gamePlayView?.UpdateLevel(levelId, killCount, requiredKills);
+        }
+
+        private void HandleLevelCompleteEvent()
+        {
+            if (_levelCompleted) return;
+            _levelCompleted = true;
+            
+            Log.Info("[GamePlayController] 关卡通关!");
+            HandleLevelComplete();
+        }
+
+        private void HandleEnergyChanged(int currentEnergy, int maxEnergy)
+        {
+            _gamePlayView?.UpdateEnergy(currentEnergy, maxEnergy);
+        }
+
+        private void RefreshLevelDisplay()
+        {
+            if (_levelModule == null || _gamePlayView == null) return;
+
+            _gamePlayView.UpdateLevel(
+                _levelModule.CurrentLevelId,
+                _levelModule.KillCount,
+                _levelModule.RequiredKills);
+
+            // 检查通关条件
+            if (!_levelCompleted && _levelModule.CheckLevelComplete())
+            {
+                _levelCompleted = true;
+                Log.Info("[GamePlayController] 关卡通关!");
+                HandleLevelComplete();
+            }
+        }
+
+        private void HandleLevelComplete()
+        {
+            if (_levelModule != null)
+            {
+                _levelModule.AdvanceToNextLevel();
+            }
+
+            // 返回主菜单
+            var procedure = GameLogicEntry.Procedure.GetProcedure<GamePlayProcedure>();
+            procedure?.ReturnToMainMenu();
         }
     }
 }

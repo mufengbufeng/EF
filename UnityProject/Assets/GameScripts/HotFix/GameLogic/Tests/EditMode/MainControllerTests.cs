@@ -189,7 +189,7 @@ namespace GameLogic.Tests.EditMode
                 finally
                 {
                     InvokeNonPublic(_view, "InternalRelease");
-                    Object.DestroyImmediate(_gameObject);
+                    UnityEngine.Object.DestroyImmediate(_gameObject);
                 }
             }
 

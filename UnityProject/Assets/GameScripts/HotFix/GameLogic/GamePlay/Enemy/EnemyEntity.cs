@@ -401,7 +401,7 @@ namespace GameLogic
         {
             if (_bulletModule == null)
             {
-                _bulletModule = ModuleSystem.Get<IBulletModule>();
+                ModuleSystem.TryGet<IBulletModule>(out _bulletModule);
             }
 
             _bulletModule?.ClearBulletsBySource(Id);
@@ -425,6 +425,12 @@ namespace GameLogic
 
             model.AddScore(KillScore);
             _hasAwardedKillScore = true;
+
+            // 记录关卡击杀
+            if (ModuleSystem.TryGet<ILevelModule>(out var levelModule))
+            {
+                levelModule.RecordKill();
+            }
         }
 
         /// <summary>

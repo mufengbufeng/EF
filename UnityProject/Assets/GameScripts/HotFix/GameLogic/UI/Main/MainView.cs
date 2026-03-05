@@ -22,6 +22,11 @@ namespace GameLogic
         public TextMeshProUGUI _energyText;
 
         /// <summary>
+        /// 关卡显示文本，可在 Prefab 绑定；未绑定时会在运行时自动创建。
+        /// </summary>
+        public TextMeshProUGUI _levelText;
+
+        /// <summary>
         /// 反馈文本，可在 Prefab 绑定；未绑定时会在运行时自动创建。
         /// </summary>
         public TextMeshProUGUI _feedbackText;
@@ -102,6 +107,24 @@ namespace GameLogic
             }
         }
 
+        public void SetLevelText(int levelId)
+        {
+            EnsureRuntimeTextComponents();
+            if (_levelText != null)
+            {
+                _levelText.text = $"当前关卡：{levelId}";
+            }
+        }
+
+        public void SetLevelDisplayUnavailable()
+        {
+            EnsureRuntimeTextComponents();
+            if (_levelText != null)
+            {
+                _levelText.text = "当前关卡：--";
+            }
+        }
+
         public void SetFeedbackText(string message)
         {
             EnsureRuntimeTextComponents();
@@ -143,6 +166,20 @@ namespace GameLogic
                     new Vector2(0f, 1f),
                     new Vector2(0f, 1f),
                     new Vector2(24f, -24f),
+                    new Vector2(300f, 40f),
+                    26,
+                    Color.white,
+                    TextAlignmentOptions.TopLeft);
+            }
+
+            if (_levelText == null)
+            {
+                _levelText = CreateRuntimeText(
+                    root,
+                    "LevelTextRuntime",
+                    new Vector2(0f, 1f),
+                    new Vector2(0f, 1f),
+                    new Vector2(24f, -70f),
                     new Vector2(300f, 40f),
                     26,
                     Color.white,
