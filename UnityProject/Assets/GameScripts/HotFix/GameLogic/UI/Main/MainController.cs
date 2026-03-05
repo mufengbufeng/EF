@@ -15,6 +15,7 @@ namespace GameLogic
         private MainView _mainView;
         private MainModel _mainModel;
         private IEnergyModule _energyModule;
+        private ILevelModule _levelModule;
 
         protected override void OnInitialize()
         {
@@ -51,6 +52,9 @@ namespace GameLogic
             }
 
             InitializeEnergyBindings();
+
+            // 初始化关卡显示
+            InitializeLevelDisplay();
 
             Log.Info("[MainController] 主界面已打开");
         }
@@ -150,6 +154,33 @@ namespace GameLogic
             {
                 _mainView?.SetFeedbackText(string.Empty);
             }
+
+            // 同时刷新关卡显示
+            RefreshLevelDisplay();
+        }
+
+        private void InitializeLevelDisplay()
+        {
+            if (!ModuleSystem.TryGet<ILevelModule>(out _levelModule))
+            {
+                _levelModule = null;
+                _mainView?.SetLevelDisplayUnavailable();
+                Log.Warning("[MainController] 未找到 ILevelModule");
+                return;
+            }
+
+            RefreshLevelDisplay();
+        }
+
+        private void RefreshLevelDisplay()
+        {
+            if (_levelModule == null)
+            {
+                _mainView?.SetLevelDisplayUnavailable();
+                return;
+            }
+
+            _mainView?.SetLevelText(_levelModule.CurrentLevelId);
         }
 
         private bool TryGetMainMenuProcedure(out MainMenuProcedure procedure)

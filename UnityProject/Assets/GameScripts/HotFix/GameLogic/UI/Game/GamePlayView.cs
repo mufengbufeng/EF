@@ -13,6 +13,7 @@ namespace GameLogic
     {
         public TextMeshProUGUI _pointText;
         public TextMeshProUGUI _levelText;
+        public TextMeshProUGUI _energyText;
         public Button _pauseButton;
 
         public event Action OnPauseClicked;
@@ -71,6 +72,19 @@ namespace GameLogic
             if (_levelText != null)
             {
                 _levelText.text = $"关卡 {levelId} | 击杀: {killCount}/{requiredKills}";
+            }
+        }
+
+        /// <summary>
+        /// 刷新体力显示。
+        /// </summary>
+        /// <param name="currentEnergy">当前体力。</param>
+        /// <param name="maxEnergy">最大体力。</param>
+        public void UpdateEnergy(int currentEnergy, int maxEnergy)
+        {
+            if (_energyText != null)
+            {
+                _energyText.text = $"体力: {currentEnergy}/{maxEnergy}";
             }
         }
 
