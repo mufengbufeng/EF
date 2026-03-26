@@ -7,6 +7,21 @@ description: "Unity Animator Controller management. Use when users want to creat
 
 Control Unity's animation system - create controllers, manage parameters, and control playback.
 
+## Guardrails
+
+**Mode**: Full-Auto required
+
+**DO NOT** (common hallucinations):
+- `animator_play` does not exist → use `animator_set_parameter` to trigger transitions, or `editor_play` for play mode
+- `animator_create_clip` / `animator_add_clip` do not exist → AnimationClips are created via Unity Editor or asset import
+- `animator_set_speed` does not exist → use `component_set_property` on Animator component with propertyName="speed"
+- `animator_get_info` does not exist → use `animator_get_parameters` or `animator_get_states`
+
+**Routing**:
+- For Timeline animation → use `timeline` module
+- For component properties on Animator → use `component` module
+- For animation import settings → use `importer` module
+
 ## Skills Overview
 
 | Skill | Description |
@@ -19,6 +34,8 @@ Control Unity's animation system - create controllers, manage parameters, and co
 | `animator_get_info` | Get Animator component info |
 | `animator_assign_controller` | Assign controller to GameObject |
 | `animator_list_states` | List states in controller |
+| `animator_add_state` | Add a state to a controller layer |
+| `animator_add_transition` | Add a transition between two states |
 
 ---
 
@@ -114,6 +131,32 @@ List all states in a controller layer.
 | `layer` | int | No | 0 | Layer index |
 
 **Returns**: `{success, states: [{name, tag, speed}]}`
+
+### animator_add_state
+Add a state to an Animator Controller layer.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `controllerPath` | string | Yes | - | Controller asset path |
+| `stateName` | string | Yes | - | Name for the new state |
+| `clipPath` | string | No | null | Animation clip asset path to assign |
+| `layer` | int | No | 0 | Layer index |
+
+**Returns**: `{success, controller, stateName, layer}`
+
+### animator_add_transition
+Add a transition between two states in an Animator Controller.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `controllerPath` | string | Yes | - | Controller asset path |
+| `fromState` | string | Yes | - | Source state name |
+| `toState` | string | Yes | - | Destination state name |
+| `layer` | int | No | 0 | Layer index |
+| `hasExitTime` | bool | No | true | Whether transition waits for exit time |
+| `duration` | float | No | 0.25 | Transition duration in seconds |
+
+**Returns**: `{success, from, to, layer, hasExitTime, duration}`
 
 ---
 

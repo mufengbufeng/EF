@@ -7,6 +7,20 @@ description: "Unity Terrain operations. Use when users want to create terrain, s
 
 > **Note**: Terrain operations require an existing Terrain in the scene, or use `terrain_create` to generate one.
 
+## Guardrails
+
+**Mode**: Full-Auto required
+
+**DO NOT** (common hallucinations):
+- `terrain_set_texture` does not exist → use `terrain_paint_texture` with layer index and brush parameters
+- `terrain_add_tree` / `terrain_add_grass` do not exist → these require Unity Terrain tools or custom scripts
+- `terrain_set_size` does not exist → terrain dimensions are set at creation via `terrain_create`
+- `terrain_import_heightmap` does not exist → use `terrain_set_heights` with height data
+
+**Routing**:
+- For terrain material → use `material` module on terrain's material
+- For objects on terrain → use `gameobject` module to create/place objects
+
 ## Skills Overview
 
 | Skill | Description |
@@ -199,7 +213,7 @@ Paint terrain texture layer. Requires terrain layers already configured.
 |-----------|------|----------|---------|-------------|
 | `normalizedX` | float | Yes | - | X position (0-1) |
 | `normalizedZ` | float | Yes | - | Z position (0-1) |
-| `layerIndex` | int | Yes | - | Layer index to paint |
+| `layerIndex` | int | Yes | - | Terrain layer index (0-based; use `terrain_get_info` to query available layers) |
 | `strength` | float | No | 1.0 | Paint strength |
 | `brushSize` | int | No | 10 | Brush size in pixels |
 | `name` | string | No | null | Terrain name |

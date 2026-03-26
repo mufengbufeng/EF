@@ -7,6 +7,20 @@ description: "Project validation and cleanup. Use when users want to find missin
 
 Maintain project health - find problems, clean up, and validate your Unity project.
 
+## Guardrails
+
+**Mode**: Full-Auto required
+
+**DO NOT** (common hallucinations):
+- `validation_run` / `validation_check` do not exist → use specific skills: `validation_check_project`, `validation_find_missing_refs`, etc.
+- `validation_fix` does not exist → validation skills report issues; use other modules to fix them
+- `validation_clean` does not exist → use `cleaner` module for cleanup operations
+
+**Routing**:
+- For unused/duplicate asset cleanup → use `cleaner` module
+- For missing script fix → `cleaner_fix_missing_scripts` (cleaner module)
+- For compile errors → `debug_check_compilation` (debug module)
+
 ## Skills Overview
 
 | Skill | Description |
@@ -18,6 +32,9 @@ Maintain project health - find problems, clean up, and validate your Unity proje
 | `validate_find_unused_assets` | Find potentially unused assets |
 | `validate_texture_sizes` | Check texture sizes |
 | `validate_project_structure` | Get project overview |
+| `validate_missing_references` | Find null/missing object references on components |
+| `validate_mesh_collider_convex` | Find non-convex MeshColliders |
+| `validate_shader_errors` | Find shaders with compilation errors |
 
 ---
 
@@ -91,6 +108,33 @@ Get project folder structure overview.
 | `maxDepth` | int | No | 3 | Max folder depth |
 
 **Returns**: `{success, structure, summary: {totalFolders, totalAssets}}`
+
+### `validate_missing_references`
+Find null/missing object references on components in the scene.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `limit` | int | No | 50 | Max results |
+
+**Returns**: `{ success, count, issues: [{ gameObject, path, component, property }] }`
+
+### `validate_mesh_collider_convex`
+Find non-convex MeshColliders (potential performance issue).
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `limit` | int | No | 50 | Max results |
+
+**Returns**: `{ success, count, nonConvexColliders: [{ gameObject, path, vertexCount }] }`
+
+### `validate_shader_errors`
+Find shaders with compilation errors.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `limit` | int | No | 50 | Max results |
+
+**Returns**: `{ success, count, shaders: [{ name, path, errorCount }] }`
 
 ---
 

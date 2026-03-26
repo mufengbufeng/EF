@@ -7,6 +7,21 @@ description: "Cinemachine virtual camera control. Use when users want to create 
 
 Control Cinemachine Virtual Cameras and settings (Cinemachine 3.x).
 
+## Guardrails
+
+**Mode**: Full-Auto required
+
+**DO NOT** (common hallucinations):
+- `cinemachine_create` does not exist → use `cinemachine_create_vcam` for virtual cameras
+- `cinemachine_set_target` does not exist → use `cinemachine_set_follow` and `cinemachine_set_lookat` separately
+- `cinemachine_add_brain` does not exist → CinemachineBrain is auto-added to Main Camera
+- Cinemachine 2.x uses `CinemachineVirtualCamera`; Cinemachine 3.x uses `CinemachineCamera` — skills handle this automatically
+
+**Routing**:
+- For basic Game Camera operations → use `camera` module
+- For Scene View camera → use `camera` module's `camera_set_transform`/`camera_look_at`
+- For camera animation sequences → use `timeline` module with Cinemachine track
+
 ## Skills
 
 ### `cinemachine_create_vcam`
@@ -32,6 +47,8 @@ Set any property on VCam or its pipeline components.
 Set Follow and LookAt targets.
 **Parameters:**
 - `vcamName` (string): Name of the VCam.
+- `instanceId` (int, optional): VCam Instance ID (preferred for precision).
+- `path` (string, optional): VCam hierarchy path.
 - `followName` (string, optional): GameObject name to follow.
 - `lookAtName` (string, optional): GameObject name to look at.
 
@@ -43,8 +60,13 @@ Switch VCam pipeline component (Body/Aim/Noise).
 - `componentType` (string): Type name (e.g. "OrbitalFollow", "Composer") or "None" to remove.
 
 ### `cinemachine_add_component`
-(Deprecated: Use `cinemachine_set_component` for better pipeline control)
-Add a Cinemachine component.
+> **DEPRECATED** — Use `cinemachine_set_component` instead for proper pipeline control (Body/Aim/Noise stages).
+Add a Cinemachine component (legacy, supports CM2 and CM3).
+**Parameters:**
+- `vcamName` (string): Name of the VCam.
+- `instanceId` (int, optional): VCam Instance ID.
+- `path` (string, optional): VCam hierarchy path.
+- `componentType` (string): Type name (e.g., "OrbitalFollow").
 
 ### `cinemachine_set_lens`
 Quickly configure Lens settings (FOV, Near, Far, OrthoSize).

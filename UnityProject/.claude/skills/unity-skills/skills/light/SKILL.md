@@ -7,6 +7,23 @@ description: "Unity lighting control. Use when users want to create or configure
 
 > **BATCH-FIRST**: Use `*_batch` skills when operating on 2+ lights.
 
+## Guardrails
+
+**Mode**: Full-Auto required
+
+**DO NOT** (common hallucinations):
+- `light_add` does not exist → use `light_create` (creates a new light GameObject)
+- `light_set_color` / `light_set_intensity` do not exist → use `light_set_properties` (sets color, intensity, range, shadows together)
+- `light_delete` does not exist → use `gameobject_delete` on the light's GameObject
+- `light_set_shadow` does not exist → use `light_set_properties` with `shadows` parameter ("none"/"hard"/"soft")
+
+**Routing**:
+- For lightmap baking settings → `light_get_lightmap_settings` (this module)
+- For reflection probes → `light_add_reflection_probe` (this module)
+- For light probe groups → `light_add_probe_group` (this module)
+
+> **Object Targeting**: All single-object skills accept `name` (string) and `instanceId` (int, preferred). Provide at least one. `path` (hierarchy path) is also accepted where noted.
+
 ## Skills Overview
 
 | Single Object | Batch Version | Use Batch When |
@@ -63,12 +80,14 @@ Configure light properties.
 | `shadows` | string | No | none/hard/soft |
 
 ### light_set_properties_batch
-Configure multiple lights.
+Configure multiple lights. Each item accepts: `name`/`instanceId`/`path` (identifier) + `r`, `g`, `b`, `intensity`, `range`, `shadows` (all optional).
+
+**Returns**: `{success, totalItems, successCount, failCount, results: [{success, name}]}`
 
 ```python
 unity_skills.call_skill("light_set_properties_batch", items=[
-    {"name": "Light1", "intensity": 2.0},
-    {"name": "Light2", "intensity": 2.0},
+    {"name": "Light1", "intensity": 2.0, "r": 1, "g": 0.9, "b": 0.8},
+    {"instanceId": 12345, "intensity": 1.5, "shadows": "soft"},
     {"name": "Light3", "intensity": 2.0}
 ])
 ```
@@ -84,6 +103,8 @@ Enable or disable a light.
 
 ### light_set_enabled_batch
 Enable or disable multiple lights.
+
+**Returns**: `{success, totalItems, successCount, failCount, results: [{success, name, enabled}]}`
 
 ```python
 unity_skills.call_skill("light_set_enabled_batch", items=[
@@ -160,6 +181,46 @@ unity_skills.call_skill("light_create",
     y=5, intensity=8, spotAngle=25, shadows="hard"
 )
 ```
+
+### `light_add_probe_group`
+Add a Light Probe Group to a GameObject. Optional grid layout: gridX/gridY/gridZ (count per axis), spacingX/spacingY/spacingZ (meters between probes).
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `name` | string | No | null | GameObject name |
+| `instanceId` | int | No | 0 | Instance ID |
+| `path` | string | No | null | Hierarchy path |
+| `gridX` | int | No | 0 | Probe count on X axis |
+| `gridY` | int | No | 0 | Probe count on Y axis |
+| `gridZ` | int | No | 0 | Probe count on Z axis |
+| `spacingX` | float | No | 2 | Meters between probes on X |
+| `spacingY` | float | No | 1.5 | Meters between probes on Y |
+| `spacingZ` | float | No | 2 | Meters between probes on Z |
+
+**Returns:** `{ success, gameObject, probeCount, existed, hasGrid }`
+
+### `light_add_reflection_probe`
+Create a Reflection Probe at a position.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `probeName` | string | No | "ReflectionProbe" | Probe name |
+| `x`, `y`, `z` | float | No | 0,1,0 | Position |
+| `sizeX`, `sizeY`, `sizeZ` | float | No | 10,10,10 | Probe box size |
+| `resolution` | int | No | 256 | Cubemap resolution |
+
+**Returns:** `{ success, name, instanceId, resolution, size }`
+
+### `light_get_lightmap_settings`
+Get Lightmap baking settings.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| *(none)* | — | — | — | No parameters required |
+
+**Returns:** `{ success, bakedGI, realtimeGI, lightmapSize, lightmapPadding, isRunning, lightmapCount }`
+
+---
 
 ## Best Practices
 

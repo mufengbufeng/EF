@@ -7,6 +7,20 @@ description: "Unity scene management. Use when users want to create, load, save 
 
 Control Unity scenes - the containers that hold all your GameObjects.
 
+## Guardrails
+
+**Mode**: Semi-Auto (available by default)
+
+**DO NOT** (common hallucinations):
+- `scene_delete` / `scene_rename` do not exist → delete scene files via `asset_delete`, rename via `asset_move`
+- `scene_list` does not exist → use `scene_get_loaded` (loaded scenes) or `asset_find` with `t:Scene` (all scene assets)
+- `scene_find_objects` is a simple name/tag/component filter; for regex/layer/path search use `gameobject_find` (Full-Auto)
+
+**Routing**:
+- For detailed hierarchy tree → use `perception` module's `hierarchy_describe`
+- For scene statistics → use `perception` module's `scene_summarize`
+- For screenshot → `scene_screenshot` (this module) or `camera_screenshot` (camera module, Full-Auto)
+
 ## Skills Overview
 
 | Skill | Description |
@@ -20,7 +34,7 @@ Control Unity scenes - the containers that hold all your GameObjects.
 | `scene_get_loaded` | Get all loaded scenes |
 | `scene_unload` | Unload an additive scene |
 | `scene_set_active` | Set active scene |
-| `scene_summarize` | Get scene summary |
+| `scene_find_objects` | Search objects by name/tag/component |
 
 ---
 
@@ -94,15 +108,17 @@ Set the active scene (for multi-scene editing).
 |-----------|------|----------|-------------|
 | `sceneName` | string | Yes | Scene name to set active |
 
-### scene_summarize
-Get a structured summary of the current scene.
+### scene_find_objects
+Search GameObjects by name pattern, tag, or component type. For advanced search (regex, layer, path) use gameobject_find.
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `includeComponentStats` | bool | No | true | Include component statistics |
-| `topComponentsLimit` | int | No | 10 | Max components to list |
+| `namePattern` | string | No | - | Name substring to match (case-insensitive) |
+| `tag` | string | No | - | Filter by tag |
+| `componentType` | string | No | - | Filter by component type name |
+| `limit` | int | No | 50 | Max results to return |
 
-**Returns**: `{success, objectCount, componentStats, hierarchyDepth}`
+**Returns**: `{success, count, objects: [{name, path, instanceId, active, tag}]}`
 
 ---
 

@@ -7,6 +7,23 @@ description: "GameObject creation and manipulation. Use when users want to creat
 
 > **BATCH-FIRST**: Use `*_batch` skills when operating on 2+ objects to reduce API calls from N to 1.
 
+## Guardrails
+
+**Mode**: Full-Auto required
+
+**DO NOT** (common hallucinations):
+- `gameobject_move` / `gameobject_rotate` / `gameobject_set_scale` do not exist → use `gameobject_set_transform` (handles position, rotation, and scale together)
+- `gameobject_set_position` does not exist → use `gameobject_set_transform` with `posX/posY/posZ`
+- `gameobject_add_component` does not exist → use `component_add` (component module)
+- `gameobject_get_transform` does not exist → use `gameobject_get_info` (returns position/rotation/scale)
+
+**Routing**:
+- To add/remove components → use `component` module
+- To set material/color → use `material` module
+- To search objects by name/tag/component → `gameobject_find` (this module) or `scene_find_objects` (scene module, Semi-Auto)
+
+> **Object Targeting**: All single-object skills accept three identifiers: `name` (string), `instanceId` (int, preferred for precision), `path` (string, hierarchy path like "Parent/Child"). Provide at least one. When only `name` is shown in a parameter table, `instanceId` and `path` are also accepted.
+
 ## Skills Overview
 
 | Single Object | Batch Version | Use Batch When |
@@ -104,26 +121,40 @@ Set position, rotation, and/or scale.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `name` | string | Yes | Object name |
+| `name` | string | No* | Object name |
+| `instanceId` | int | No* | Instance ID (preferred) |
+| `path` | string | No* | Hierarchy path |
 | `posX/posY/posZ` | float | No | Position |
 | `rotX/rotY/rotZ` | float | No | Rotation (euler) |
 | `scaleX/scaleY/scaleZ` | float | No | Scale |
+
+*At least one identifier required
 
 ### gameobject_set_parent
 Set parent-child relationship.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `name` | string | Yes | Child object name |
-| `parentName` | string | Yes | Parent object name (empty string = unparent) |
+| `childName` | string | No* | Child object name |
+| `childInstanceId` | int | No* | Child Instance ID (preferred) |
+| `childPath` | string | No* | Child hierarchy path |
+| `parentName` | string | No* | Parent object name (empty string = unparent) |
+| `parentInstanceId` | int | No* | Parent Instance ID |
+| `parentPath` | string | No* | Parent hierarchy path |
+
+*At least one child identifier and one parent identifier required
 
 ### gameobject_set_active
 Enable or disable a GameObject.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `name` | string | Yes | Object name |
+| `name` | string | No* | Object name |
+| `instanceId` | int | No* | Instance ID (preferred) |
+| `path` | string | No* | Hierarchy path |
 | `active` | bool | Yes | Enable state |
+
+*At least one identifier required
 
 ---
 
@@ -131,6 +162,8 @@ Enable or disable a GameObject.
 
 ### gameobject_create_batch
 Create multiple GameObjects in one call.
+
+**Returns**: `{success, totalItems, successCount, failCount, results: [{success, name, instanceId, path, position}]}`
 
 ```python
 unity_skills.call_skill("gameobject_create_batch", items=[
@@ -143,19 +176,29 @@ unity_skills.call_skill("gameobject_create_batch", items=[
 ### gameobject_delete_batch
 Delete multiple GameObjects.
 
+**Returns**: `{success, totalItems, successCount, failCount, results: [{success, name}]}`
+
 ```python
 # By names
 unity_skills.call_skill("gameobject_delete_batch", items=["Cube1", "Cube2", "Cube3"])
 
-# By instanceId (preferred)
+# By instanceId (preferred for precision)
 unity_skills.call_skill("gameobject_delete_batch", items=[
     {"instanceId": 12345},
     {"instanceId": 12346}
+])
+
+# By path
+unity_skills.call_skill("gameobject_delete_batch", items=[
+    {"path": "Environment/Cube1"},
+    {"path": "Environment/Cube2"}
 ])
 ```
 
 ### gameobject_duplicate_batch
 Duplicate multiple GameObjects.
+
+**Returns**: `{success, totalItems, successCount, failCount, results: [{success, originalName, copyName, copyInstanceId, copyPath}]}`
 
 ```python
 unity_skills.call_skill("gameobject_duplicate_batch", items=[
@@ -167,6 +210,8 @@ unity_skills.call_skill("gameobject_duplicate_batch", items=[
 ### gameobject_rename_batch
 Rename multiple GameObjects.
 
+**Returns**: `{success, totalItems, successCount, failCount, results: [{success, oldName, newName, instanceId}]}`
+
 ```python
 unity_skills.call_skill("gameobject_rename_batch", items=[
     {"instanceId": 12345, "newName": "Enemy_01"},
@@ -177,16 +222,20 @@ unity_skills.call_skill("gameobject_rename_batch", items=[
 ### gameobject_set_transform_batch
 Set transforms for multiple objects.
 
+**Returns**: `{success, totalItems, successCount, failCount, results: [{success, name, position, rotation, scale}]}`
+
 ```python
 unity_skills.call_skill("gameobject_set_transform_batch", items=[
     {"name": "Cube1", "posX": 0, "posY": 1},
-    {"name": "Cube2", "posX": 2, "posY": 1},
-    {"name": "Cube3", "posX": 4, "posY": 1}
+    {"instanceId": 12345, "posX": 2, "posY": 1},
+    {"path": "Env/Cube3", "posX": 4, "posY": 1}
 ])
 ```
 
 ### gameobject_set_active_batch
 Toggle multiple objects.
+
+**Returns**: `{success, totalItems, successCount, failCount, results: [{success, name, active}]}`
 
 ```python
 unity_skills.call_skill("gameobject_set_active_batch", items=[
@@ -196,17 +245,22 @@ unity_skills.call_skill("gameobject_set_active_batch", items=[
 ```
 
 ### gameobject_set_parent_batch
-Parent multiple objects.
+Parent multiple objects. Each item supports `childName`/`childInstanceId`/`childPath` and `parentName`/`parentInstanceId`/`parentPath`.
+
+**Returns**: `{success, totalItems, successCount, failCount, results: [{success, child, parent}]}`
 
 ```python
 unity_skills.call_skill("gameobject_set_parent_batch", items=[
     {"childName": "Wheel1", "parentName": "Car"},
-    {"childName": "Wheel2", "parentName": "Car"}
+    {"childInstanceId": 12345, "parentName": "Car"},
+    {"childPath": "Wheels/Wheel3", "parentPath": "Vehicles/Car"}
 ])
 ```
 
 ### gameobject_set_layer_batch
 Set layer for multiple objects.
+
+**Returns**: `{success, totalItems, successCount, failCount, results: [{success, name, layer}]}`
 
 ```python
 unity_skills.call_skill("gameobject_set_layer_batch", items=[
@@ -217,6 +271,8 @@ unity_skills.call_skill("gameobject_set_layer_batch", items=[
 
 ### gameobject_set_tag_batch
 Set tag for multiple objects.
+
+**Returns**: `{success, totalItems, successCount, failCount, results: [{success, name, tag}]}`
 
 ```python
 unity_skills.call_skill("gameobject_set_tag_batch", items=[

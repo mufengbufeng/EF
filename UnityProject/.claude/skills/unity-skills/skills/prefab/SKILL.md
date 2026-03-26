@@ -7,6 +7,21 @@ description: "Prefab management. Use when users want to create, instantiate, app
 
 > **BATCH-FIRST**: Use `prefab_instantiate_batch` when spawning 2+ prefab instances.
 
+## Guardrails
+
+**Mode**: Full-Auto required
+
+**DO NOT** (common hallucinations):
+- `prefab_create_from_object` does not exist → use `prefab_create` (takes scene object name/instanceId and savePath)
+- `prefab_spawn` does not exist → use `prefab_instantiate`
+- `prefab_edit` / `prefab_modify` do not exist → use `prefab_set_property` (edit prefab asset directly) or instantiate, modify, then `prefab_apply`
+- `prefab_save` does not exist → use `prefab_apply` (applies instance changes to source prefab)
+
+**Routing**:
+- To modify components on a prefab instance in scene → use `component` module skills, then `prefab_apply`
+- To set a property directly on the prefab asset → `prefab_set_property` (this module)
+- To find all instances of a prefab → `prefab_find_instances` (this module)
+
 ## Skills Overview
 
 | Single Object | Batch Version | Use Batch When |
@@ -20,6 +35,9 @@ description: "Prefab management. Use when users want to create, instantiate, app
 - `prefab_get_overrides` - Get instance overrides
 - `prefab_revert_overrides` - Revert to prefab values
 - `prefab_apply_overrides` - Apply overrides to prefab
+- `prefab_create_variant` - Create a prefab variant
+- `prefab_find_instances` - Find all instances of a prefab in scene
+- `prefab_set_property` - Set a property on a component inside a Prefab asset (supports basic types, vectors, colors, and asset references)
 
 ---
 
@@ -58,6 +76,8 @@ Instantiate multiple prefabs in one call.
 | `items` | array | Yes | Array of instantiation configs |
 
 **Item properties**: `prefabPath`, `name`, `x`, `y`, `z`, `rotX`, `rotY`, `rotZ`, `scaleX`, `scaleY`, `scaleZ`, `parentName`
+
+**Returns**: `{success, totalItems, successCount, failCount, results: [{success, name, instanceId, prefabPath, position}]}`
 
 ```python
 unity_skills.call_skill("prefab_instantiate_batch", items=[
@@ -117,6 +137,69 @@ Apply all overrides from instance to source prefab asset.
 |-----------|------|----------|-------------|
 | `name` | string | No* | Prefab instance name |
 | `instanceId` | int | No* | Instance ID |
+
+### prefab_create_variant
+Create a prefab variant from an existing prefab.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `sourcePrefabPath` | string | Yes | - | Path to the source prefab asset |
+| `variantPath` | string | Yes | - | Save path for the new variant |
+
+**Returns:** `{ success, sourcePath, variantPath, name }`
+
+### prefab_find_instances
+Find all instances of a prefab in the current scene.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `prefabPath` | string | Yes | - | Prefab asset path to search for |
+| `limit` | int | No | 50 | Maximum number of instances to return |
+
+**Returns:** `{ success, prefabPath, count, instances: [{ name, path, instanceId }] }`
+
+### prefab_set_property
+Set a property on a component inside a Prefab asset file (without instantiating it). Supports basic types, vectors, colors, enums, and asset references.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `prefabPath` | string | Yes | - | Path to the prefab asset |
+| `componentType` | string | Yes | - | Component type name |
+| `propertyName` | string | Yes | - | Serialized property name |
+| `value` | string | Cond. | null | Value for basic types (int/float/bool/string/enum/vector/color) |
+| `assetReferencePath` | string | Cond. | null | Asset path for Object reference fields (Material, Texture, AudioClip, ScriptableObject, etc.) |
+| `gameObjectName` | string | No | null | Child object name inside prefab (defaults to root) |
+
+> Provide either `value` (basic types) or `assetReferencePath` (asset references).
+
+**Returns:** `{ success, prefabPath, gameObject, component, property, valueSet }`
+
+```python
+# Set a float property on prefab root
+unity_skills.call_skill("prefab_set_property",
+    prefabPath="Assets/Prefabs/Enemy.prefab",
+    componentType="EnemyStats",
+    propertyName="maxHealth",
+    value="100"
+)
+
+# Assign an asset reference to a prefab component
+unity_skills.call_skill("prefab_set_property",
+    prefabPath="Assets/Prefabs/Enemy.prefab",
+    componentType="AudioSource",
+    propertyName="m_audioClip",
+    assetReferencePath="Assets/Audio/hit.wav"
+)
+
+# Edit a child object inside a prefab
+unity_skills.call_skill("prefab_set_property",
+    prefabPath="Assets/Prefabs/Player.prefab",
+    componentType="MeshRenderer",
+    propertyName="m_Materials.Array.data[0]",
+    assetReferencePath="Assets/Materials/PlayerSkin.mat",
+    gameObjectName="Body"
+)
+```
 
 ---
 

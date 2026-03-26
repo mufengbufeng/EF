@@ -7,6 +7,23 @@ description: "Unity material and shader properties. Use when users want to creat
 
 > **BATCH-FIRST**: Use `*_batch` skills when operating on 2+ objects/materials.
 
+## Guardrails
+
+**Mode**: Full-Auto required
+
+**DO NOT** (common hallucinations):
+- `material_set_metallic` / `material_set_smoothness` do not exist → use `material_set_float` with `propertyName="_Metallic"` or `"_Glossiness"` (Standard) / `"_Smoothness"` (URP)
+- `material_set_color` r/g/b/a range is **0–1**, not 0–255
+- `material_set_property` does not exist → use the specific setter: `material_set_float`, `material_set_int`, `material_set_vector`, `material_set_color`
+- `material_get_color` does not exist → use `material_get_properties` (returns all properties including colors)
+
+**Routing**:
+- For shader changes → `material_set_shader` (this module)
+- For texture tiling → `material_set_texture_scale` / `material_set_texture_offset`
+- Pipeline-specific property names differ: check Render Pipeline Compatibility table in this doc
+
+> **Object Targeting**: Single-object skills accept `name` (GameObject name) or `path` (material asset path like `Assets/Materials/X.mat`). For asset-based operations, prefer `path`.
+
 ## Skills Overview
 
 | Single Object | Batch Version | Use Batch When |
@@ -42,6 +59,8 @@ Create a new material (auto-detects render pipeline).
 ### material_create_batch
 Create multiple materials.
 
+**Returns**: `{success, totalItems, successCount, failCount, results: [{success, name, path}]}`
+
 ```python
 unity_skills.call_skill("material_create_batch", items=[
     {"name": "Red", "savePath": "Assets/Materials"},
@@ -62,6 +81,8 @@ Assign material to object's renderer.
 
 ### material_assign_batch
 Assign materials to multiple objects.
+
+**Returns**: `{success, totalItems, successCount, failCount, results: [{success, name, materialPath}]}`
 
 ```python
 unity_skills.call_skill("material_assign_batch", items=[
@@ -85,6 +106,8 @@ Set material color with optional HDR intensity.
 ### material_set_colors_batch
 Set colors on multiple objects.
 
+**Returns**: `{success, totalItems, successCount, failCount, results: [{success, name}]}`
+
 ```python
 unity_skills.call_skill("material_set_colors_batch", items=[
     {"name": "Cube1", "r": 1, "g": 0, "b": 0},
@@ -106,6 +129,8 @@ Set emission color with auto-enable keyword.
 
 ### material_set_emission_batch
 Set emission on multiple objects.
+
+**Returns**: `{success, totalItems, successCount, failCount, results: [{success, name}]}`
 
 ```python
 unity_skills.call_skill("material_set_emission_batch", items=[
