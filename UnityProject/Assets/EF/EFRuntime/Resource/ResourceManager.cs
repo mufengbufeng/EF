@@ -6,6 +6,7 @@ using EF.Debugger;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using YooAsset;
+using SceneHandle = YooAsset.SceneHandle;
 
 namespace EF.Resource
 {
@@ -317,7 +318,6 @@ namespace EF.Resource
 
         #region 场景管理
 
-        /// <inheritdoc />
         public async UniTask<SceneHandle> LoadSceneAsync(string location, LoadSceneMode sceneMode = LoadSceneMode.Single, LocalPhysicsMode physicsMode = LocalPhysicsMode.None, bool suspendLoad = false, uint priority = 0, Action<float> progress = null)
         {
             EnsureInitialized();

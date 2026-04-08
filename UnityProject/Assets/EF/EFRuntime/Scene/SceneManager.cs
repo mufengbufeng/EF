@@ -6,6 +6,7 @@ using EF.Debugger;
 using EF.Resource;
 using UnityEngine.SceneManagement;
 using YooAsset;
+using SceneHandle = YooAsset.SceneHandle;
 
 namespace EF.Scene
 {
@@ -106,7 +107,7 @@ namespace EF.Scene
         #region ISceneManager 实现
 
         /// <inheritdoc />
-        public async UniTask<bool> LoadSceneAsync(string sceneName, LoadSceneMode sceneMode = LoadSceneMode.Single, 
+        public async UniTask<bool> LoadSceneAsync(string sceneName, LoadSceneMode sceneMode = LoadSceneMode.Single,
             LocalPhysicsMode physicsMode = LocalPhysicsMode.None, bool suspendLoad = false, uint priority = 0)
         {
             if (string.IsNullOrEmpty(sceneName))
@@ -151,7 +152,7 @@ namespace EF.Scene
 
                     OnSceneLoaded?.Invoke(sceneInfo);
                     Log.Info($"[SceneManager] 场景 '{sceneName}' 加载成功，耗时：{sceneInfo.LoadDuration.TotalSeconds:F2}秒");
-                    
+
                     return true;
                 }
                 else
@@ -232,7 +233,7 @@ namespace EF.Scene
                 Log.Info($"[SceneManager] 开始卸载场景：{sceneName}");
 
                 var unloadOperation = sceneHandle.UnloadAsync();
-                
+
                 while (!unloadOperation.IsDone)
                 {
                     await UniTask.Yield();
@@ -248,7 +249,7 @@ namespace EF.Scene
                         _currentSceneHandle = null;
                         _currentScene = null;
                     }
-                    
+
                     Log.Info($"[SceneManager] 场景 '{sceneName}' 卸载成功");
                     return true;
                 }

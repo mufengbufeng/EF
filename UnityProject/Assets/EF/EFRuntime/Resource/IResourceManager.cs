@@ -4,6 +4,7 @@ using EF.Common;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using YooAsset;
+using SceneHandle = YooAsset.SceneHandle;
 
 namespace EF.Resource
 {
