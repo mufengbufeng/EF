@@ -1,6 +1,7 @@
 using System;
 using EF.Common;
 using EF.Debugger;
+using EF.Timer;
 using EF.UI;
 
 namespace GameLogic
@@ -16,6 +17,8 @@ namespace GameLogic
         private MainModel _mainModel;
         private IEnergyModule _energyModule;
         private ILevelModule _levelModule;
+        private ITimerManager _timerManager;
+        private int _countdownTimerId;
 
         protected override void OnInitialize()
         {
@@ -56,11 +59,15 @@ namespace GameLogic
             // 初始化关卡显示
             InitializeLevelDisplay();
 
+            // 初始化恢复倒计时
+            InitializeCountdownTimer();
+
             Log.Info("[MainController] 主界面已打开");
         }
 
         protected override void OnExit()
         {
+            CancelCountdownTimer();
             // 不再需要手动取消订阅，EventBinder 会在 InternalExit 中自动清理
             base.OnExit();
             Log.Info("[MainController] 主界面已关闭");
@@ -143,6 +150,7 @@ namespace GameLogic
         private void HandleEnergyChanged(int currentEnergy, int maxEnergy)
         {
             _mainView?.SetEnergyText(currentEnergy, maxEnergy);
+            UpdateCountdownDisplay();
 
             bool canStart = currentEnergy >= StartGameEnergyCost;
             _mainView?.SetStartButtonInteractable(canStart);
@@ -181,6 +189,45 @@ namespace GameLogic
             }
 
             _mainView?.SetLevelText(_levelModule.CurrentLevelId);
+        }
+
+        private void InitializeCountdownTimer()
+        {
+            if (!ModuleSystem.TryGet<ITimerManager>(out _timerManager))
+            {
+                return;
+            }
+
+            // 每秒刷新倒计时显示
+            _countdownTimerId = _timerManager.ScheduleLoop(1f, 1f, UpdateCountdownDisplay);
+        }
+
+        private void UpdateCountdownDisplay()
+        {
+            if (_energyModule == null || _mainView == null)
+            {
+                return;
+            }
+
+            // 每秒刷新体力数值（动态计算）和倒计时
+            _mainView.SetEnergyText(_energyModule.CurrentEnergy, _energyModule.MaxEnergy);
+
+            bool canStart = _energyModule.CurrentEnergy >= StartGameEnergyCost;
+            _mainView.SetStartButtonInteractable(canStart);
+
+            if (_energyModule.IsRecovering)
+            {
+                _mainView.SetEnergyRecoveryCountdown(_energyModule.TimeToNextRecovery);
+            }
+        }
+
+        private void CancelCountdownTimer()
+        {
+            if (_countdownTimerId != 0 && _timerManager != null)
+            {
+                _timerManager.Cancel(_countdownTimerId);
+                _countdownTimerId = 0;
+            }
         }
 
         private bool TryGetMainMenuProcedure(out MainMenuProcedure procedure)

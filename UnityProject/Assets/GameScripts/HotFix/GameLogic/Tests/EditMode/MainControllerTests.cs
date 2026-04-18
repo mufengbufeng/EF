@@ -226,6 +226,12 @@ namespace GameLogic.Tests.EditMode
 
             public int MaxEnergy { get; }
 
+            public int RecoveryIntervalSeconds => 360;
+
+            public float TimeToNextRecovery => _currentEnergy < MaxEnergy ? 300f : 0f;
+
+            public bool IsRecovering => _currentEnergy < MaxEnergy;
+
             public int TryConsumeCalls { get; private set; }
 
             public int RecoverCalls { get; private set; }

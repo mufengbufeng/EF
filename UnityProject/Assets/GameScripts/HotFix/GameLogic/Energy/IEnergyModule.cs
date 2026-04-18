@@ -19,6 +19,21 @@ namespace GameLogic
         int MaxEnergy { get; }
 
         /// <summary>
+        /// 自动恢复间隔（秒）。
+        /// </summary>
+        int RecoveryIntervalSeconds { get; }
+
+        /// <summary>
+        /// 距下次自动恢复剩余秒数。体力已满时返回 0。
+        /// </summary>
+        float TimeToNextRecovery { get; }
+
+        /// <summary>
+        /// 当前是否正在自动恢复中（体力未满时为 true）。
+        /// </summary>
+        bool IsRecovering { get; }
+
+        /// <summary>
         /// 体力变化事件。
         /// </summary>
         event Action<int, int> OnEnergyChanged;

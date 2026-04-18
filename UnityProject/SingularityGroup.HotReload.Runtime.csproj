@@ -119,6 +119,10 @@
       <HintPath>D:\DocApp\UnityEditor\6000.3.12f1\Editor\Data\Managed\UnityEngine\UnityEngine.ARModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.AdaptivePerformanceModule">
+      <HintPath>D:\DocApp\UnityEditor\6000.3.12f1\Editor\Data\Managed\UnityEngine\UnityEngine.AdaptivePerformanceModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.AndroidJNIModule">
       <HintPath>D:\DocApp\UnityEditor\6000.3.12f1\Editor\Data\Managed\UnityEngine\UnityEngine.AndroidJNIModule.dll</HintPath>
       <Private>False</Private>
@@ -389,6 +393,10 @@
     </Reference>
     <Reference Include="UnityEngine.VRModule">
       <HintPath>D:\DocApp\UnityEditor\6000.3.12f1\Editor\Data\Managed\UnityEngine\UnityEngine.VRModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.VectorGraphicsModule">
+      <HintPath>D:\DocApp\UnityEditor\6000.3.12f1\Editor\Data\Managed\UnityEngine\UnityEngine.VectorGraphicsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.VehiclesModule">

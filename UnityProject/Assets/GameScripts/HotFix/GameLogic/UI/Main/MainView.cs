@@ -98,6 +98,24 @@ namespace GameLogic
             }
         }
 
+        public void SetEnergyRecoveryCountdown(float seconds)
+        {
+            EnsureRuntimeTextComponents();
+            if (_energyText == null)
+            {
+                return;
+            }
+
+            if (seconds <= 0f)
+            {
+                return;
+            }
+
+            int minutes = (int)seconds / 60;
+            int secs = (int)seconds % 60;
+            _energyText.text = $"{_energyText.text}  下次恢复：{minutes}:{secs:D2}";
+        }
+
         public void SetEnergyDisplayUnavailable()
         {
             EnsureRuntimeTextComponents();
