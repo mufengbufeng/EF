@@ -40,13 +40,29 @@ namespace EF.Feature
         /// </summary>
         public T AddFeature<T>() where T : IFeature, new()
         {
-            return (T)AddFeature(typeof(T));
+            return (T)AddFeature(typeof(T), null);
+        }
+
+        /// <summary>
+        /// 添加指定类型的特性并传入配置数据。
+        /// </summary>
+        public T AddFeature<T>(object data) where T : IFeature, new()
+        {
+            return (T)AddFeature(typeof(T), data);
         }
 
         /// <summary>
         /// 添加指定类型的特性。
         /// </summary>
         public IFeature AddFeature(Type featureType)
+        {
+            return AddFeature(featureType, null);
+        }
+
+        /// <summary>
+        /// 添加指定类型的特性并传入配置数据。
+        /// </summary>
+        public IFeature AddFeature(Type featureType, object data)
         {
             if (featureType == null)
             {
@@ -93,6 +109,9 @@ namespace EF.Feature
             }
             _features[featureType].Add(feature);
             _allFeatures.Add(feature);
+
+            // 传入配置数据（在 OnInit 之前）
+            feature.OnSetup(data);
 
             // 初始化特性
             feature.OnInit();
@@ -245,6 +264,18 @@ namespace EF.Feature
                         featureBase.OnDisable();
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// 向已注册的特性传递配置数据。
+        /// </summary>
+        public void SetupFeature<T>(object data) where T : IFeature
+        {
+            IFeature feature = GetFeature<T>();
+            if (feature != null)
+            {
+                feature.OnSetup(data);
             }
         }
 

@@ -108,10 +108,8 @@
     <Compile Include="Assets\EF\EFRuntime\Sound\ISoundManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UHub\UHubBindingConfig.cs" />
     <Compile Include="Assets\EF\EFRuntime\Sound\SoundAgentPool.cs" />
-    <Compile Include="Assets\EF\EFRuntime\Feature\Examples\ExampleFeatures.cs" />
     <Compile Include="Assets\EF\EFRuntime\Procedure\IProcedureManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Entity\ICollisionHandler.cs" />
-    <Compile Include="Assets\EF\EFRuntime\Feature\Examples\ExampleFeatureUsage.cs" />
     <Compile Include="Assets\EF\EFRuntime\Entity\IEntityGroup.cs" />
     <Compile Include="Assets\EF\EFRuntime\Timer\TimerManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Event\EventHandlerRegistry.cs" />
@@ -150,6 +148,7 @@
     <Compile Include="Assets\EF\EFRuntime\Entity\IEntity.cs" />
     <Compile Include="Assets\EF\EFRuntime\Feature\FeatureBase.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\IUIManager.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Feature\FeatureBaseTData.cs" />
     <Compile Include="Assets\EF\EFRuntime\Procedure\ProcedureBase.cs" />
     <Compile Include="Assets\EF\EFRuntime\Save\ISaveManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Event\PendingEvent.cs" />

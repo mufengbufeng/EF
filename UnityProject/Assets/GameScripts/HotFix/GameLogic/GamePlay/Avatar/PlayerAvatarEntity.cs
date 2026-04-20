@@ -3,73 +3,48 @@ using EF.Common;
 using EF.Debugger;
 using EF.Entity;
 using UnityEngine;
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
-#endif
 
 namespace GameLogic
 {
     /// <summary>
     /// 玩家飞机实体。
-    /// 负责拖拽输入、自动攻击与动画状态控制。
+    /// 作为编排者管理 Feature 生命周期，对外通过 IHealth 回调转发暴露接口。
     /// </summary>
     public sealed class PlayerAvatarEntity : EntityBase, IHealth
     {
-        private enum ActivePointerType
-        {
-            None,
-            Mouse,
-            Touch
-        }
-
         private const string MoveAnimationState = "Move";
         private const string BoomAnimationState = "Boom";
-        private const float DragOffsetAlignSpeed = 4f;
 
         private GameObject _handleField;
         private IBulletModule _bulletModule;
         private IEntityManager _entityManager;
         private Animator _animator;
-        private SpriteRenderer _spriteRenderer;
         private Collider2D _collider2D;
 
-        private ActivePointerType _activePointerType;
-        private int _activeTouchId;
-        private Vector3 _dragOffset;
-        private float _attackInterval;
-        private float _attackTimer;
-        private float _bulletSpeed;
-        private float _dragBoundaryPadding;
-        private float _fixedZ;
-        private Camera _mainCamera;
-        private bool _cameraWarningLogged;
-        private bool _bulletWarningLogged;
         private int _lifecycleToken;
         private Action _onDead;
         private bool _deathNotified;
 
-        // 生命值系统
-        private float _currentHealth;
-        private float _maxHealth;
-        private bool _isDead;
+        // IHealth 回调字段 —— Feature 注册
+        private Action<float> _takeDamageCallback;
+        private Func<float> _currentHealthCallback;
+        private Func<float> _maxHealthCallback;
+        private Func<bool> _isDeadCallback;
 
         /// <summary>
         /// 当前生命值。
         /// </summary>
-        public float CurrentHealth => _currentHealth;
+        public float CurrentHealth => _currentHealthCallback?.Invoke() ?? 0f;
 
         /// <summary>
         /// 最大生命值。
         /// </summary>
-        public float MaxHealth => _maxHealth;
+        public float MaxHealth => _maxHealthCallback?.Invoke() ?? 0f;
 
         /// <summary>
         /// 是否已死亡。
         /// </summary>
-        public bool IsDead => _isDead;
-
-        // 技能系统可通过该入口接管攻击；返回 true 表示已处理，不再执行默认攻击。
-        private Func<Vector3, bool> _customAttackExecutor;
+        public bool IsDead => _isDeadCallback?.Invoke() ?? false;
 
         /// <summary>
         /// 实体关联的 GameObject。
@@ -86,7 +61,11 @@ namespace GameLogic
         /// <param name="attackExecutor">自定义攻击逻辑。</param>
         public void SetCustomAttackExecutor(Func<Vector3, bool> attackExecutor)
         {
-            _customAttackExecutor = attackExecutor;
+            var attackFeature = Features.GetFeature<AttackFeature>();
+            if (attackFeature != null)
+            {
+                attackFeature.SetCustomAttackExecutor(attackExecutor);
+            }
         }
 
         /// <summary>
@@ -106,56 +85,7 @@ namespace GameLogic
         /// <param name="damage">伤害值。</param>
         public void TakeDamage(float damage)
         {
-            if (_isDead)
-            {
-                return;
-            }
-
-            _currentHealth -= damage;
-            Log.Info($"[PlayerAvatarEntity] 实体 {Id} 受到伤害 {damage}，当前生命值: {_currentHealth}/{_maxHealth}");
-
-            if (_currentHealth <= 0)
-            {
-                _isDead = true;
-                _currentHealth = 0;
-                Log.Info($"[PlayerAvatarEntity] 实体 {Id} 已死亡");
-
-                // 禁用碰撞器避免重复击中
-                if (_collider2D != null)
-                {
-                    _collider2D.enabled = false;
-                }
-
-                ResetPointerState();
-                ClearOwnedBullets();
-
-                // 播放死亡动画
-                PlayBoomAnimation();
-
-                // 延迟隐藏实体(等待动画播放)
-                DelayedHide(1.0f, _lifecycleToken, Id);
-            }
-        }
-
-        /// <summary>
-        /// 延迟隐藏实体。
-        /// </summary>
-        private async void DelayedHide(float delay, int expectedToken, int expectedEntityId)
-        {
-            await Cysharp.Threading.Tasks.UniTask.Delay(System.TimeSpan.FromSeconds(delay));
-
-            if (expectedToken != _lifecycleToken || !_isDead || Id != expectedEntityId)
-            {
-                return;
-            }
-
-            NotifyDeathOnce();
-
-            if (Handle != null && _entityManager != null)
-            {
-                _entityManager.HideEntity(expectedEntityId);
-                Log.Info($"[PlayerAvatarEntity] 实体 {expectedEntityId} 已隐藏");
-            }
+            _takeDamageCallback?.Invoke(damage);
         }
 
         /// <summary>
@@ -193,63 +123,75 @@ namespace GameLogic
             Handle.SetActive(true);
 
             _animator = Handle.GetComponent<Animator>();
-            _spriteRenderer = Handle.GetComponent<SpriteRenderer>();
             _collider2D = Handle.GetComponent<Collider2D>();
-            _mainCamera = Camera.main;
-            _cameraWarningLogged = false;
-            _bulletWarningLogged = false;
 
             if (_collider2D == null)
             {
-                // 资源缺失碰撞组件时自动补最小命中组件，保证点击命中稳定。
                 _collider2D = Handle.AddComponent<BoxCollider2D>();
-                Log.Warning("[PlayerAvatarEntity] Avatar 缺少 Collider2D，已自动补充 BoxCollider2D 用于命中检测");
+                Log.Warning("[PlayerAvatarEntity] Avatar 缺少 Collider2D，已自动补充 BoxCollider2D");
             }
 
-            if (_collider2D != null)
-            {
-                _collider2D.enabled = true;
-            }
+            _collider2D.enabled = true;
+
+            Vector3 spawnPosition;
+            float fixedZ;
+            float attackInterval;
+            float bulletSpeed;
+            float dragBoundaryPadding;
 
             if (userData is PlayerAvatarBehaviorData behaviorData)
             {
-                Handle.transform.position = behaviorData.SpawnPosition;
-                _fixedZ = behaviorData.SpawnPosition.z;
-                _attackInterval = behaviorData.AttackInterval;
-                _bulletSpeed = behaviorData.BulletSpeed;
-                _dragBoundaryPadding = Mathf.Max(0f, behaviorData.DragBoundaryPadding);
+                spawnPosition = behaviorData.SpawnPosition;
+                attackInterval = behaviorData.AttackInterval;
+                bulletSpeed = behaviorData.BulletSpeed;
+                dragBoundaryPadding = behaviorData.DragBoundaryPadding;
                 _onDead = behaviorData.OnDead;
-                
-                // 初始化生命值
-                _maxHealth = 100f;
-                _currentHealth = _maxHealth;
-                _isDead = false;
             }
             else
             {
-                Vector3 currentPosition = Handle.transform.position;
-                _fixedZ = currentPosition.z;
-                _attackInterval = 0.2f;
-                _bulletSpeed = 8f;
-                _dragBoundaryPadding = 0.25f;
+                spawnPosition = Handle.transform.position;
+                attackInterval = 0.2f;
+                bulletSpeed = 8f;
+                dragBoundaryPadding = 0.25f;
                 _onDead = null;
-                
-                // 初始化生命值
-                _maxHealth = 100f;
-                _currentHealth = _maxHealth;
-                _isDead = false;
-                
                 Log.Warning($"[PlayerAvatarEntity] 实体 {Id} 未接收到行为数据，使用默认参数");
             }
 
-            _attackTimer = 0f;
-            ResetPointerState();
+            Handle.transform.position = spawnPosition;
+            fixedZ = spawnPosition.z;
+
+            // 添加 Feature 并注册回调
+            var healthFeature = Features.AddFeature<HealthFeature>(new HealthFeatureData { MaxHealth = 100f });
+            healthFeature.OnDeath += HandleHealthDeath;
+            _takeDamageCallback = healthFeature.TakeDamage;
+            _currentHealthCallback = () => healthFeature.CurrentHealth;
+            _maxHealthCallback = () => healthFeature.MaxHealth;
+            _isDeadCallback = () => healthFeature.IsDead;
+
+            Features.AddFeature<PositionClampFeature>(new PositionClampData
+            {
+                BoundaryPadding = dragBoundaryPadding,
+                FixedZ = fixedZ
+            });
+
+            Features.AddFeature<DragInputFeature>(new DragInputData
+            {
+                FixedZ = fixedZ
+            });
+
+            Features.AddFeature<AttackFeature>(new AttackData
+            {
+                AttackInterval = attackInterval,
+                BulletSpeed = bulletSpeed,
+                SourceEntityId = Id
+            });
+
+            _deathNotified = false;
             PlayMoveAnimation();
-            ClampCurrentPosition();
         }
 
         /// <summary>
-        /// 每帧更新。
+        /// 每帧更新。调用 base.OnUpdate 分发到 Feature，然后检查状态编排 Feature 启停。
         /// </summary>
         public override void OnUpdate(float elapseSeconds, float realElapseSeconds)
         {
@@ -260,14 +202,12 @@ namespace GameLogic
                 return;
             }
 
-            if (_isDead)
+            // 编排：死亡时禁用其他 Feature
+            if (IsDead)
             {
-                return;
+                Features.SetFeatureEnabled<DragInputFeature>(false);
+                Features.SetFeatureEnabled<AttackFeature>(false);
             }
-
-            UpdateDragInput(elapseSeconds);
-            ClampCurrentPosition();
-            UpdateAttack(elapseSeconds);
         }
 
         /// <summary>
@@ -294,227 +234,48 @@ namespace GameLogic
             ResetRuntimeState();
         }
 
-        private void UpdateDragInput(float elapseSeconds)
+        /// <summary>
+        /// HealthFeature 死亡回调，执行碰撞器禁用、子弹清理和爆炸动画。
+        /// </summary>
+        private void HandleHealthDeath()
         {
-            Camera camera = GetMainCamera();
-            if (camera == null)
+            if (_collider2D != null)
             {
-                return;
+                _collider2D.enabled = false;
             }
 
-            if (_activePointerType == ActivePointerType.None)
-            {
-                if (TryBeginTouchDrag(camera))
-                {
-                    return;
-                }
-
-                TryBeginMouseDrag(camera);
-                return;
-            }
-
-            if (_activePointerType == ActivePointerType.Mouse)
-            {
-                UpdateMouseDrag(camera, elapseSeconds);
-                return;
-            }
-
-            UpdateTouchDrag(camera, elapseSeconds);
+            ClearOwnedBullets();
+            PlayBoomAnimation();
+            DelayedHide(1.0f, _lifecycleToken, Id);
         }
 
-        private bool TryBeginTouchDrag(Camera camera)
+        /// <summary>
+        /// 延迟隐藏实体，等待爆炸动画播放完毕。
+        /// </summary>
+        /// <param name="delay">延迟时间（秒）。</param>
+        /// <param name="expectedToken">期望的生命周期令牌，用于取消过期操作。</param>
+        /// <param name="expectedEntityId">期望的实体 ID。</param>
+        private async void DelayedHide(float delay, int expectedToken, int expectedEntityId)
         {
-            // 同一帧可能有多个触点开始，必须逐个命中检测，避免漏掉后续有效触点。
-#if ENABLE_INPUT_SYSTEM
-            Touchscreen touchscreen = Touchscreen.current;
-            if (touchscreen != null)
+            await Cysharp.Threading.Tasks.UniTask.Delay(System.TimeSpan.FromSeconds(delay));
+
+            if (expectedToken != _lifecycleToken || !IsDead || Id != expectedEntityId)
             {
-                var touches = touchscreen.touches;
-                for (int i = 0; i < touches.Count; i++)
-                {
-                    var touch = touches[i];
-                    if (!touch.press.wasPressedThisFrame)
-                    {
-                        continue;
-                    }
-
-                    Vector2 touchScreenPosition = touch.position.ReadValue();
-                    Vector3 touchWorldPosition = ScreenToWorld(camera, touchScreenPosition, _fixedZ);
-                    if (!IsPointerOnAvatar(touchWorldPosition))
-                    {
-                        continue;
-                    }
-
-                    _activePointerType = ActivePointerType.Touch;
-                    _activeTouchId = touch.touchId.ReadValue();
-                    _dragOffset = Handle.transform.position - touchWorldPosition;
-                    return true;
-                }
+                return;
             }
-#endif
-#if ENABLE_LEGACY_INPUT_MANAGER
-            int touchCount = Input.touchCount;
-            for (int i = 0; i < touchCount; i++)
+
+            NotifyDeathOnce();
+
+            if (Handle != null && _entityManager != null)
             {
-                Touch touch = Input.GetTouch(i);
-                if (touch.phase != TouchPhase.Began)
-                {
-                    continue;
-                }
-
-                Vector3 touchWorldPosition = ScreenToWorld(camera, touch.position, _fixedZ);
-                if (!IsPointerOnAvatar(touchWorldPosition))
-                {
-                    continue;
-                }
-
-                _activePointerType = ActivePointerType.Touch;
-                _activeTouchId = touch.fingerId;
-                _dragOffset = Handle.transform.position - touchWorldPosition;
-                return true;
+                _entityManager.HideEntity(expectedEntityId);
+                Log.Info($"[PlayerAvatarEntity] 实体 {expectedEntityId} 已隐藏");
             }
-#endif
-            return false;
         }
 
-        private void TryBeginMouseDrag(Camera camera)
-        {
-            if (!TryGetMouseDownPosition(out Vector2 mouseScreenPosition))
-            {
-                return;
-            }
-
-            Vector3 mouseWorldPosition = ScreenToWorld(camera, mouseScreenPosition, _fixedZ);
-            if (!IsPointerOnAvatar(mouseWorldPosition))
-            {
-                return;
-            }
-
-            _activePointerType = ActivePointerType.Mouse;
-            _dragOffset = Handle.transform.position - mouseWorldPosition;
-        }
-
-        private void UpdateMouseDrag(Camera camera, float elapseSeconds)
-        {
-            if (!TryGetMouseHeldPosition(out Vector2 mouseScreenPosition))
-            {
-                ResetPointerState();
-                return;
-            }
-
-            Vector3 mouseWorldPosition = ScreenToWorld(camera, mouseScreenPosition, _fixedZ);
-            Vector3 targetPosition = BuildDragTargetPosition(mouseWorldPosition, elapseSeconds);
-            SetClampedPosition(camera, targetPosition);
-        }
-
-        private void UpdateTouchDrag(Camera camera, float elapseSeconds)
-        {
-            if (!TryGetTouchPosition(_activeTouchId, out Vector2 touchScreenPosition, out bool isPressed))
-            {
-                ResetPointerState();
-                return;
-            }
-
-            if (!isPressed)
-            {
-                ResetPointerState();
-                return;
-            }
-
-            Vector3 touchWorldPosition = ScreenToWorld(camera, touchScreenPosition, _fixedZ);
-            Vector3 targetPosition = BuildDragTargetPosition(touchWorldPosition, elapseSeconds);
-            SetClampedPosition(camera, targetPosition);
-        }
-
-        private Vector3 BuildDragTargetPosition(Vector3 pointerWorldPosition, float elapseSeconds)
-        {
-            UpdateDragOffset(elapseSeconds);
-            return pointerWorldPosition + _dragOffset;
-        }
-
-        private void UpdateDragOffset(float elapseSeconds)
-        {
-            if (_dragOffset == Vector3.zero)
-            {
-                return;
-            }
-
-            float maxDelta = Mathf.Max(0f, elapseSeconds) * DragOffsetAlignSpeed;
-            if (maxDelta <= 0f)
-            {
-                return;
-            }
-
-            _dragOffset = Vector3.MoveTowards(_dragOffset, Vector3.zero, maxDelta);
-        }
-
-        private void UpdateAttack(float elapseSeconds)
-        {
-            if (_attackInterval <= 0f)
-            {
-                return;
-            }
-
-            _attackTimer += elapseSeconds;
-            if (_attackTimer < _attackInterval)
-            {
-                return;
-            }
-
-            _attackTimer = 0f;
-            ExecuteAttack();
-        }
-
-        private void ExecuteAttack()
-        {
-            if (Handle == null)
-            {
-                return;
-            }
-
-            if (_customAttackExecutor != null)
-            {
-                try
-                {
-                    if (_customAttackExecutor.Invoke(Handle.transform.position))
-                    {
-                        return;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Log.Error($"[PlayerAvatarEntity] 自定义攻击执行器异常: {e.Message}");
-                }
-            }
-
-            FireDefaultBullet();
-        }
-
-        private void FireDefaultBullet()
-        {
-            if (_bulletModule == null && !ModuleSystem.TryGet<IBulletModule>(out _bulletModule))
-            {
-                if (!_bulletWarningLogged)
-                {
-                    _bulletWarningLogged = true;
-                    Log.Warning($"[PlayerAvatarEntity] 实体 {Id} 无法获取 IBulletModule，跳过默认攻击");
-                }
-                return;
-            }
-
-            _bulletWarningLogged = false;
-            var bulletData = new BulletData
-            {
-                SpawnPosition = Handle.transform.position,
-                Direction = Vector3.up,
-                Speed = _bulletSpeed,
-                OwnerType = BulletOwnerType.Player,
-                Damage = 10f,
-                SourceEntityId = Id
-            };
-            _bulletModule.Fire(bulletData);
-        }
-
+        /// <summary>
+        /// 清理该实体发射的所有子弹。
+        /// </summary>
         private void ClearOwnedBullets()
         {
             if (_bulletModule == null && !ModuleSystem.TryGet<IBulletModule>(out _bulletModule))
@@ -525,6 +286,9 @@ namespace GameLogic
             _bulletModule.ClearBulletsBySource(Id);
         }
 
+        /// <summary>
+        /// 通知外部死亡事件，保证只触发一次。
+        /// </summary>
         private void NotifyDeathOnce()
         {
             if (_deathNotified)
@@ -548,6 +312,9 @@ namespace GameLogic
             }
         }
 
+        /// <summary>
+        /// 播放移动动画。
+        /// </summary>
         private void PlayMoveAnimation()
         {
             if (_animator != null)
@@ -556,215 +323,30 @@ namespace GameLogic
             }
         }
 
-        private void ClampCurrentPosition()
-        {
-            if (Handle == null)
-            {
-                return;
-            }
-
-            Camera camera = GetMainCamera();
-            if (camera == null)
-            {
-                return;
-            }
-
-            SetClampedPosition(camera, Handle.transform.position);
-        }
-
-        private void SetClampedPosition(Camera camera, Vector3 targetPosition)
-        {
-            Vector3 clampedPosition = ClampToCameraBounds(camera, targetPosition);
-            Handle.transform.position = clampedPosition;
-        }
-
-        private Vector3 ClampToCameraBounds(Camera camera, Vector3 targetPosition)
-        {
-            if (camera.orthographic)
-            {
-                float halfHeight = camera.orthographicSize;
-                float halfWidth = halfHeight * camera.aspect;
-                float minX = camera.transform.position.x - halfWidth + _dragBoundaryPadding;
-                float maxX = camera.transform.position.x + halfWidth - _dragBoundaryPadding;
-                float minY = camera.transform.position.y - halfHeight + _dragBoundaryPadding;
-                float maxY = camera.transform.position.y + halfHeight - _dragBoundaryPadding;
-
-                if (minX > maxX)
-                {
-                    minX = maxX = camera.transform.position.x;
-                }
-
-                if (minY > maxY)
-                {
-                    minY = maxY = camera.transform.position.y;
-                }
-
-                targetPosition.x = Mathf.Clamp(targetPosition.x, minX, maxX);
-                targetPosition.y = Mathf.Clamp(targetPosition.y, minY, maxY);
-                targetPosition.z = _fixedZ;
-                return targetPosition;
-            }
-
-            float zDistance = Mathf.Abs(camera.transform.position.z - _fixedZ);
-            Vector3 viewport = camera.WorldToViewportPoint(targetPosition);
-            viewport.x = Mathf.Clamp01(viewport.x);
-            viewport.y = Mathf.Clamp01(viewport.y);
-            Vector3 world = camera.ViewportToWorldPoint(new Vector3(viewport.x, viewport.y, zDistance));
-            world.z = _fixedZ;
-            return world;
-        }
-
-        private bool IsPointerOnAvatar(Vector3 pointerWorldPosition)
-        {
-            if (_collider2D != null)
-            {
-                return _collider2D.OverlapPoint(pointerWorldPosition);
-            }
-
-            if (_spriteRenderer != null)
-            {
-                return _spriteRenderer.bounds.Contains(pointerWorldPosition);
-            }
-
-            return Vector3.SqrMagnitude(Handle.transform.position - pointerWorldPosition) <= 0.64f;
-        }
-
-        private Camera GetMainCamera()
-        {
-            if (_mainCamera == null)
-            {
-                _mainCamera = Camera.main;
-            }
-
-            if (_mainCamera == null && !_cameraWarningLogged)
-            {
-                _cameraWarningLogged = true;
-                Log.Warning($"[PlayerAvatarEntity] 实体 {Id} 未找到主摄像机，拖拽输入暂不可用");
-            }
-
-            return _mainCamera;
-        }
-
-        private static Vector3 ScreenToWorld(Camera camera, Vector2 screenPosition, float targetZ)
-        {
-            float distance = Mathf.Abs(camera.transform.position.z - targetZ);
-            Vector3 worldPosition = camera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, distance));
-            worldPosition.z = targetZ;
-            return worldPosition;
-        }
-
-        private bool TryGetMouseDownPosition(out Vector2 screenPosition)
-        {
-#if ENABLE_INPUT_SYSTEM
-            Mouse mouse = Mouse.current;
-            if (mouse != null && mouse.leftButton.wasPressedThisFrame)
-            {
-                screenPosition = mouse.position.ReadValue();
-                return true;
-            }
-#endif
-#if ENABLE_LEGACY_INPUT_MANAGER
-            if (Input.GetMouseButtonDown(0))
-            {
-                screenPosition = Input.mousePosition;
-                return true;
-            }
-#endif
-            screenPosition = default;
-            return false;
-        }
-
-        private bool TryGetMouseHeldPosition(out Vector2 screenPosition)
-        {
-#if ENABLE_INPUT_SYSTEM
-            Mouse mouse = Mouse.current;
-            if (mouse != null && mouse.leftButton.isPressed)
-            {
-                screenPosition = mouse.position.ReadValue();
-                return true;
-            }
-#endif
-#if ENABLE_LEGACY_INPUT_MANAGER
-            if (Input.GetMouseButton(0))
-            {
-                screenPosition = Input.mousePosition;
-                return true;
-            }
-#endif
-            screenPosition = default;
-            return false;
-        }
-
-        private bool TryGetTouchPosition(int touchId, out Vector2 screenPosition, out bool isPressed)
-        {
-#if ENABLE_INPUT_SYSTEM
-            Touchscreen touchscreen = Touchscreen.current;
-            if (touchscreen != null)
-            {
-                var touches = touchscreen.touches;
-                for (int i = 0; i < touches.Count; i++)
-                {
-                    var touch = touches[i];
-                    if (touch.touchId.ReadValue() != touchId)
-                    {
-                        continue;
-                    }
-
-                    screenPosition = touch.position.ReadValue();
-                    isPressed = touch.press.isPressed;
-                    return true;
-                }
-            }
-#endif
-#if ENABLE_LEGACY_INPUT_MANAGER
-            int touchCount = Input.touchCount;
-            for (int i = 0; i < touchCount; i++)
-            {
-                Touch touch = Input.GetTouch(i);
-                if (touch.fingerId != touchId)
-                {
-                    continue;
-                }
-
-                screenPosition = touch.position;
-                isPressed = touch.phase != TouchPhase.Ended && touch.phase != TouchPhase.Canceled;
-                return true;
-            }
-#endif
-            screenPosition = default;
-            isPressed = false;
-            return false;
-        }
-
-        private void ResetPointerState()
-        {
-            _activePointerType = ActivePointerType.None;
-            _activeTouchId = -1;
-            _dragOffset = Vector3.zero;
-        }
-
+        /// <summary>
+        /// 重置所有运行时状态，清空回调并移除所有 Feature。
+        /// </summary>
         private void ResetRuntimeState()
         {
-            ResetPointerState();
-            _attackInterval = 0f;
-            _attackTimer = 0f;
-            _bulletSpeed = 0f;
-            _dragBoundaryPadding = 0f;
-            _fixedZ = 0f;
-            _bulletModule = null;
+            // 清理回调
+            _takeDamageCallback = null;
+            _currentHealthCallback = null;
+            _maxHealthCallback = null;
+            _isDeadCallback = null;
+
+            // 移除所有 Feature
+            var allFeatures = Features.GetAllFeatures();
+            for (int i = allFeatures.Count - 1; i >= 0; i--)
+            {
+                Features.RemoveFeature(allFeatures[i]);
+            }
+
             _animator = null;
-            _spriteRenderer = null;
             _collider2D = null;
-            _mainCamera = null;
-            _cameraWarningLogged = false;
-            _bulletWarningLogged = false;
+            _bulletModule = null;
             _entityManager = null;
-            _customAttackExecutor = null;
             _onDead = null;
             _deathNotified = false;
-            _currentHealth = 0f;
-            _maxHealth = 0f;
-            _isDead = false;
             _lifecycleToken++;
         }
     }

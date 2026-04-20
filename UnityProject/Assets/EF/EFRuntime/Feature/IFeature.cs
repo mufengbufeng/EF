@@ -48,5 +48,11 @@ namespace EF.Feature
         /// <param name="elapseSeconds">逻辑流逝时间（秒）。</param>
         /// <param name="realElapseSeconds">真实流逝时间（秒）。</param>
         void OnUpdate(float elapseSeconds, float realElapseSeconds);
+
+        /// <summary>
+        /// 接收外部传入的配置数据，在 OnInit 之前调用。
+        /// </summary>
+        /// <param name="data">配置数据对象。</param>
+        void OnSetup(object data);
     }
 }

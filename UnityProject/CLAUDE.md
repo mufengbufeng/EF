@@ -25,20 +25,20 @@ Unity 6000.3 (Unity 6) 游戏项目，使用 **EasyFramework (EF)** 自研模块
 
 所有模块在 `Assets/EF/EFRuntime/` 中，通过 `ModuleSystem`（静态服务定位器，提供 `Register<T>()`/`Get<T>()`）注册和获取：
 
-| 模块 | 接口 | 职责 |
-|------|------|------|
-| Resource | `IResourceManager` | 基于 YooAsset 的资源加载 |
-| Event | `IEventManager` | 发布/订阅事件系统 |
-| UI | `IUIManager` | MVC UI，支持分层（Background/Normal/Popup/Overlay） |
-| Sound | `ISoundManager` | 音频播放 |
-| Timer | `ITimerManager` | 定时器调度 |
-| ObjectPool | `IObjectPoolManager` | 对象池 |
-| Fsm | `IFsmManager` | 有限状态机 |
-| Procedure | `IProcedureManager` | 游戏流程状态（基于 FSM） |
-| Save | `ISaveManager` | 本地存档 |
-| Model | `ModelManager` | 数据模型管理，支持 `INotifyPropertyChanged` |
-| Entity | `IEntityManager` | 实体生命周期与对象池 |
-| Scene | `ISceneManager` | 场景加载/卸载 |
+| 模块       | 接口                 | 职责                                                |
+| ---------- | -------------------- | --------------------------------------------------- |
+| Resource   | `IResourceManager`   | 基于 YooAsset 的资源加载                            |
+| Event      | `IEventManager`      | 发布/订阅事件系统                                   |
+| UI         | `IUIManager`         | MVC UI，支持分层（Background/Normal/Popup/Overlay） |
+| Sound      | `ISoundManager`      | 音频播放                                            |
+| Timer      | `ITimerManager`      | 定时器调度                                          |
+| ObjectPool | `IObjectPoolManager` | 对象池                                              |
+| Fsm        | `IFsmManager`        | 有限状态机                                          |
+| Procedure  | `IProcedureManager`  | 游戏流程状态（基于 FSM）                            |
+| Save       | `ISaveManager`       | 本地存档                                            |
+| Model      | `ModelManager`       | 数据模型管理，支持 `INotifyPropertyChanged`         |
+| Entity     | `IEntityManager`     | 实体生命周期与对象池                                |
+| Scene      | `ISceneManager`      | 场景加载/卸载                                       |
 
 ### UI 系统（MVC）
 
@@ -53,13 +53,13 @@ Unity 6000.3 (Unity 6) 游戏项目，使用 **EasyFramework (EF)** 自研模块
 
 ### 程序集
 
-| 程序集 | 路径 | 类型 |
-|--------|------|------|
-| `EF.Runtime` | `Assets/EF/EFRuntime/` | AOT（框架） |
-| `EGF` | `Assets/EGF/` | AOT（游戏扩展） |
-| `GameLogic` | `Assets/GameScripts/HotFix/GameLogic/` | 热更新 |
-| `GameProto` | `Assets/GameScripts/HotFix/GameProto/` | 热更新（协议/数据定义） |
-| `GameLogic.Tests.EditMode` | `Assets/GameScripts/HotFix/GameLogic/Tests/EditMode/` | 编辑器测试 |
+| 程序集                     | 路径                                                  | 类型                    |
+| -------------------------- | ----------------------------------------------------- | ----------------------- |
+| `EF.Runtime`               | `Assets/EF/EFRuntime/`                                | AOT（框架）             |
+| `EGF`                      | `Assets/EGF/`                                         | AOT（游戏扩展）         |
+| `GameLogic`                | `Assets/GameScripts/HotFix/GameLogic/`                | 热更新                  |
+| `GameProto`                | `Assets/GameScripts/HotFix/GameProto/`                | 热更新（协议/数据定义） |
+| `GameLogic.Tests.EditMode` | `Assets/GameScripts/HotFix/GameLogic/Tests/EditMode/` | 编辑器测试              |
 
 ### 核心依赖
 
@@ -95,6 +95,8 @@ Unity 编辑器中运行：Window > General > Test Runner > EditMode 标签页�
 - 热更新代码必须在 `Assets/GameScripts/HotFix/` 中，不能放在 Runtime
 - UI Prefab 通过资源路径引用（如 `"UI/MainMenuPrefab"`）
 - 异步操作使用 UniTask（`async UniTask`），不使用协程
+- 所有代码必须保证有函数级别的注释，特别是公共接口
+- 代码提交信息必须清晰描述变更内容和原因，使用中文
 
 ## 工具使用指南
 

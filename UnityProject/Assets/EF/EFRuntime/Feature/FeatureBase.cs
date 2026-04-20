@@ -64,6 +64,14 @@ namespace EF.Feature
         }
 
         /// <summary>
+        /// 接收外部传入的配置数据，在 OnInit 之前调用。默认空实现。
+        /// </summary>
+        /// <param name="data">配置数据对象。</param>
+        public virtual void OnSetup(object data)
+        {
+        }
+
+        /// <summary>
         /// 设置特性所属的实体（由特性容器内部调用）。
         /// </summary>
         /// <param name="entity">所属的实体。</param>

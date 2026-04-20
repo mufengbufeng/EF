@@ -26,6 +26,14 @@ namespace EF.Feature
         T AddFeature<T>() where T : IFeature, new();
 
         /// <summary>
+        /// 添加指定类型的特性并传入配置数据。
+        /// </summary>
+        /// <typeparam name="T">特性类型，必须实现 IFeature 接口且有无参构造函数。</typeparam>
+        /// <param name="data">配置数据，在 OnInit 之前传递给 OnSetup。</param>
+        /// <returns>添加的特性实例。</returns>
+        T AddFeature<T>(object data) where T : IFeature, new();
+
+        /// <summary>
         /// 添加指定类型的特性。
         /// </summary>
         /// <param name="featureType">特性类型，必须实现 IFeature 接口。</param>
@@ -87,6 +95,13 @@ namespace EF.Feature
         /// <typeparam name="T">特性类型。</typeparam>
         /// <param name="enabled">是否启用。</param>
         void SetFeatureEnabled<T>(bool enabled) where T : IFeature;
+
+        /// <summary>
+        /// 向已注册的特性传递配置数据。
+        /// </summary>
+        /// <typeparam name="T">特性类型。</typeparam>
+        /// <param name="data">配置数据。</param>
+        void SetupFeature<T>(object data) where T : IFeature;
 
         /// <summary>
         /// 获取所有特性的只读列表。
