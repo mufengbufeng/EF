@@ -61,11 +61,16 @@
     <Analyzer Include="D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.entities@8b72e8a7d7d1\Unity.Entities\SourceGenerators\Unity.Entities.Analyzer.CodeFixes.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\EF\EFEditor\Editor\EventCodeGen\EventCodeGenAssetProcessor.cs" />
     <Compile Include="Assets\EF\EFEditor\Editor\ReferenceCollectorEditor\ReferenceCollectorScriptGenerator.cs" />
     <Compile Include="Assets\EF\EFEditor\Editor\BuildDll.cs" />
     <Compile Include="Assets\EF\EFEditor\Editor\ScriptingDefineSymbols.cs" />
     <Compile Include="Assets\EF\EFEditor\Editor\SynAssemblysContent.cs" />
+    <Compile Include="Assets\EF\EFEditor\Editor\EventCodeGen\EventCodeGenRunner.cs" />
+    <Compile Include="Assets\EF\EFEditor\Editor\EventCodeGen\EventCodeGenGenerator.cs" />
+    <Compile Include="Assets\EF\EFEditor\Editor\EventMonitor\EFEventMonitorWindow.cs" />
     <Compile Include="Assets\EF\EFEditor\Editor\ReferenceCollectorEditor\ReferenceCollectorEditor.cs" />
+    <Compile Include="Assets\EF\EFEditor\Editor\EventCodeGen\EventCodeGenScanner.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

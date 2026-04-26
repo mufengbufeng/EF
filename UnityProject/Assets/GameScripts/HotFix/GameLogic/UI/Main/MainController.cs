@@ -139,24 +139,21 @@ namespace GameLogic
                 return;
             }
 
-            BindEvent<Action<int, int>>(
-                h => _energyModule.OnEnergyChanged += h,
-                h => _energyModule.OnEnergyChanged -= h,
-                HandleEnergyChanged);
+            EventBinder.BindEvent(GameLogicEntry.Event.EnergyChangedEvent, HandleEnergyChanged);
 
-            HandleEnergyChanged(_energyModule.CurrentEnergy, _energyModule.MaxEnergy);
+            HandleEnergyChanged(new EnergyChangedEvent(_energyModule.CurrentEnergy, _energyModule.MaxEnergy));
         }
 
-        private void HandleEnergyChanged(int currentEnergy, int maxEnergy)
+        private void HandleEnergyChanged(EnergyChangedEvent e)
         {
-            _mainView?.SetEnergyText(currentEnergy, maxEnergy);
+            _mainView?.SetEnergyText(e.Current, e.Max);
             UpdateCountdownDisplay();
 
-            bool canStart = currentEnergy >= StartGameEnergyCost;
+            bool canStart = e.Current >= StartGameEnergyCost;
             _mainView?.SetStartButtonInteractable(canStart);
 
             _mainModel?.SetInteractable(canStart);
-            _mainModel?.SetEnergy(currentEnergy, maxEnergy);
+            _mainModel?.SetEnergy(e.Current, e.Max);
 
             if (canStart)
             {

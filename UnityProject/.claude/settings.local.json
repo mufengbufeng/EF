@@ -34,7 +34,13 @@
       "Bash(test:*)",
       "Bash(python:*)",
       "Bash(git reset:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "mcp__mcp-router__generate_skill",
+      "Bash(mv \"D:/UnityGame/Self/EasyFramework/UnityProject/Assets/EF/EFRuntime/Event/.claude/skills/ef-event-system\" \"D:/UnityGame/Self/EasyFramework/UnityProject/.claude/skills/ef-event-system\")",
+      "Bash(rm -rf \"D:/UnityGame/Self/EasyFramework/UnityProject/Assets/EF/EFRuntime/Event/.claude\")",
+      "mcp__mcp-router__get_symbols_overview",
+      "mcp__mcp-router__find_symbol",
+      "mcp__zai-mcp-server__extract_text_from_screenshot"
     ]
   }
 }

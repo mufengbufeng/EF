@@ -225,12 +225,9 @@ namespace GameLogic
                 return;
             }
 
-            BindEvent<Action<int, int>>(
-                h => _energyModule.OnEnergyChanged += h,
-                h => _energyModule.OnEnergyChanged -= h,
-                HandleEnergyChanged);
+            EventBinder.BindEvent(GameLogicEntry.Event.EnergyChangedEvent, HandleEnergyChanged);
 
-            HandleEnergyChanged(_energyModule.CurrentEnergy, _energyModule.MaxEnergy);
+            HandleEnergyChanged(new EnergyChangedEvent(_energyModule.CurrentEnergy, _energyModule.MaxEnergy));
         }
 
         private void InitializeLevelBindings()
@@ -243,27 +240,21 @@ namespace GameLogic
             }
 
             // 订阅进度变化事件
-            BindEvent<Action<int, int, int>>(
-                h => _levelModule.OnProgressChanged += h,
-                h => _levelModule.OnProgressChanged -= h,
-                HandleLevelProgressChanged);
+            EventBinder.BindEvent(GameLogicEntry.Event.LevelProgressChangedEvent, HandleLevelProgressChanged);
 
             // 订阅通关事件
-            BindEvent<Action>(
-                h => _levelModule.OnLevelComplete += h,
-                h => _levelModule.OnLevelComplete -= h,
-                HandleLevelCompleteEvent);
+            EventBinder.BindEvent(GameLogicEntry.Event.LevelCompleteEvent, HandleLevelCompleteEvent);
 
             // 初始显示
-            HandleLevelProgressChanged(_levelModule.CurrentLevelId, _levelModule.KillCount, _levelModule.RequiredKills);
+            HandleLevelProgressChanged(new LevelProgressChangedEvent(_levelModule.CurrentLevelId, _levelModule.KillCount, _levelModule.RequiredKills));
         }
 
-        private void HandleLevelProgressChanged(int levelId, int killCount, int requiredKills)
+        private void HandleLevelProgressChanged(LevelProgressChangedEvent e)
         {
-            _gamePlayView?.UpdateLevel(levelId, killCount, requiredKills);
+            _gamePlayView?.UpdateLevel(e.LevelId, e.KillCount, e.RequiredKills);
         }
 
-        private void HandleLevelCompleteEvent()
+        private void HandleLevelCompleteEvent(LevelCompleteEvent e)
         {
             if (_levelCompleted) return;
             _levelCompleted = true;
@@ -272,9 +263,9 @@ namespace GameLogic
             HandleLevelComplete();
         }
 
-        private void HandleEnergyChanged(int currentEnergy, int maxEnergy)
+        private void HandleEnergyChanged(EnergyChangedEvent e)
         {
-            _gamePlayView?.UpdateEnergy(currentEnergy, maxEnergy);
+            _gamePlayView?.UpdateEnergy(e.Current, e.Max);
         }
 
         private void RefreshLevelDisplay()

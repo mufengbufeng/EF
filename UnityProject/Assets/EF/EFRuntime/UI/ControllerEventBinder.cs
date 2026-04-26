@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using EF.Event;
 
 namespace EF.UI
 {
@@ -43,6 +44,31 @@ namespace EF.UI
             _subscriptions.Add(new EventSubscription
             {
                 Unsubscribe = () => removeHandler(handler)
+            });
+        }
+
+        /// <summary>
+        /// 绑定 EventChannel 事件，自动管理生命周期。
+        /// OnExit 时自动 Unsubscribe，无需手动管理。
+        /// </summary>
+        /// <typeparam name="T">事件参数类型。</typeparam>
+        /// <param name="channel">事件 Channel。</param>
+        /// <param name="handler">事件处理回调。</param>
+        public void BindEvent<T>(EventChannel<T> channel, Action<T> handler) where T : struct
+        {
+            if (_isDisposed)
+            {
+                throw new ObjectDisposedException(nameof(ControllerEventBinder));
+            }
+
+            if (channel == null) throw new ArgumentNullException(nameof(channel));
+            if (handler == null) throw new ArgumentNullException(nameof(handler));
+
+            channel.Subscribe(handler);
+
+            _subscriptions.Add(new EventSubscription
+            {
+                Unsubscribe = () => channel.Unsubscribe(handler)
             });
         }
 

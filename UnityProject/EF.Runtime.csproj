@@ -50,7 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\EF\EFRuntime\UI\UHub\UHubComponent.cs" />
-    <Compile Include="Assets\EF\EFRuntime\Event\BaseEventArgs.cs" />
     <Compile Include="Assets\EF\EFRuntime\Feature\AllowMultipleAttribute.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UIWindowDescriptor.cs" />
     <Compile Include="Assets\EF\EFRuntime\Timer\TimerMode.cs" />
@@ -62,16 +61,18 @@
     <Compile Include="Assets\EF\EFRuntime\Fsm\Fsm.cs" />
     <Compile Include="Assets\EF\EFRuntime\Debugger\DebuggerManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Scene\SceneInfo.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Event\EventChannelInfoSnapshot.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UIRuntimeContext.cs" />
     <Compile Include="Assets\EF\EFRuntime\Entity\EntityGroup.cs" />
     <Compile Include="Assets\EF\EFRuntime\Entity\DefaultEntityHelper.cs" />
     <Compile Include="Assets\EF\EFRuntime\Entity\EntityGroupOptions.cs" />
     <Compile Include="Assets\EF\EFRuntime\Sound\SoundManagerExtensions.cs" />
-    <Compile Include="Assets\EF\EFRuntime\Event\EventPoolModel.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Event\EventChannelLifecycleState.cs" />
     <Compile Include="Assets\EF\EFRuntime\Procedure\ProcedureManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UHub\Attributes.cs" />
     <Compile Include="Assets\EF\EFRuntime\Feature\IFeatureContainer.cs" />
     <Compile Include="Assets\EF\EFRuntime\Fsm\FsmManager.cs" />
+    <Compile Include="Assets\EF\EFRuntime\AssemblyInfo.cs" />
     <Compile Include="Assets\EF\EFRuntime\Save\SaveManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Feature\IFeature.cs" />
     <Compile Include="Assets\EF\EFRuntime\Common\Manager\ModuleSystem.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="Assets\EF\EFRuntime\UI\UIBindingCollection.cs" />
     <Compile Include="Assets\EF\EFRuntime\Resource\ResourceModeConfig.cs" />
     <Compile Include="Assets\EF\EFRuntime\Resource\ResourceMode.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Event\IEventChannelScheduler.cs" />
     <Compile Include="Assets\EF\EFRuntime\ObjectPool\ObjectPoolManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Resource\ResourceManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UILayer.cs" />
@@ -97,11 +99,11 @@
     <Compile Include="Assets\EF\EFRuntime\ObjectPool\IObjectPoolManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\ObjectPool\ObjectPool.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\ControllerEventBinder.cs" />
-    <Compile Include="Assets\EF\EFRuntime\Event\EventTypeResolver.cs" />
     <Compile Include="Assets\EF\EFRuntime\Fsm\FsmState.cs" />
     <Compile Include="Assets\EF\EFRuntime\Save\ISaveStrategy.cs" />
     <Compile Include="Assets\EF\EFRuntime\Sound\SoundType.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UHub\ComponentBinder.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Event\EventChannel.cs" />
     <Compile Include="Assets\EF\EFRuntime\Fsm\IFsm.cs" />
     <Compile Include="Assets\EF\EFRuntime\Debugger\DebuggerMacro.cs" />
     <Compile Include="Assets\EF\EFRuntime\Sound\SoundManager.cs" />
@@ -112,10 +114,8 @@
     <Compile Include="Assets\EF\EFRuntime\Entity\ICollisionHandler.cs" />
     <Compile Include="Assets\EF\EFRuntime\Entity\IEntityGroup.cs" />
     <Compile Include="Assets\EF\EFRuntime\Timer\TimerManager.cs" />
-    <Compile Include="Assets\EF\EFRuntime\Event\EventHandlerRegistry.cs" />
     <Compile Include="Assets\EF\EFRuntime\Model\ModelBase.cs" />
     <Compile Include="Assets\EF\EFRuntime\ObjectPool\IObjectPool.cs" />
-    <Compile Include="Assets\EF\EFRuntime\Event\GameEventArgs.cs" />
     <Compile Include="Assets\EF\EFRuntime\Fsm\IFsmInternal.cs" />
     <Compile Include="Assets\EF\EFRuntime\ObjectPool\ObjectPoolOptions.cs" />
     <Compile Include="Assets\EF\EFRuntime\Sound\SoundAgent.cs" />
@@ -131,28 +131,28 @@
     <Compile Include="Assets\EF\EFRuntime\Timer\TimerTask.cs" />
     <Compile Include="Assets\EF\EFRuntime\Resource\IResourceManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Debugger\LogLevel.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Event\IEventChannel.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UHub\IEventBinding.cs" />
     <Compile Include="Assets\EF\EFRuntime\Common\Manager\IEFManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UIWindowHandle.cs" />
     <Compile Include="Assets\EF\EFRuntime\Entity\IEntityHelper.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Event\EventArgsAttribute.cs" />
     <Compile Include="Assets\EF\EFRuntime\Save\PlayerPrefsSaveStrategy.cs" />
     <Compile Include="Assets\EF\EFRuntime\ObjectPool\PooledObject.cs" />
     <Compile Include="Assets\EF\EFRuntime\Common\Manager\AEFManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\UIView.cs" />
-    <Compile Include="Assets\EF\EFRuntime\Event\EventManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Fsm\FsmDataCollection.cs" />
     <Compile Include="Assets\EF\EFRuntime\Entity\EntityManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Feature\FeatureContainer.cs" />
     <Compile Include="Assets\EF\EFRuntime\Common\Update\IUpdate.cs" />
-    <Compile Include="Assets\EF\EFRuntime\Event\PendingEventQueue.cs" />
     <Compile Include="Assets\EF\EFRuntime\Entity\IEntity.cs" />
     <Compile Include="Assets\EF\EFRuntime\Feature\FeatureBase.cs" />
     <Compile Include="Assets\EF\EFRuntime\UI\IUIManager.cs" />
     <Compile Include="Assets\EF\EFRuntime\Feature\FeatureBaseTData.cs" />
     <Compile Include="Assets\EF\EFRuntime\Procedure\ProcedureBase.cs" />
     <Compile Include="Assets\EF\EFRuntime\Save\ISaveManager.cs" />
-    <Compile Include="Assets\EF\EFRuntime\Event\PendingEvent.cs" />
     <Compile Include="Assets\EF\EFRuntime\Timer\TimerClock.cs" />
+    <Compile Include="Assets\EF\EFRuntime\Event\IEventChannelInfo.cs" />
     <Compile Include="Assets\EF\EFRuntime\Entity\Examples\ExampleEntityUsage.cs" />
     <Compile Include="Assets\EF\EFRuntime\Save\JsonSaveStrategy.cs" />
   </ItemGroup>

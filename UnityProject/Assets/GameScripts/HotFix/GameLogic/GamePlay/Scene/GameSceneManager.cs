@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using EF.Debugger;
-using EF.Event;
 using EF.Scene;
 
 namespace GameLogic
@@ -12,17 +11,17 @@ namespace GameLogic
     public class GameSceneManager : IGameSceneManager
     {
         private readonly ISceneManager _sceneManager;
-        private readonly IEventManager _eventManager;
+        private readonly EventHub _eventHub;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="sceneManager">框架层场景管理器</param>
-        /// <param name="eventManager">事件管理器</param>
-        public GameSceneManager(ISceneManager sceneManager, IEventManager eventManager)
+        /// <param name="eventHub">事件系统枢纽</param>
+        public GameSceneManager(ISceneManager sceneManager, EventHub eventHub)
         {
             _sceneManager = sceneManager ?? throw new System.ArgumentNullException(nameof(sceneManager));
-            _eventManager = eventManager ?? throw new System.ArgumentNullException(nameof(eventManager));
+            _eventHub = eventHub ?? throw new System.ArgumentNullException(nameof(eventHub));
         }
 
         /// <summary>
@@ -34,17 +33,14 @@ namespace GameLogic
 
             Log.Info($"[GameSceneManager] 准备进入游戏玩法场景: {sceneName}");
 
-            // 发布场景进入前事件
-            _eventManager.Publish(new BeforeSceneEnterEvent(sceneName));
+            _eventHub.BeforeSceneEnterEvent.Enqueue(new BeforeSceneEnterEvent(sceneName));
 
             bool success = await _sceneManager.LoadSceneAsync(sceneName);
 
             if (success)
             {
                 Log.Info($"[GameSceneManager] 成功进入游戏玩法场景: {sceneName}");
-
-                // 发布场景进入事件
-                _eventManager.Publish(new SceneEnterEvent(sceneName));
+                _eventHub.SceneEnterEvent.Enqueue(new SceneEnterEvent(sceneName));
             }
             else
             {
@@ -61,17 +57,14 @@ namespace GameLogic
 
             Log.Info($"[GameSceneManager] 准备进入战斗场景: {sceneName}");
 
-            // 发布场景进入前事件
-            _eventManager.Publish(new BeforeSceneEnterEvent(sceneName));
+            _eventHub.BeforeSceneEnterEvent.Enqueue(new BeforeSceneEnterEvent(sceneName));
 
             bool success = await _sceneManager.LoadSceneAsync(sceneName);
 
             if (success)
             {
                 Log.Info($"[GameSceneManager] 成功进入战斗场景: {sceneName}");
-
-                // 发布场景进入事件
-                _eventManager.Publish(new SceneEnterEvent(sceneName));
+                _eventHub.SceneEnterEvent.Enqueue(new SceneEnterEvent(sceneName));
             }
             else
             {
@@ -88,17 +81,14 @@ namespace GameLogic
 
             Log.Info($"[GameSceneManager] 准备返回大厅场景: {sceneName}");
 
-            // 发布场景进入前事件
-            _eventManager.Publish(new BeforeSceneEnterEvent(sceneName));
+            _eventHub.BeforeSceneEnterEvent.Enqueue(new BeforeSceneEnterEvent(sceneName));
 
             bool success = await _sceneManager.LoadSceneAsync(sceneName);
 
             if (success)
             {
                 Log.Info($"[GameSceneManager] 成功返回大厅场景: {sceneName}");
-
-                // 发布场景进入事件
-                _eventManager.Publish(new SceneEnterEvent(sceneName));
+                _eventHub.SceneEnterEvent.Enqueue(new SceneEnterEvent(sceneName));
             }
             else
             {

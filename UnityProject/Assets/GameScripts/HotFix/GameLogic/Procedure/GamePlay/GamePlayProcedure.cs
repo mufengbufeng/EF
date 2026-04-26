@@ -17,7 +17,6 @@ namespace GameLogic
     /// </summary>
     public class GamePlayProcedure : ProcedureBase
     {
-        private const int GamePlayScope = 1001;
         private const string BackgroundPrefabName = "BackgroundPrefab";
         private const string EnemyPrefabName = "EnemyPlane";
         private const string AvatarPrefabName = "Avatar";
@@ -73,7 +72,7 @@ namespace GameLogic
                 }
 
                 // 进入玩法前，清理上一次遗留的玩法作用域模块（幂等）。
-                int cleanedCount = ModuleSystem.ShutdownScope(GamePlayScope);
+                int cleanedCount = ModuleSystem.ShutdownScope(ModuleScope.GAME_PLAY);
                 if (cleanedCount > 0)
                 {
                     Log.Info($"[GamePlayProcedure] 已清理遗留玩法模块数量：{cleanedCount}");
@@ -84,12 +83,12 @@ namespace GameLogic
                 // 注册背景模块。
                 _gameBackgroundModule = new GameBackgroundModule(GameLogicEntry.Resource, GameLogicEntry.ObjectPool);
                 _gameBackgroundModule.Configure(BackgroundPrefabName, speed: 1f);
-                ModuleSystem.Register(_gameBackgroundModule, replace: true, scope: GamePlayScope);
+                ModuleSystem.Register(_gameBackgroundModule, replace: true, scope: ModuleScope.GAME_PLAY);
 
                 // 注册子弹模块（先注册并初始化，确保敌人攻击前子弹系统就绪）。
                 _bulletModule = new BulletModule(GameLogicEntry.Entity);
                 _bulletModule.Configure(BulletPrefabName);
-                ModuleSystem.Register(_bulletModule, replace: true, scope: GamePlayScope);
+                ModuleSystem.Register(_bulletModule, replace: true, scope: ModuleScope.GAME_PLAY);
                 await _bulletModule.InitializeAsync();
                 if (!IsEnterSequenceActive(enterSequence, "子弹模块初始化完成"))
                 {
@@ -102,7 +101,7 @@ namespace GameLogic
                 _enemySpawnerModule = new EnemySpawnerModule(GameLogicEntry.Entity);
                 _enemySpawnerModule.Configure(EnemyPrefabName, spawnInterval: 2f, maxEnemyCount: 10);
                 _enemySpawnerModule.Initialize();
-                ModuleSystem.Register(_enemySpawnerModule, replace: true, scope: GamePlayScope);
+                ModuleSystem.Register(_enemySpawnerModule, replace: true, scope: ModuleScope.GAME_PLAY);
                 Log.Info("[GamePlayProcedure] 敌人生成器模块已注册");
 
                 // 进入玩法场景（复用现有 GameSceneManager）。
@@ -156,7 +155,7 @@ namespace GameLogic
                         AvatarDragBoundaryPadding);
                     _playerAvatarModule.OnPlayerDied += HandlePlayerDied;
                     _playerAvatarModule.SetSpawnAnchor(_playerPoint);
-                    ModuleSystem.Register(_playerAvatarModule, replace: true, scope: GamePlayScope);
+                    ModuleSystem.Register(_playerAvatarModule, replace: true, scope: ModuleScope.GAME_PLAY);
                     await _playerAvatarModule.InitializeAsync();
                     if (!IsEnterSequenceActive(enterSequence, "玩家模块初始化完成"))
                     {
@@ -228,7 +227,7 @@ namespace GameLogic
 
             ResetGamePlayModelData();
 
-            int cleanedCount = ModuleSystem.ShutdownScope(GamePlayScope);
+            int cleanedCount = ModuleSystem.ShutdownScope(ModuleScope.GAME_PLAY);
             Log.Info($"[GamePlayProcedure] 已清理玩法模块数量：{cleanedCount}");
 
             // 退出玩法时主动尝试卸载场景，失败只记录日志，不阻断流程。

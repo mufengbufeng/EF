@@ -4,7 +4,6 @@ using System.Reflection;
 using EF.Common;
 using EF.Debugger;
 using EF.Entity;
-using EF.Event;
 using EF.Fsm;
 using EF.Model;
 using EF.ObjectPool;
@@ -27,7 +26,7 @@ namespace GameLogic
     {
         // EF 框架管理器引用
         private static IResourceManager _resourceManager;
-        private static IEventManager _eventManager;
+        private static EventHub _eventHub;
         private static IUIManager _uiManager;
         private static ISoundManager _soundManager;
         private static ITimerManager _timerManager;
@@ -52,9 +51,9 @@ namespace GameLogic
         public static IResourceManager Resource => _resourceManager;
 
         /// <summary>
-        /// 事件管理器
+        /// 事件系统枢纽
         /// </summary>
-        public static IEventManager Event => _eventManager;
+        public static EventHub Event => _eventHub;
 
         /// <summary>
         /// UI 管理器
@@ -126,11 +125,14 @@ namespace GameLogic
         /// </summary>
         public static void Init()
         {
+            Register();
             Log.Info("[GameLogicEntry] 开始初始化热更新逻辑...");
 
             // 从 ModuleSystem 获取所有 EF 框架管理器引用
             _resourceManager = ModuleSystem.Get<IResourceManager>();
-            _eventManager = ModuleSystem.Get<IEventManager>();
+
+            // 创建并注册事件系统枢纽
+            _eventHub = ModuleSystem.Get<EventHub>();
             _uiManager = ModuleSystem.Get<IUIManager>();
             _soundManager = ModuleSystem.Get<ISoundManager>();
             _timerManager = ModuleSystem.Get<ITimerManager>();
@@ -147,7 +149,7 @@ namespace GameLogic
             _sceneManager = new SceneManager(_resourceManager);
 
             // 创建游戏场景管理器
-            _gameSceneManager = new GameSceneManager(_sceneManager, _eventManager);
+            _gameSceneManager = new GameSceneManager(_sceneManager, _eventHub);
 
             Log.Info("[GameLogicEntry] EF 框架管理器初始化完成。");
 
@@ -160,6 +162,11 @@ namespace GameLogic
             InitializeProcedures();
 
             Log.Info("[GameLogicEntry] 游戏逻辑初始化完成。");
+        }
+
+        private static void Register()
+        {
+            ModuleSystem.Register<EventHub>(_eventHub);
         }
 
         private static void MangerLogicInit()
@@ -185,8 +192,8 @@ namespace GameLogic
             var normal = rc.Get<GameObject>("Normal");
             var popup = rc.Get<GameObject>("Popup");
             var overlay = rc.Get<GameObject>("Overlay");
-            var uiCamera =  rc.Get<GameObject>("UICamera");
-            
+            var uiCamera = rc.Get<GameObject>("UICamera");
+
             // 缓存 UI 摄像机引用，用于 URP Camera Stack
             if (uiCamera != null)
             {

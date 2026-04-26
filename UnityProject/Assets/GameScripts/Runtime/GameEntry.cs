@@ -6,7 +6,6 @@ using Cysharp.Threading.Tasks;
 using EF.Common;
 using EF.Debugger;
 using EF.Entity;
-using EF.Event;
 using EF.Fsm;
 using EF.HotFix;
 using EF.Model;
@@ -41,7 +40,6 @@ public class GameEntry : MonoBehaviour
         _resourceManager = ModuleSystem.Get<IResourceManager>();
 
         // 2. 注册不需要依赖的管理器
-        ModuleSystem.Register<IEventManager>(new EventManager());
         ModuleSystem.Register<ITimerManager>(new TimerManager());
         ModuleSystem.Register<IObjectPoolManager>(new ObjectPoolManager());
         ModuleSystem.Register<IFsmManager>(new FsmManager());

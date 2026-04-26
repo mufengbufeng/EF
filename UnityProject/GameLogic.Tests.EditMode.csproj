@@ -61,8 +61,17 @@
     <Analyzer Include="D:\UnityGame\Self\EasyFramework\UnityProject\Library\PackageCache\com.unity.entities@8b72e8a7d7d1\Unity.Entities\SourceGenerators\Unity.Entities.Analyzer.CodeFixes.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Tests\EditMode\Framework\FsmTests.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\Tests\EditMode\MainControllerTests.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Tests\EditMode\Framework\EventChannelTests.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\Tests\EditMode\EnergyModuleTests.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Tests\EditMode\Framework\ModuleSystemTests.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Tests\EditMode\Framework\FeatureTests.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Tests\EditMode\Framework\ObjectPoolManagerTests.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Tests\EditMode\Framework\SaveManagerTests.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Tests\EditMode\Framework\TimerTests.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Tests\EditMode\Framework\ObjectPoolTests.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Tests\EditMode\Framework\ModelManagerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\GameScripts\HotFix\GameLogic\Tests\EditMode\GameLogic.Tests.EditMode.asmdef" />

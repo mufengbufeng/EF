@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using EF.Common;
+using EF.Event;
 using EF.Model;
 using EF.Procedure;
 using EF.UI;
@@ -17,6 +18,7 @@ namespace GameLogic.Tests.EditMode
         {
             ModuleSystem.ShutdownAll();
             SetProcedureManager(null);
+            SetEventHub(new EventHub());
         }
 
         [TearDown]
@@ -24,6 +26,7 @@ namespace GameLogic.Tests.EditMode
         {
             ModuleSystem.ShutdownAll();
             SetProcedureManager(null);
+            SetEventHub(null);
         }
 
         [Test]
@@ -137,6 +140,13 @@ namespace GameLogic.Tests.EditMode
             field.SetValue(null, procedureManager);
         }
 
+        private static void SetEventHub(EventHub eventHub)
+        {
+            var field = typeof(GameLogicEntry).GetField("_eventHub", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(field, Is.Not.Null);
+            field.SetValue(null, eventHub);
+        }
+
         private static object InvokeNonPublic(object target, string methodName, params object[] args)
         {
             Type currentType = target.GetType();
@@ -238,8 +248,6 @@ namespace GameLogic.Tests.EditMode
 
             public int LastTryConsumeAmount { get; private set; }
 
-            public event Action<int, int> OnEnergyChanged;
-
             public bool CanConsume(int amount)
             {
                 if (amount <= 0)
@@ -263,7 +271,6 @@ namespace GameLogic.Tests.EditMode
                 if (amount > 0)
                 {
                     _currentEnergy -= amount;
-                    OnEnergyChanged?.Invoke(_currentEnergy, MaxEnergy);
                 }
 
                 return true;
@@ -278,7 +285,6 @@ namespace GameLogic.Tests.EditMode
                 }
 
                 _currentEnergy = Mathf.Min(MaxEnergy, _currentEnergy + amount);
-                OnEnergyChanged?.Invoke(_currentEnergy, MaxEnergy);
             }
 
             public void Update(float elapseSeconds, float realElapseSeconds)
@@ -287,7 +293,6 @@ namespace GameLogic.Tests.EditMode
 
             public void Shutdown()
             {
-                OnEnergyChanged = null;
             }
         }
 

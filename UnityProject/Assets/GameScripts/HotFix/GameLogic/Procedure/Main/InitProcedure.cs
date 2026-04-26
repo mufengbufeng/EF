@@ -43,7 +43,7 @@ namespace GameLogic
                 if (!ModuleSystem.TryGet<IEnergyModule>(out _))
                 {
                     ModuleSystem.Register<IEnergyModule>(
-                        new EnergyModule(_saveManager),
+                        new EnergyModule(_saveManager, GameLogicEntry.Event),
                         scope: (int)GameScope.Global);
                     Log.Info("[InitProcedure] 体力模块注册完成");
                 }
@@ -56,7 +56,7 @@ namespace GameLogic
                 if (!ModuleSystem.TryGet<ILevelModule>(out _))
                 {
                     ModuleSystem.Register<ILevelModule>(
-                        new LevelModule(_saveManager),
+                        new LevelModule(_saveManager, GameLogicEntry.Event),
                         scope: (int)GameScope.Global);
                     Log.Info("[InitProcedure] 关卡模块注册完成");
                 }

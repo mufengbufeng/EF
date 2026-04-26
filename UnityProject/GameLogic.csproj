@@ -65,9 +65,9 @@
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Scene\GameSceneManager.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Background\GameBackgroundModule.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GameLifetimeScope.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Level\LevelProgressChangedEvent.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\Define\GameSceneEventDefine.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Enemy\IEnemySpawnerModule.cs" />
-    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Enum\EGameEvent.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Model\GamePlayModel.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Game\GamePlayController.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Avatar\Features\Data\AttackData.cs" />
@@ -82,6 +82,7 @@
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Avatar\Features\AttackFeature.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Game\GamePlayView.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Main\MainController.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Event\Generated\EventHub.Generated.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\Procedure\Main\LoginProcedure.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Avatar\PlayerAvatarBehaviorData.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\Procedure\Main\InitProcedure.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\Energy\IEnergyModule.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GameScope.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Game\GameMenuController.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Level\LevelCompleteEvent.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\Energy\EnergyModule.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Main\MainModel.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\UI\Game\GameMenuView.cs" />
@@ -112,6 +114,7 @@
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Avatar\Features\HealthFeature.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\GamePlay\Enemy\EnemySpawnerModule.cs" />
     <Compile Include="Assets\GameScripts\HotFix\GameLogic\Level\ILevelModule.cs" />
+    <Compile Include="Assets\GameScripts\HotFix\GameLogic\Energy\EnergyChangedEvent.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\GameScripts\HotFix\GameLogic\GameLogic.asmdef" />

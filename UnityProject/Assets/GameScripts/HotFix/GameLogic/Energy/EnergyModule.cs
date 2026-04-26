@@ -4,6 +4,8 @@ using EF.Debugger;
 using EF.Save;
 using UnityEngine;
 
+using EventHub = GameLogic.EventHub;
+
 namespace GameLogic
 {
     /// <summary>
@@ -16,6 +18,7 @@ namespace GameLogic
         private const int DefaultRecoveryIntervalSeconds = 360; // 6 分钟
 
         private readonly ISaveManager _saveManager;
+        private readonly EventHub _eventHub;
 
         private int _baseEnergy;          // 上次操作时的体力快照
         private int _maxEnergy;
@@ -52,11 +55,10 @@ namespace GameLogic
 
         public bool IsRecovering => ComputeCurrentEnergy() < _maxEnergy;
 
-        public event Action<int, int> OnEnergyChanged;
-
-        public EnergyModule(ISaveManager saveManager)
+        public EnergyModule(ISaveManager saveManager, EventHub eventHub)
         {
             _saveManager = saveManager ?? throw new ArgumentNullException(nameof(saveManager));
+            _eventHub = eventHub ?? throw new ArgumentNullException(nameof(eventHub));
             LoadOrCreateState();
         }
 
@@ -117,7 +119,6 @@ namespace GameLogic
             // 关闭时将当前真实体力写回快照再存盘
             SyncBaseToNow();
             SaveState();
-            OnEnergyChanged = null;
         }
 
         /// <summary>
@@ -209,7 +210,7 @@ namespace GameLogic
 
         private void RaiseEnergyChanged()
         {
-            OnEnergyChanged?.Invoke(ComputeCurrentEnergy(), _maxEnergy);
+            _eventHub.EnergyChangedEvent.Publish(new EnergyChangedEvent(ComputeCurrentEnergy(), _maxEnergy));
         }
 
         [Serializable]

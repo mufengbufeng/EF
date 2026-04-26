@@ -5,15 +5,17 @@ namespace GameLogic
     /// <summary>
     /// 场景进入事件数据
     /// </summary>
-    public class SceneEnterEvent : BaseEventArgs
+    [EventArgs]
+    public readonly struct SceneEnterEvent
     {
         /// <summary>
         /// 场景名称
         /// </summary>
-        public string SceneName { get; set; }
+        public readonly string SceneName;
 
-        public override int EventId => (int)EGameEvent.SceneEnterEvent;
-
+        /// <summary>
+        /// 创建场景进入事件
+        /// </summary>
         public SceneEnterEvent(string sceneName)
         {
             SceneName = sceneName;
@@ -23,15 +25,17 @@ namespace GameLogic
     /// <summary>
     /// 场景进入前事件数据
     /// </summary>
-    public class BeforeSceneEnterEvent : BaseEventArgs
+    [EventArgs]
+    public readonly struct BeforeSceneEnterEvent
     {
         /// <summary>
         /// 场景名称
         /// </summary>
-        public string SceneName { get; set; }
+        public readonly string SceneName;
 
-        public override int EventId => (int)EGameEvent.BeforeSceneEnterEvent;
-
+        /// <summary>
+        /// 创建场景进入前事件
+        /// </summary>
         public BeforeSceneEnterEvent(string sceneName)
         {
             SceneName = sceneName;

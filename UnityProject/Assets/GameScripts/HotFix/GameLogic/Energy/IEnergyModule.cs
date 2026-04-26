@@ -1,4 +1,3 @@
-using System;
 using EF.Common;
 
 namespace GameLogic
@@ -32,11 +31,6 @@ namespace GameLogic
         /// 当前是否正在自动恢复中（体力未满时为 true）。
         /// </summary>
         bool IsRecovering { get; }
-
-        /// <summary>
-        /// 体力变化事件。
-        /// </summary>
-        event Action<int, int> OnEnergyChanged;
 
         /// <summary>
         /// 是否可消耗指定体力。
