@@ -1,5 +1,3 @@
-using YooAsset;
-
 namespace EF.Resource
 {
     /// <summary>
@@ -28,21 +26,21 @@ namespace EF.Resource
         WebPlay
     }
 
-    internal static class ResourceModeUtility
+    /// <summary>
+    /// 微信小游戏的资源交付方式。
+    /// </summary>
+    public enum WechatMiniGameResourceDeliveryMode
     {
         /// <summary>
-        /// 将框架定义的资源模式转换为 YooAssets 的播放模式。
+        /// 仅读取构建进小游戏包体的资源，不访问 CDN。
+        /// 仅适用于已提供包内 StreamingAssets 读取能力的自定义小游戏转换与文件系统管线。
         /// </summary>
-        public static EPlayMode ToYooPlayMode(this ResourceMode mode)
-        {
-            return mode switch
-            {
-                ResourceMode.EditorSimulate => EPlayMode.EditorSimulateMode,
-                ResourceMode.OfflinePlay => EPlayMode.OfflinePlayMode,
-                ResourceMode.HostPlay => EPlayMode.HostPlayMode,
-                ResourceMode.WebPlay => EPlayMode.WebPlayMode,
-                _ => EPlayMode.EditorSimulateMode
-            };
-        }
+        BuiltinOnly,
+
+        /// <summary>
+        /// 从远端 CDN 获取版本、清单和资源文件。
+        /// </summary>
+        RemoteUpdate
     }
+
 }

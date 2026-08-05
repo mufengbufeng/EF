@@ -79,7 +79,9 @@ public static class BuildDLLCommand
             Log.Info($"[CopyAOTAssembliesToStreamingAssets] created directory {aotAssembliesDstDir}");
         }
 
-        foreach (var dll in SyncAssemblyContent.AOTMetaAssemblies)
+        // Read the project setting directly. The editor-side cache is only filled by a
+        // menu action and can otherwise omit configured AOT metadata assemblies.
+        foreach (var dll in SettingsUtil.AOTAssemblyNames)
         {
             string srcDllPath = $"{aotAssembliesSrcDir}/{dll}";
             if (!System.IO.File.Exists(srcDllPath))

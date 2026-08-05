@@ -14,56 +14,6 @@ namespace GameLogic
         private readonly List<IEventChannel> _activeChannels = new List<IEventChannel>();
         private readonly Dictionary<IEventChannel, int> _activeChannelIndices = new Dictionary<IEventChannel, int>();
 
-        /// <summary>
-        /// BeforeSceneEnterEvent 事件 Channel。
-        /// </summary>
-        private EventChannel<BeforeSceneEnterEvent> _beforeSceneEnterEvent;
-
-        /// <summary>
-        /// BeforeSceneEnterEvent 事件 Channel。
-        /// </summary>
-        public EventChannel<BeforeSceneEnterEvent> BeforeSceneEnterEvent => _beforeSceneEnterEvent ??= CreateChannel<BeforeSceneEnterEvent>();
-
-        /// <summary>
-        /// EnergyChangedEvent 事件 Channel。
-        /// </summary>
-        private EventChannel<EnergyChangedEvent> _energyChangedEvent;
-
-        /// <summary>
-        /// EnergyChangedEvent 事件 Channel。
-        /// </summary>
-        public EventChannel<EnergyChangedEvent> EnergyChangedEvent => _energyChangedEvent ??= CreateChannel<EnergyChangedEvent>();
-
-        /// <summary>
-        /// LevelCompleteEvent 事件 Channel。
-        /// </summary>
-        private EventChannel<LevelCompleteEvent> _levelCompleteEvent;
-
-        /// <summary>
-        /// LevelCompleteEvent 事件 Channel。
-        /// </summary>
-        public EventChannel<LevelCompleteEvent> LevelCompleteEvent => _levelCompleteEvent ??= CreateChannel<LevelCompleteEvent>();
-
-        /// <summary>
-        /// LevelProgressChangedEvent 事件 Channel。
-        /// </summary>
-        private EventChannel<LevelProgressChangedEvent> _levelProgressChangedEvent;
-
-        /// <summary>
-        /// LevelProgressChangedEvent 事件 Channel。
-        /// </summary>
-        public EventChannel<LevelProgressChangedEvent> LevelProgressChangedEvent => _levelProgressChangedEvent ??= CreateChannel<LevelProgressChangedEvent>();
-
-        /// <summary>
-        /// SceneEnterEvent 事件 Channel。
-        /// </summary>
-        private EventChannel<SceneEnterEvent> _sceneEnterEvent;
-
-        /// <summary>
-        /// SceneEnterEvent 事件 Channel。
-        /// </summary>
-        public EventChannel<SceneEnterEvent> SceneEnterEvent => _sceneEnterEvent ??= CreateChannel<SceneEnterEvent>();
-
         private EventChannel<T> CreateChannel<T>() where T : struct
         {
             return new EventChannel<T>(this);
@@ -113,11 +63,6 @@ namespace GameLogic
         /// </summary>
         public override void Shutdown()
         {
-            ClearCreatedChannel(_beforeSceneEnterEvent);
-            ClearCreatedChannel(_energyChangedEvent);
-            ClearCreatedChannel(_levelCompleteEvent);
-            ClearCreatedChannel(_levelProgressChangedEvent);
-            ClearCreatedChannel(_sceneEnterEvent);
 
             _activeChannels.Clear();
             _activeChannelIndices.Clear();
@@ -130,11 +75,6 @@ namespace GameLogic
         {
             return new IEventChannelInfo[]
             {
-                GetChannelInfo("BeforeSceneEnterEvent", _beforeSceneEnterEvent),
-                GetChannelInfo("EnergyChangedEvent", _energyChangedEvent),
-                GetChannelInfo("LevelCompleteEvent", _levelCompleteEvent),
-                GetChannelInfo("LevelProgressChangedEvent", _levelProgressChangedEvent),
-                GetChannelInfo("SceneEnterEvent", _sceneEnterEvent),
             };
         }
 

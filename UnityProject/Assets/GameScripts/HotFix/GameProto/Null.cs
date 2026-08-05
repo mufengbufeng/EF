@@ -1,17 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
-using EF;
-using EF.Debugger;
-using UnityEngine;
-
 namespace GameProto
 {
-
-    public static class NULL
+    /// <summary>
+    /// GameProto 热更新程序集占位类型，用于保留 HybridCLR 加载链路。
+    /// </summary>
+    public static class GameProtoAssemblyMarker
     {
-        public static void TestLog(string str)
+        /// <summary>
+        /// 标记程序集已被保留。
+        /// </summary>
+        public static bool IsPresent()
         {
-            Log.Info(str + "bbbbb");
+            return true;
         }
     }
 }

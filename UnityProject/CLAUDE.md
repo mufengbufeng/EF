@@ -1,35 +1,33 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+本文档为 Claude Code 在本仓库中工作时的指南。
 
 ## 语言要求
 
-**始终使用中文（简体）进行交流、注释、日志输出和提交信息。** 代码标识符（类名、方法名、变量名）使用英文，但所有自然语言内容一律使用中文。
+- 自然语言（交流、注释、日志、提交信息）→ 中文（简体）
+- 代码标识符（类名、方法名、变量名）→ 英文
 
 ## 项目概述
 
-Unity 6000.3 (Unity 6) 游戏项目，使用 **EasyFramework (EF)** 自研模块化框架，支持 HybridCLR 热更新、YooAsset 资源管理、MVC 架构的 UI 系统。
+Unity 6000.3 (Unity 6) 游戏项目，使用 **EasyFramework (EF)** 自研模块化框架，支持 HybridCLR 热更新、YooAsset 资源管理和 W-Framework UGUI 窗口系统。
 
 ## 架构
 
-### 两层代码分离（核心）
+### 两层代码分离
 
-项目严格区分 **Runtime（AOT）** 和 **HotFix（热更新）** 两层代码：
-
-- **`Assets/GameScripts/Runtime/`** — AOT 代码，随 Player 一起发布。包含 `GameEntry.cs`（启动入口）和 `HotFixConfig.cs`。代码量极少，不能引用 HotFix 程序集。
-- **`Assets/GameScripts/HotFix/`** — 热更新代码，运行时通过 HybridCLR 加载。包含 `GameLogic` 和 `GameProto` 程序集。所有游戏逻辑都在这里。
-
-**启动流程**：`GameEntry.Awake()` 注册所有 EF 管理器到 `ModuleSystem` → 初始化 `ResourceManager` → 加载 HybridCLR DLL → 通过反射调用 `GameLogicEntry.Init()`。
+- AOT 代码 → `Assets/GameScripts/Runtime/`（含 `GameEntry.cs`、`HotFixConfig.cs`，不能引用 HotFix）
+- 热更新代码 → `Assets/GameScripts/HotFix/`（`GameLogic` + `GameProto` 程序集，所有游戏逻辑）
+- 启动流程 → `GameEntry.Awake()` 注册 EF 管理器到 `ModuleSystem` → 初始化 `ResourceManager` → 加载 HybridCLR DLL → 反射调用 `GameLogicEntry.Init()`
 
 ### EasyFramework (EF) 模块
 
-所有模块在 `Assets/EF/EFRuntime/` 中，通过 `ModuleSystem`（静态服务定位器，提供 `Register<T>()`/`Get<T>()`）注册和获取：
+所有模块在 `Assets/EF/EFRuntime/` 中，通过 `ModuleSystem`（静态服务定位器）注册/获取：
 
 | 模块       | 接口                 | 职责                                                |
 | ---------- | -------------------- | --------------------------------------------------- |
 | Resource   | `IResourceManager`   | 基于 YooAsset 的资源加载                            |
 | Event      | `IEventManager`      | 发布/订阅事件系统                                   |
-| UI         | `IUIManager`         | MVC UI，支持分层（Background/Normal/Popup/Overlay） |
+| UI         | `IWFrameworkUIManager` | W-Framework 窗口栈、焦点、资源加载与生命周期       |
 | Sound      | `ISoundManager`      | 音频播放                                            |
 | Timer      | `ITimerManager`      | 定时器调度                                          |
 | ObjectPool | `IObjectPoolManager` | 对象池                                              |
@@ -40,139 +38,183 @@ Unity 6000.3 (Unity 6) 游戏项目，使用 **EasyFramework (EF)** 自研模块
 | Entity     | `IEntityManager`     | 实体生命周期与对象池                                |
 | Scene      | `ISceneManager`      | 场景加载/卸载                                       |
 
-### UI 系统（MVC）
+- 获取管理器 → `ModuleSystem.Get<IXxxManager>()` 或 `GameLogicEntry.XXX` 静态属性
+- 新管理器实现 → `IEFManager` 接口（`Update` + `Shutdown`）
 
-- **View**（`UIView`，MonoBehaviour）：只读数据访问，通过 `GetModelData<TData>()` 获取数据。支持 `BindProperty()` 响应式绑定。
-- **Controller**（`UIController`）：完整读写 Model。协调 View 和 Model。
-- **Model**（`ModelBase<TData>`）：数据存储，自动变更通知。全局注册在 `ModelManager` 中。
-- **窗口注册**：使用 `OpenWindowAsync<TView, TController>(location)` 自动注册，或 `RegisterWindow(descriptor)` 手动注册。
+### UI 系统（W-Framework）
+
+- 运行时 UI → `IWFrameworkUIManager` + W-Framework Logic + UGUI Prefab
+- 打开窗口 → `GameLogicEntry.WFrameworkUI.Open("WindowName")`
+- 命名约定 → `{Stem}Window` / `{Stem}Logic` / `{Stem}Window.prefab` 围绕同一 `{Stem}` 组织，窗口 id 同时为资源地址
+- 组件绑定 → 使用 `Assets/EF/EFEditor/Editor/SerializeComponentTool` 的本地工具生成并挂载强类型序列化绑定组件
+- 窗口生命周期 → 继承 `UIStackLogicBase` 或 `UIFixedLogicBase`
+- Model 注册 → `ModelBase<TData>` 在 `ModelManager` 懒注册，首次 `ModelManager.TryGetModel<T>()` 时自动构造
+- 入口场景初始化 → `GameLogicEntry.InitializeUI()` 消费场景已序列化的 `UIRoot/WFrameworkUI` 根节点
 
 ### 流程（Procedure）
 
-流程继承 `ProcedureBase`，游戏从 `InitProcedure` 启动。流程代码在 `Assets/GameScripts/HotFix/GameLogic/Procedure/`。
+- 基类 → `ProcedureBase`
+- 启动流程 → `InitProcedure`
+- 代码位置 → `Assets/GameScripts/HotFix/GameLogic/Procedure/`
 
 ### 程序集
 
 | 程序集                     | 路径                                                  | 类型                    |
 | -------------------------- | ----------------------------------------------------- | ----------------------- |
 | `EF.Runtime`               | `Assets/EF/EFRuntime/`                                | AOT（框架）             |
-| `EGF`                      | `Assets/EGF/`                                         | AOT（游戏扩展）         |
 | `GameLogic`                | `Assets/GameScripts/HotFix/GameLogic/`                | 热更新                  |
 | `GameProto`                | `Assets/GameScripts/HotFix/GameProto/`                | 热更新（协议/数据定义） |
 | `GameLogic.Tests.EditMode` | `Assets/GameScripts/HotFix/GameLogic/Tests/EditMode/` | 编辑器测试              |
 
 ### 核心依赖
 
-- **HybridCLR** — C# 热更新（运行时加载 DLL）
-- **YooAsset 2.3.x** — 资源管理与加载
-- **UniTask** — Unity 异步方案
-- **Luban** — 配置/数据生成
-- **VContainer** — DI 容器（可用，按需使用）
-- **URP** — 通用渲染管线
+- HybridCLR → C# 热更新（运行时加载 DLL）
+- YooAsset 3.0.x → 资源管理与加载（Options + Event 模型）
+- UniTask → Unity 异步方案
+- GreatClock 依赖 → `collections`、`datadriven`、`serializecomponenttool`、`uimanager`、`utils`，均以适配后的源码纳入 `Assets/EF`
+- Luban → 配置/数据生成
+- URP → 通用渲染管线
+
+## 代码搜索与分析
+
+### 读代码
+
+| 想做的事 | 用什么工具 |
+| -------- | ---------- |
+| 概念/自然语言搜索 | codedb `codedb_search`（默认语义 + BM25 混合排序） |
+| 关键词 top-K 例子 | codedb `codedb_search`（默认 lexical + vector） |
+| 找语义相似代码 | codedb `codedb_search`（贴上参考 chunk 关键文字）或 `codedb_explain` |
+| 全量字面/正则匹配（审计、批量改） | 优先 codedb `codedb_search`（`regex=true`），`rg` 仅作备选 |
+| 查看文件符号结构 | codedb `codedb_outline` |
+| 按名称查找符号定义 | codedb `codedb_symbol`（`body=true` 拿源码） |
+| 查询符号被谁引用 | codedb `codedb_callers` |
+| 找文件（路径模糊） | codedb `codedb_find` / `codedb_glob` |
+| 列目录 / 看子节点 | codedb `codedb_ls` / `codedb_tree` |
+| 读文件片段 | codedb `codedb_read`（小段优先，全文用内置 Read） |
+| 看最近修改的文件 | codedb `codedb_hot` / `codedb_changes` |
+| 查文件依赖/反向依赖 | codedb `codedb_deps`（C# namespace 精度最高） |
+
+
+
+### 工具使用规则
+
+- 代码搜索默认优先 codedb-mcp；只有非 C# / 未索引文件、codedb 不命中、或必须扫资产/文档/配置时，才用 `rg` 作为备选
+- 想用 `rg` / `grep` / `findstr` → 先尝试 codedb `codedb_search`（必要时 `regex=true`），再按需回退到 `rg`
+- 自然语言/概念/语义搜索 → 用 codedb `codedb_search`
+- 文件已完整读过 → 不要再用 codedb  重复分析
+- 过滤范围 → codedb 工具均支持 `path` 参数；遇到第三方噪音可显式排除 `Library/PackageCache/`
+- 符号级编辑/重构 → 必须 codedb 只读（`codedb_edit` 是 stub）
+- 写操作前 → 先 `codedb_callers` 查影响面
+- 使用范围 → codedb 始终带 `path` 过滤；
+- C# LSP 支持依赖 → `UnityProject.slnx` 必须存在
+- codedb 索引依赖 → `.codedb-mcp/codedb-mcp.toml`，文件保存自动增量索引；批量重命名/拉大量代码后手动 `codebase-mcp.exe ... index <repo>` 兜底
 
 ## 构建与测试
 
-### 运行测试
+### 测试结构
 
-测试使用 Unity Test Runner（NUnit），EditMode 测试在 `GameLogic.Tests.EditMode` 程序集中。
+- EditMode → `GameLogic.Tests.EditMode` 程序集，覆盖纯逻辑模块（FSM / Model / ObjectPool / EventChannel），全 mock
+- PlayMode → `GameLogic.Tests.PlayMode` 程序集，覆盖 EF 运行时基础设施（YooAsset 初始化、SceneManager、EntityManager prefab 池化、UniTask + TimerManager 帧驱动），详见 `Assets/GameScripts/HotFix/GameLogic/Tests/README.md`
+- CI 范围 → 仅 EditMode；PlayMode 仅本地
 
-命令行运行：
+### 编译检查与测试触发
+
+| 想做的事 | 怎么做 |
+| -------- | ------ |
+| 默认编译检查（新增/修改/删除 C# 脚本、`.asmdef`、`Packages/manifest.json` 后必须执行） | Unity 已打开时使用 AIBridge CLI `compile unity`；否则使用 Unity Editor batchmode 导入项目 |
+| 回退编译命令（Unity 已打开时） | `dotnet build UnityProject.slnx --no-restore` |
+| Unity 已打开时验证（编译 / Console / EditMode 测试 / 场景 Prefab 检查） | 使用 AIBridge CLI（`.aibridge/cli/AIBridgeCLI.exe`）→ `compile unity` / `get_logs` / `test run --mode EditMode` |
+| 首次配置 AIBridge | Unity 编辑器 → `AIBridge/Workflows` 窗口 → Skills 标签 → 勾选 Claude → "Install Selected Integrations" |
+| Unity 未打开时跑 EditMode 测试 | `"<UnityEditorPath>" -batchmode -quit -runTests -testPlatform EditMode -testResults TestResults/editmode-results.xml -projectPath .` |
+| PlayMode 测试（仅本地） | `Window > General > Test Runner > PlayMode` 标签 → Run；或 AIBridge CLI `test run --mode PlayMode` |
+
+- Unity 编辑器路径 → 由开发者本机安装位置决定，命令中以 `<UnityEditorPath>` 表示
+- Unity 版本 → 6000.3.12f1（Unity 6）
+- 同项目已被 Unity 打开 → 禁止启动第二个 `Unity.exe -batchmode` 实例
+
+## 项目约定
+
+- 管理器获取 → `ModuleSystem.Get<IXxxManager>()` 或 `GameLogicEntry.XXX`
+- 热更新代码位置 → 必须 `Assets/GameScripts/HotFix/`，不能放 Runtime
+- UI Prefab 引用 → 资源路径（如 `"UI/MainMenuPrefab"`）
+- 异步操作 → `async UniTask`，不用协程
+- Luban 主键 `id` → 统一 `int`
+- Luban 引用 id 字段 → `int#ref=<module>.<TbName>`
+- Luban 引用 id 列表 → `(list#sep=;),int#ref=<module>.<TbName>`
+- 函数注释 → 必须有函数级别注释，特别是公共接口
+- 脚本行数 → 单个脚本最多 450 行，统计时不包括注释行
+- 提交信息 → 中文，清晰描述变更内容和原因
+
+## 并行 AI 任务与 Git Worktree
+
+- 并行任务 → 一个任务一个独立分支 + 一个独立 worktree
+- worktree 路径 → `.claude/worktrees/<change-name>/`
+- 分支命名 → `feature/<change-name>` / `fix/<change-name>` / `chore/<change-name>`
+- 启动确认 → `git status` + `git branch --show-current`
+- 合并前 → 在对应 worktree 内提交完整修改，再回主工作区 merge 或创建 PR
+- 共享文件冲突 → 不要让多个 worktree 同时修改同一个场景/Prefab/ScriptableObject/`ProjectSettings`
+- 同一 `UnityProject` 工作目录 → 不要同时运行多个 AI 终端修改代码
+
+## 工具链
+
+### codedb-mcp（语义 / 词法 / 正则统一索引，MCP）
+
+代码搜索、符号查询、引用查找、依赖图——读操作首选。
+
+| 想做的事 | 怎么做 |
+| -------- | ------ |
+| 注册 MCP（首次） | `claude mcp add --transport stdio --scope local codedb-mcp -- "<codebase-mcp.exe>" --config "<repo>\.codedb-mcp\codedb-mcp.toml" mcp "<repo>"` |
+| 构建/重建索引（兜底） | `"<codebase-mcp.exe>" --config "<repo>\.codedb-mcp\codedb-mcp.toml" index "<repo>"` |
+| 健康检查 | `codedb_status` |
+| 语义/关键词搜索 | `codedb_search(query, path)` |
+| 正则搜索 | `codedb_search(query, regex=true)` |
+| 文件符号 outline | `codedb_outline(path)` |
+| 找定义 | `codedb_symbol(name, body=true)` |
+| 查引用（LSP-like） | `codedb_callers(target: { path, line })` |
+| 找文件（模糊/glob） | `codedb_find(query)` / `codedb_glob(pattern)` |
+| 列目录 / 看树 | `codedb_ls(path)` / `codedb_tree` |
+| 文件依赖 / 反向依赖 | `codedb_deps(path, direction, transitive)` |
+| 最近改动 | `codedb_hot` / `codedb_changes(since_sequence)` |
+| 一次发多个查询 | `codedb_bundle([...])`（最多 100 个，禁套娃） |
+
+- 配置 → `<repo>\.codedb-mcp\codedb-mcp.toml`（C# 扩展、Unity skip_dirs、`Library/PackageCache` include）
+- 索引位置 → `<repo>\.codedb-mcp\index.bin`（已 gitignore）
+- 文件监听 → `[watch] enabled = true`，C# 文件保存后 debounce 自动重建对应 chunk
+- 自动更新失效场景 → MCP 进程未运行 / 改的扩展不在 `["cs"]` / 文件在 `skip_dirs` / 文件 > 50 MB → 需手动 reindex
+
+### AIBridge（编辑器自动化）
+
+- 安装 → Package Manager 导入 `cn.lys.aibridge`（`https://github.com/liyingsong99/AIBridge.git`）
+- 配置 → Unity 编辑器 `AIBridge/Workflows` 窗口 → Skills 标签 → 勾选 Claude → "Install Selected Integrations"
+- CLI 路径 → `.aibridge/cli/AIBridgeCLI.exe`（Unity 导入包后自动生成）
+- 常用 CLI 命令 → `compile unity` / `get_logs --logType Error` / `test run --mode EditMode` / `screenshot game` / `scene get_hierarchy`
+- 优先级 → Unity 已打开时，编译/Console/EditMode 测试/场景检查走 AIBridge CLI
+
+### Matt Pocock Skills（调试/TDD 辅助）
+
+| 想做的事 | 斜杠命令 |
+| -------- | -------- |
+| 复杂缺陷/性能问题诊断 | `/diagnose` |
+| 红绿重构循环实现 | `/tdd` |
+| 理解陌生代码区域 | `/zoom-out` |
+| 对方案/设计连续追问 | `/grill-me` |
+| 创建新的 Claude Code skill | `/write-a-skill` |
+
+### MemPalace（跨会话记忆 / MCP）
+
+方式一 → Claude Code 插件
 ```bash
-Unity.exe -runTests -testPlatform EditMode -testResults results.xml -projectPath .
+claude plugin marketplace add MemPalace/mempalace
+claude plugin install --scope user mempalace
 ```
+随后运行 `/mempalace:init`
 
-Unity 编辑器中运行：Window > General > Test Runner > EditMode 标签页。
+方式二 → Python 包 + local scope MCP
+```bash
+pip install mempalace
+claude mcp add --transport stdio --scope local mempalace -- python3 -m mempalace.mcp_server
+```
+Windows 环境 → `python3` 改为 `python`
 
-### Unity 编辑器
-
-- 在 Unity Hub 中打开 `UnityProject/` 文件夹
-- Unity 版本：**6000.3.12f1**（Unity 6）
-
-## 约定
-
-- 管理器通过 `ModuleSystem.Get<IXxxManager>()` 或静态属性 `GameLogicEntry.XXX` 获取
-- 新管理器需实现 `IEFManager` 接口（`Update`、`Shutdown`）
-- 热更新代码必须在 `Assets/GameScripts/HotFix/` 中，不能放在 Runtime
-- UI Prefab 通过资源路径引用（如 `"UI/MainMenuPrefab"`）
-- 异步操作使用 UniTask（`async UniTask`），不使用协程
-- 所有代码必须保证有函数级别的注释，特别是公共接口
-- 代码提交信息必须清晰描述变更内容和原因，使用中文
-
-## 工具使用指南
-
-### Serena（MCP 代码智能工具）
-
-Serena 通过 `mcp__mcp-router__*` 工具提供 C# 语言服务器支持。配置文件在 `.serena/project.yml`，语言设置为 `csharp`。
-
-**推荐工作流程：**
-
-1. **每次会话开始时激活项目**：
-   ```
-   mcp__mcp-router__activate_project(project: "UnityProject")
-   ```
-
-2. **读取初始化指令**（每个会话调用一次）：
-   ```
-   mcp__mcp-router__initial_instructions()
-   ```
-
-3. **浏览文件中的符号**（比读取整个文件更快）：
-   ```
-   mcp__mcp-router__get_symbols_overview(relative_path: "Assets/EF/EFRuntime/UI/UIManager.cs", depth: 1)
-   ```
-
-4. **查找特定符号**（类、方法、接口）：
-   ```
-   mcp__mcp-router__find_symbol(name_path_pattern: "UIManager", include_body: true, depth: 1)
-   ```
-
-5. **查找符号的所有引用**（重构时必用）：
-   ```
-   mcp__mcp-router__find_referencing_symbols(name_path: "IResourceManager/LoadAssetAsync", relative_path: "Assets/EF/EFRuntime/Resource/IResourceManager.cs")
-   ```
-
-6. **符号级编辑**（替换方法体）：
-   ```
-   mcp__mcp-router__replace_symbol_body(name_path: "ClassName/MethodName", relative_path: "path/to/file.cs", body: "新方法体")
-   ```
-
-7. **在符号前后插入代码**（添加新方法）：
-   ```
-   mcp__mcp-router__insert_after_symbol(name_path: "ClassName/ExistingMethod", relative_path: "path/to/file.cs", body: "新方法代码")
-   ```
-
-8. **项目级重命名符号**：
-   ```
-   mcp__mcp-router__rename_symbol(name_path: "OldName", relative_path: "path/to/file.cs", new_name: "NewName")
-   ```
-
-9. **模式搜索**（符号工具无法满足时使用）：
-   ```
-   mcp__mcp-router__search_for_pattern(substring_pattern: "LoadAssetSync", restrict_search_to_code_files: true)
-   ```
-
-10. **安全删除**（先检查引用）：
-    ```
-    mcp__mcp-router__safe_delete_symbol(name_path_pattern: "UnusedClass", relative_path: "path/to/file.cs")
-    ```
-
-**使用技巧：**
-- 始终使用 `relative_path` 缩小搜索范围——项目文件很多
-- 使用 `depth: 1` 列出类成员而不读取方法体
-- Serena 需要 `.sln` 文件来支持 C#——使用 `UnityProject.slnx`
-- 大范围修改后，用 `mcp__mcp-router__find_referencing_symbols` 验证是否有遗漏
-
-### Unity Skills（编辑器自动化）
-
-通过 `/unity-skills` 斜杠命令使用。默认 **半自动模式**（仅脚本创建、场景感知、资源基础操作）。输入"全自动模式"切换到全自动模式，可操作 GameObject/组件/材质等。
-
-### OpenSpec（变更管理）
-
-OpenSpec 在 `openspec/changes/` 中管理结构化变更。使用斜杠命令：
-- `/opsx:propose` — 创建完整的变更提案
-- `/opsx:apply` — 实施变更中的任务
-- `/opsx:verify` — 验证实现是否符合规格
-- `/opsx:archive` — 归档已完成的变更
-- `/opsx:explore` — 探索模式，用于思考和分析
-
-变更包含制品：`proposal.md` → `design.md` → `tasks.md` → 实现。
+- 约束 → 个人 palace 数据、会话挖掘结果、向量库、密钥、机器相关路径不得提交仓库
+- 项目级 `.mcp.json` 提交条件 → 启动命令对所有机器可移植且不含个人路径/密钥

@@ -4,7 +4,6 @@ using Cysharp.Threading.Tasks;
 using EF.Common;
 using EF.Resource;
 using UnityEngine;
-using YooAsset;
 
 namespace EF.Sound
 {
@@ -15,7 +14,7 @@ namespace EF.Sound
     public sealed class SoundManager : AEFManager, ISoundManager
     {
         private SoundAgentPool _agentPool;
-        private readonly Dictionary<string, AssetHandle> _cachedClips = new();
+        private readonly Dictionary<string, AudioClip> _cachedClips = new();
         private readonly Dictionary<SoundType, float> _typeVolumes = new();
         private const int DefaultInitialPoolSize = 10;
         private const int DefaultMaxPoolSize = 50;
@@ -39,10 +38,14 @@ namespace EF.Sound
             _typeVolumes[SoundType.Ambient] = 1f;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 当前音频代理池中的活跃音频数量；代理池未创建时为 0。
+        /// </summary>
         public int ActiveSoundCount => _agentPool?.ActiveCount ?? 0;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 全局主音量（0.0 ~ 1.0），设置后会刷新所有活跃音频的最终音量。
+        /// </summary>
         public float MasterVolume
         {
             get => _masterVolume;
@@ -53,7 +56,9 @@ namespace EF.Sound
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 背景音乐类型音量（0.0 ~ 1.0），设置后会刷新正在播放的音乐音频。
+        /// </summary>
         public float MusicVolume
         {
             get => _typeVolumes[SoundType.Music];
@@ -64,7 +69,9 @@ namespace EF.Sound
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 音效类型音量（0.0 ~ 1.0），设置后会刷新正在播放的音效音频。
+        /// </summary>
         public float SoundEffectVolume
         {
             get => _typeVolumes[SoundType.SoundEffect];
@@ -75,7 +82,9 @@ namespace EF.Sound
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 语音类型音量（0.0 ~ 1.0），设置后会刷新正在播放的语音音频。
+        /// </summary>
         public float VoiceVolume
         {
             get => _typeVolumes[SoundType.Voice];
@@ -86,7 +95,9 @@ namespace EF.Sound
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 环境音类型音量（0.0 ~ 1.0），设置后会刷新正在播放的环境音频。
+        /// </summary>
         public float AmbientVolume
         {
             get => _typeVolumes[SoundType.Ambient];
@@ -105,7 +116,11 @@ namespace EF.Sound
             _resourceManager = resourceManager ?? throw new ArgumentNullException(nameof(resourceManager));
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 启动一次音频播放请求，并以异步方式加载和播放资源。
+        /// </summary>
+        /// <param name="args">播放参数，必须包含有效的音频资源名称。</param>
+        /// <returns>同步入口返回临时标识 -1；实际音频标识由异步播放完成后生成。</returns>
         public int Play(SoundPlayArgs args)
         {
             if (args == null)
@@ -158,7 +173,11 @@ namespace EF.Sound
             return agent.SoundId;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 停止指定音频实例，可按指定时长淡出。
+        /// </summary>
+        /// <param name="soundId">音频实例标识。</param>
+        /// <param name="fadeOutDuration">淡出时长（秒），为 0 时立即停止。</param>
         public void Stop(int soundId, float fadeOutDuration = 0f)
         {
             if (_agentPool == null)
@@ -170,7 +189,10 @@ namespace EF.Sound
             agent?.Stop(fadeOutDuration);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 暂停指定音频实例；实例不存在时不执行操作。
+        /// </summary>
+        /// <param name="soundId">音频实例标识。</param>
         public void Pause(int soundId)
         {
             if (_agentPool == null)
@@ -182,7 +204,10 @@ namespace EF.Sound
             agent?.Pause();
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 恢复指定音频实例；实例不存在时不执行操作。
+        /// </summary>
+        /// <param name="soundId">音频实例标识。</param>
         public void Resume(int soundId)
         {
             if (_agentPool == null)
@@ -194,7 +219,11 @@ namespace EF.Sound
             agent?.Resume();
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 停止指定类型的所有活跃音频，可按指定时长淡出。
+        /// </summary>
+        /// <param name="soundType">需要停止的音频类型。</param>
+        /// <param name="fadeOutDuration">淡出时长（秒），为 0 时立即停止。</param>
         public void StopAll(SoundType soundType, float fadeOutDuration = 0f)
         {
             if (_agentPool == null)
@@ -209,7 +238,10 @@ namespace EF.Sound
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 停止所有活跃音频，可按指定时长淡出。
+        /// </summary>
+        /// <param name="fadeOutDuration">淡出时长（秒），为 0 时立即停止。</param>
         public void StopAll(float fadeOutDuration = 0f)
         {
             if (_agentPool == null)
@@ -224,7 +256,10 @@ namespace EF.Sound
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 暂停指定类型的所有活跃音频。
+        /// </summary>
+        /// <param name="soundType">需要暂停的音频类型。</param>
         public void PauseAll(SoundType soundType)
         {
             if (_agentPool == null)
@@ -239,7 +274,9 @@ namespace EF.Sound
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 暂停所有活跃音频。
+        /// </summary>
         public void PauseAll()
         {
             if (_agentPool == null)
@@ -254,7 +291,10 @@ namespace EF.Sound
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 恢复指定类型的所有活跃音频。
+        /// </summary>
+        /// <param name="soundType">需要恢复的音频类型。</param>
         public void ResumeAll(SoundType soundType)
         {
             if (_agentPool == null)
@@ -269,7 +309,9 @@ namespace EF.Sound
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 恢复所有活跃音频。
+        /// </summary>
         public void ResumeAll()
         {
             if (_agentPool == null)
@@ -284,7 +326,11 @@ namespace EF.Sound
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 设置指定音频实例的独立音量；实例不存在时不执行操作。
+        /// </summary>
+        /// <param name="soundId">音频实例标识。</param>
+        /// <param name="volume">音量（0.0 ~ 1.0）。</param>
         public void SetVolume(int soundId, float volume)
         {
             if (_agentPool == null)
@@ -296,7 +342,11 @@ namespace EF.Sound
             agent?.SetVolume(volume);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 判断指定音频实例当前是否正在播放。
+        /// </summary>
+        /// <param name="soundId">音频实例标识。</param>
+        /// <returns>音频存在且正在播放时返回 true，否则返回 false。</returns>
         public bool IsPlaying(int soundId)
         {
             if (_agentPool == null)
@@ -308,7 +358,11 @@ namespace EF.Sound
             return agent != null && agent.IsPlaying;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 获取指定音频实例的播放进度。
+        /// </summary>
+        /// <param name="soundId">音频实例标识。</param>
+        /// <returns>播放进度（0.0 ~ 1.0）；实例不存在时返回 0。</returns>
         public float GetProgress(int soundId)
         {
             if (_agentPool == null)
@@ -339,9 +393,9 @@ namespace EF.Sound
             _agentPool = null;
 
             // 释放缓存的音频资源
-            foreach (AssetHandle handle in _cachedClips.Values)
+            foreach (AudioClip clip in _cachedClips.Values)
             {
-                handle?.Release();
+                _resourceManager.Release(clip);
             }
 
             _cachedClips.Clear();
@@ -375,9 +429,9 @@ namespace EF.Sound
                 return;
             }
 
-            if (_cachedClips.TryGetValue(assetName, out AssetHandle handle))
+            if (_cachedClips.TryGetValue(assetName, out AudioClip clip))
             {
-                handle?.Release();
+                _resourceManager.Release(clip);
                 _cachedClips.Remove(assetName);
             }
         }
@@ -385,9 +439,9 @@ namespace EF.Sound
         private async UniTask<AudioClip> LoadClipAsync(string assetName, SoundType soundType)
         {
             // 检查缓存
-            if (_cachedClips.TryGetValue(assetName, out AssetHandle cachedHandle))
+            if (_cachedClips.TryGetValue(assetName, out AudioClip cachedClip))
             {
-                return cachedHandle.AssetObject as AudioClip;
+                return cachedClip;
             }
 
             if (_resourceManager == null)
@@ -399,9 +453,9 @@ namespace EF.Sound
             try
             {
                 // 短音效完全加载到内存，长音频使用流式加载（通过 Unity 的 AudioClip Load Type 设置）
-                AssetHandle handle = await _resourceManager.LoadAssetAsync<AudioClip>(assetName);
+                AudioClip clip = await _resourceManager.Load<AudioClip>(assetName);
 
-                if (handle == null || handle.AssetObject == null)
+                if (clip == null)
                 {
                     Debug.LogError($"加载音频失败: {assetName}");
                     return null;
@@ -410,15 +464,15 @@ namespace EF.Sound
                 // 短音效缓存起来，长音频根据策略可选择性缓存
                 if (soundType == SoundType.SoundEffect)
                 {
-                    _cachedClips[assetName] = handle;
+                    _cachedClips[assetName] = clip;
                 }
                 else
                 {
                     // 长音频也可以缓存，但需要注意内存占用
-                    _cachedClips[assetName] = handle;
+                    _cachedClips[assetName] = clip;
                 }
 
-                return handle.AssetObject as AudioClip;
+                return clip;
             }
             catch (Exception ex)
             {

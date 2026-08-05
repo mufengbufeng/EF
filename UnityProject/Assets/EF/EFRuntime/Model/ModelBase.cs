@@ -206,14 +206,27 @@ namespace EF.Model
         /// </summary>
         protected TData Data => (TData)GetViewInstance();
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 获取只读数据接口实例，供外部访问模型数据。
+        /// </summary>
+        public TData GetData()
+        {
+            return Data;
+        }
+
+        /// <summary>
+        /// 初始化泛型模型，创建只读数据实例并通知子类完成初始化。
+        /// </summary>
+        /// <exception cref="InvalidOperationException">当 <see cref="CreateData"/> 返回空值时抛出。</exception>
         protected sealed override void OnInitialize()
         {
             _data = CreateData() ?? throw new InvalidOperationException($"模型 {GetType().FullName} 未能创建数据 {typeof(TData).FullName}。");
             OnModelInitialized();
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// 关闭泛型模型，通知子类释放资源并清空只读数据实例。
+        /// </summary>
         protected sealed override void OnShutdown()
         {
             OnModelReleased();
