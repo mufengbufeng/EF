@@ -1,0 +1,16 @@
+{
+    "name": "EF.Fsm",
+    "rootNamespace": "",
+    "references": [
+        "EF.Base"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,31 @@
+{
+    "name": "Game.Runtime",
+    "rootNamespace": "",
+    "references": [
+        "EF.Base",
+        "EF.Bootstrap",
+        "EF.Commercial",
+        "EF.Debugger",
+        "EF.Entity",
+        "EF.Fsm",
+        "EF.Model",
+        "EF.ObjectPool",
+        "EF.Procedure",
+        "EF.Resource",
+        "EF.Save",
+        "EF.Sound",
+        "EF.Timer",
+        "EF.UI",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "HybridCLR.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

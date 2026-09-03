@@ -1,0 +1,32 @@
+{
+    "name": "EF",
+    "rootNamespace": "",
+    "references": [
+        "EF.Base",
+        "EF.Bootstrap",
+        "EF.Commercial",
+        "EF.DataDriven",
+        "EF.Debugger",
+        "EF.Entity",
+        "EF.Event",
+        "EF.Fsm",
+        "EF.Model",
+        "EF.ObjectPool",
+        "EF.Procedure",
+        "EF.Resource",
+        "EF.Save",
+        "EF.Scene",
+        "EF.Sound",
+        "EF.Timer",
+        "EF.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

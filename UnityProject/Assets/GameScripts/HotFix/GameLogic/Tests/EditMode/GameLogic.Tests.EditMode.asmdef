@@ -3,12 +3,25 @@
     "rootNamespace": "GameLogic.Tests",
     "references": [
         "GUID:7db8d1283300ba84fb00ce1b81c52367",
-        "GUID:901fdfb0b8ece28439b245be1b1f16b0",
+        "EF.Editor",
+        "EF.Base",
+        "EF.Commercial",
+        "EF.DataDriven",
+        "EF.Entity",
+        "EF.Event",
+        "EF.Fsm",
+        "EF.Model",
+        "EF.ObjectPool",
+        "EF.Resource",
+        "EF.Scene",
+        "EF.Save",
+        "EF.Timer",
+        "EF.UI",
         "GUID:27619889b8ba8c24980f49ee34dbb44a",
         "GUID:0acc523941302664db1f4e527237feb3",
-        "GUID:6055be8ebefd69e48b49212b09b47b2f",
         "GUID:f51ebe6a0ceec4240a699833d6309b23",
-        "GUID:e34a5702dd353724aa315fb8011f08c3"
+        "GUID:e34a5702dd353724aa315fb8011f08c3",
+        "Unity.ugui"
     ],
     "includePlatforms": [
         "Editor"

@@ -24,22 +24,22 @@ namespace GameLogic.Tests.EditMode.Framework
 
             public StateA(StateTracker tracker) { _tracker = tracker; }
 
-            protected internal override void OnEnter(IFsm<TestOwner> fsm)
+            protected override void OnEnter(IFsm<TestOwner> fsm)
             {
                 _tracker.Log.Add("A:OnEnter");
             }
 
-            protected internal override void OnLeave(IFsm<TestOwner> fsm, bool isShutdown)
+            protected override void OnLeave(IFsm<TestOwner> fsm, bool isShutdown)
             {
                 _tracker.Log.Add(isShutdown ? "A:OnLeave:shutdown" : "A:OnLeave");
             }
 
-            protected internal override void OnUpdate(IFsm<TestOwner> fsm, float elapseSeconds, float realElapseSeconds)
+            protected override void OnUpdate(IFsm<TestOwner> fsm, float elapseSeconds, float realElapseSeconds)
             {
                 _tracker.Log.Add("A:OnUpdate");
             }
 
-            protected internal override void OnDestroy(IFsm<TestOwner> fsm)
+            protected override void OnDestroy(IFsm<TestOwner> fsm)
             {
                 _tracker.Log.Add("A:OnDestroy");
             }
@@ -52,17 +52,17 @@ namespace GameLogic.Tests.EditMode.Framework
 
             public StateB(StateTracker tracker) { _tracker = tracker; }
 
-            protected internal override void OnEnter(IFsm<TestOwner> fsm)
+            protected override void OnEnter(IFsm<TestOwner> fsm)
             {
                 _tracker.Log.Add("B:OnEnter");
             }
 
-            protected internal override void OnLeave(IFsm<TestOwner> fsm, bool isShutdown)
+            protected override void OnLeave(IFsm<TestOwner> fsm, bool isShutdown)
             {
                 _tracker.Log.Add(isShutdown ? "B:OnLeave:shutdown" : "B:OnLeave");
             }
 
-            protected internal override void OnUpdate(IFsm<TestOwner> fsm, float elapseSeconds, float realElapseSeconds)
+            protected override void OnUpdate(IFsm<TestOwner> fsm, float elapseSeconds, float realElapseSeconds)
             {
                 _tracker.Log.Add("B:OnUpdate");
             }

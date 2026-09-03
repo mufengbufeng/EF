@@ -40,7 +40,7 @@ Tests/
 
 - `includePlatforms`: `[]`（**所有平台**，不能限制为 `["Editor"]`，否则 Test Runner 会把它识别为 EditMode 测试）
 - `defineConstraints`: `["UNITY_INCLUDE_TESTS"]`（仅在测试编译期编译，不进入 Player）
-- `references`: GameLogic / EF.Runtime / UniTask / YooAsset / UnityEngine.TestRunner / UnityEditor.TestRunner（GUID 引用）
+- `references`: GameLogic / EF.Base 与被测 EF 模块 / UniTask / YooAsset / UnityEngine.TestRunner / UnityEditor.TestRunner（显式引用）
 - `precompiledReferences`: `["nunit.framework.dll"]`
 - `autoReferenced`: `false`，`overrideReferences`: `true`
 

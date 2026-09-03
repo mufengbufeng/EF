@@ -1,0 +1,29 @@
+{
+    "name": "EF.Editor",
+    "rootNamespace": "",
+    "references": [
+        "Game.Runtime",
+        "EF.DataDriven",
+        "EF.Debugger",
+        "EF.Event",
+        "EF.Resource",
+        "EF.UI",
+        "GUID:e34a5702dd353724aa315fb8011f08c3",
+        "HybridCLR.Editor",
+        "HybridCLR.Runtime",
+        "Unity.ugui",
+        "Unity.TextMeshPro",
+        "YooAsset.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,17 @@
+{
+    "name": "EF.Save",
+    "rootNamespace": "",
+    "references": [
+        "EF.Base",
+        "EF.Debugger"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

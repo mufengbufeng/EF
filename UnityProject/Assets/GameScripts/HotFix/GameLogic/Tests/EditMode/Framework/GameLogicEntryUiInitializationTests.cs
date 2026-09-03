@@ -37,7 +37,7 @@ namespace GameLogic.Tests
             string scene = File.ReadAllText(GetEntryScenePath());
 
             StringAssert.Contains("m_Name: WFrameworkUI", scene);
-            StringAssert.Contains("EF.Runtime::EF.UI.WFramework.UIRoot", scene);
+            StringAssert.Contains("EF.UI::EF.UI.WFramework.UIRoot", scene);
             StringAssert.Contains("m_RootCanvas: {fileID:", scene);
             StringAssert.Contains("m_ParentForUI: {fileID:", scene);
             StringAssert.Contains("m_LayerForHide: 2", scene);

@@ -1,0 +1,17 @@
+{
+    "name": "EF.Procedure",
+    "rootNamespace": "",
+    "references": [
+        "EF.Base",
+        "EF.Fsm"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
