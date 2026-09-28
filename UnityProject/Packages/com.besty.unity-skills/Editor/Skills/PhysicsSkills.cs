@@ -33,9 +33,9 @@ namespace UnitySkills
                 {
                     hit = true,
                     collider = hit.collider.name,
-                    colliderInstanceId = hit.collider.GetInstanceID(),
+                    colliderInstanceId = hit.collider.GetSessionId(),
                     objectName = hit.collider.gameObject.name,
-                    objectInstanceId = hit.collider.gameObject.GetInstanceID(),
+                    objectInstanceId = hit.collider.gameObject.GetSessionId(),
                     path = GameObjectFinder.GetPath(hit.collider.gameObject),
                     point = new { x = hit.point.x, y = hit.point.y, z = hit.point.z },
                     normal = new { x = hit.normal.x, y = hit.normal.y, z = hit.normal.z },
@@ -128,7 +128,7 @@ namespace UnitySkills
             var results = hits.OrderBy(h => h.distance).Select(h => new
             {
                 objectName = h.collider.gameObject.name,
-                instanceId = h.collider.gameObject.GetInstanceID(),
+                instanceId = h.collider.gameObject.GetSessionId(),
                 path = GameObjectFinder.GetPath(h.collider.gameObject),
                 point = new { x = h.point.x, y = h.point.y, z = h.point.z },
                 normal = new { x = h.normal.x, y = h.normal.y, z = h.normal.z },
@@ -158,7 +158,7 @@ namespace UnitySkills
                 {
                     hit = true,
                     objectName = hit.collider.gameObject.name,
-                    instanceId = hit.collider.gameObject.GetInstanceID(),
+                    instanceId = hit.collider.gameObject.GetSessionId(),
                     point = new { x = hit.point.x, y = hit.point.y, z = hit.point.z },
                     distance = hit.distance
                 };
@@ -189,7 +189,7 @@ namespace UnitySkills
                 {
                     hit = true,
                     objectName = hit.collider.gameObject.name,
-                    instanceId = hit.collider.gameObject.GetInstanceID(),
+                    instanceId = hit.collider.gameObject.GetSessionId(),
                     point = new { x = hit.point.x, y = hit.point.y, z = hit.point.z },
                     distance = hit.distance
                 };

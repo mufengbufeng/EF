@@ -328,7 +328,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = projector.gameObject.name,
-                instanceId = projector.gameObject.GetInstanceID(),
+                instanceId = projector.gameObject.GetSessionId(),
                 path = GameObjectFinder.GetPath(projector.gameObject),
                 material = projector.material != null ? new
                 {

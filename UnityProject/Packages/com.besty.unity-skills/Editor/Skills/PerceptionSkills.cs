@@ -1371,7 +1371,7 @@ namespace UnitySkills
                 foreach (var mat in renderer.sharedMaterials)
                 {
                     if (mat == null) continue;
-                    var key = mat.GetInstanceID().ToString();
+                    var key = mat.GetSessionId().ToString();
                     if (!materialMap.ContainsKey(key))
                     {
                         materialMap[key] = new MaterialInfo
@@ -2799,7 +2799,7 @@ namespace UnitySkills
             // 4. Duplicate materials
             var mats = renderers.SelectMany(r => r.sharedMaterials).Where(m => m != null).ToArray();
             var uniqueShaders = mats.Select(m => m.shader?.name).Distinct().Count();
-            var duplicateCount = mats.Length - mats.Select(m => m.GetInstanceID()).Distinct().Count();
+            var duplicateCount = mats.Length - mats.Select(m => m.GetSessionId()).Distinct().Count();
             if (duplicateCount > 10)
                 hints.Add(new { priority = 3, category = "Materials", issue = $"{duplicateCount} duplicate material references",
                     suggestion = "Consolidate materials", fixSkill = "optimize_find_duplicate_materials" });
@@ -2993,7 +2993,7 @@ namespace UnitySkills
 
             snapshot.Add(new Dictionary<string, object>
             {
-                ["instanceId"] = go.GetInstanceID(),
+                ["instanceId"] = go.GetSessionId(),
                 ["name"] = go.name,
                 ["path"] = GameObjectFinder.GetPath(go),
                 ["componentList"] = string.Join(",", components),

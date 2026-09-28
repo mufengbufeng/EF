@@ -9,7 +9,7 @@
 
 ## 项目概述
 
-Unity 6000.3 (Unity 6) 游戏项目，使用 **EasyFramework (EF)** 自研模块化框架，支持 HybridCLR 热更新、YooAsset 资源管理和 W-Framework UGUI 窗口系统。
+Unity 6000.6 (Unity 6) 游戏项目，使用 **EasyFramework (EF)** 自研模块化框架，支持 HybridCLR 热更新、YooAsset 资源管理和 W-Framework UGUI 窗口系统。
 
 ## 架构
 
@@ -102,7 +102,7 @@ Unity 6000.3 (Unity 6) 游戏项目，使用 **EasyFramework (EF)** 自研模块
 | 修改公共 API 前检查影响范围 | 先 codedb `codedb_callers` 看影响，必要时用 `rg` 复核 |
 | 局部或跨文件文本修改 | `apply_patch` |
 | 批量机械替换 | 优先脚本/格式化工具生成补丁，人工复查 diff |
-| 改完 C# / Unity 逻辑获取报错 | AIBridge `compile unity` + `get_logs --logType Error` |
+| 改完 C# / Unity 逻辑获取报错 | `unity command recompile` → 轮询 `unity command recompile_status`；用 `unity command console --level error` 查看错误 |
 
 ### 工具使用规则
 
@@ -129,16 +129,15 @@ Unity 6000.3 (Unity 6) 游戏项目，使用 **EasyFramework (EF)** 自研模块
 
 | 想做的事 | 怎么做 |
 | -------- | ------ |
-| 默认编译检查（新增/修改/删除 C# 脚本、`.asmdef`、`Packages/manifest.json` 后必须执行） | Unity 已打开时使用 AIBridge CLI `compile unity`；否则使用 Unity Editor batchmode 导入项目 |
-| 回退编译命令（Unity 已打开时） | `dotnet build UnityProject.slnx --no-restore` |
-| Unity 已打开时验证（编译 / Console / EditMode 测试 / 场景 Prefab 检查） | 使用 AIBridge CLI（`.aibridge/cli/AIBridgeCLI.exe`）→ `compile unity` / `get_logs` / `test run --mode EditMode` |
-| 首次配置 AIBridge | Unity 编辑器 → `AIBridge/Workflows` 窗口 → Skills 标签 → 勾选 Claude → "Install Selected Integrations" |
-| Unity 未打开时跑 EditMode 测试 | `"<UnityEditorPath>" -batchmode -quit -runTests -testPlatform EditMode -testResults TestResults/editmode-results.xml -projectPath .` |
-| PlayMode 测试（仅本地） | `Window > General > Test Runner > PlayMode` 标签 → Run；或 AIBridge CLI `test run --mode PlayMode` |
+| 默认编译检查（新增/修改/删除 C# 脚本、`.asmdef`、`Packages/manifest.json` 后必须执行） | 编辑器已打开：`unity command recompile` → 轮询 `unity command recompile_status`，检查 `failed` / `errors`；未打开：`unity run .` 执行批量导入与编译 |
+| 回退编译命令（Pipeline 不可用时，仅辅助诊断） | `dotnet build UnityProject.slnx --no-restore`；不能替代 Unity 编译结果 |
+| Unity 已打开时验证（编译 / Console / EditMode 测试 / 场景检查） | `unity command recompile_status` / `unity command console_status` / `unity command console --level error` / `unity command run_tests --mode editor` / `unity command get_scene_hierarchy` |
+| Unity 未打开时跑 EditMode 测试 | `unity test . --mode EditMode --output TestResults/editmode-results.xml` |
+| PlayMode 测试（仅本地） | `Window > General > Test Runner > PlayMode` 标签 → Run；或 `unity command run_tests --mode playmode` |
 
-- Unity 编辑器路径 → 由开发者本机安装位置决定，命令中以 `<UnityEditorPath>` 表示
-- Unity 版本 → 6000.3.12f1（Unity 6）
-- 同项目已被 Unity 打开 → 禁止启动第二个 `Unity.exe -batchmode` 实例
+- Unity 版本 → 以 `ProjectSettings/ProjectVersion.txt` 为准（当前 6000.6.3f1）
+- C# 语言版本 → 兼容 C# 9.0，禁止使用更高版本语法
+- 同项目已被 Unity 打开 → 禁止通过 `unity run` / `unity test` 或直接启动 `Unity.exe -batchmode` 创建第二个编辑器实例；优先连接当前编辑器
 
 ## 项目约定
 
@@ -189,15 +188,17 @@ Unity 6000.3 (Unity 6) 游戏项目，使用 **EasyFramework (EF)** 自研模块
 - 索引位置 → `<repo>\.codedb-mcp\index.bin`（已 gitignore）
 - 文件监听 → `[watch] enabled = true`，C# 文件保存后 debounce 自动重建对应 chunk
 - 自动更新失效场景 → MCP 进程未运行 / 改的扩展不在 `["cs"]` / 文件在 `skip_dirs` / 文件 > 50 MB → 需手动 reindex
-- 不能用于 → 写操作、Unity Editor 操作（用 AIBridge）
+- 不能用于 → 写操作、Unity Editor 操作（用 Unity CLI + Pipeline）
 
-### AIBridge（编辑器自动化）
+### Unity CLI + Unity Pipeline（编辑器自动化）
 
-- 安装 → Package Manager 导入 `cn.lys.aibridge`（`https://github.com/liyingsong99/AIBridge.git`）
-- 配置 → Unity 编辑器 `AIBridge/Workflows` 窗口 → Skills 标签 → 勾选 Claude → "Install Selected Integrations"
-- CLI 路径 → `.aibridge/cli/AIBridgeCLI.exe`（Unity 导入包后自动生成）
-- 常用 CLI 命令 → `compile unity` / `get_logs --logType Error` / `test run --mode EditMode` / `screenshot game` / `scene get_hierarchy`
-- 优先级 → Unity 已打开时，编译/Console/EditMode 测试/场景检查走 AIBridge CLI
+- CLI → 使用 PATH 中的 `unity`（`unity --version`）；项目依赖 `com.unity.pipeline` 记录在 `Packages/manifest.json`
+- 接入与检查 → 未安装时运行 `unity pipeline install --project-path .`；用 `unity pipeline list` / `unity status` 确认连接，`unity command editor_status` 检查编辑器状态
+- Agent Skill → Codex 使用 `.agents/skills/unity-cli/SKILL.md` 与 `.agents/skills/unity-pipeline/SKILL.md`（缺失时运行 `unity skill install codex --local`）；Claude Code 缺失时运行 `unity skill install claude-code --local`
+- 已打开编辑器 → 如需后台编译/测试，先运行 `unity command set_autotick --enable true`；修改后 `unity command recompile`，轮询 `unity command recompile_status`，再查 `unity command console_status` / `unity command console --level error`
+- 测试与场景 → `unity command run_tests --mode editor` / `unity command get_scene_hierarchy` / `unity command screenshot`；具体参数先用 `unity command --query <关键词>` 查询
+- 多编辑器与故障 → 使用 `--project-path <项目路径>` 指定目标；连接失败先用 `unity pipeline list` 检查 Safe Mode，修复编译错误后再验证
+- 主机命令 → `rg`、`git`、`dotnet` 等直接在终端运行，无需经 Unity CLI 转发
 
 ### Matt Pocock Skills（调试/TDD 辅助）
 
@@ -227,36 +228,3 @@ Windows 环境 → `python3` 改为 `python`
 
 - 约束 → 个人 palace 数据、会话挖掘结果、向量库、密钥、机器相关路径不得提交仓库
 - 项目级 `.mcp.json` 提交条件 → 启动命令对所有机器可移植且不含个人路径/密钥
-
-<!-- AIBRIDGE:START {"assistant":"aibridge","templateId":"unity-integration","version":7,"target":"root-rule"} -->
-## AIBridge Bootstrap
-
-**CLI Alias**: `$CLI = ./.aibridge/cli/AIBridgeCLI.exe`
-
-**常用命令**:
-```bash
-$CLI compile unity
-$CLI get_logs --logType Error
-$CLI editor log --message "Hello" --logType Warning
-```
-
-**Host Exec**:
-- 当 AIBridge CLI 可用时，调用 `rg`、`git`、`dotnet`、`python`、`node`、`sg`、`grep` 等外部 host 工具优先用 `$CLI exec run --stdin`，快速查找/显示任务也适用；多任务使用 `$CLI exec batch --stdin`。直接 host shell 仅用于极简单的一次性命令、用户明确要求或 AIBridge CLI 不可用时。
-
-**路由原则**:
-- 快速任务：纯问答、代码解释、简单查找/显示，且不需要修改代码或 Unity 资源、不输出审查/验证/根因结论时，直接回答或执行，不加载 `aibridge-development-workflow`。
-- 工作流任务：当任务需要修改代码或 Unity 资源、修改持久化 AGENTS/Skill/workflow 规则、调试根因、采集 Runtime/日志证据，或输出风险审查/验证结论时，必须优先加载 `aibridge-development-workflow`。
-- 进入工作流后，由 `aibridge-development-workflow` 探测 harness 能力、选择任务分支，并决定是否继续加载其它 Skill。
-
-**Skill 加载**:
-- 工作流任务先加载 `/.codex/skills/aibridge-development-workflow/SKILL.md` 中的 `aibridge-development-workflow`。
-- AIBridge Skills 安装在 `/.codex/skills/<skill-name>/SKILL.md`；当本根规则或工作流要求时，从该目录加载同级 Skill。
-
-**项目版本**:
-- 当前项目 Unity 版本：6000.3.12f1
-- 当前项目 C# 语言版本要求：兼容 C# 9.0，禁止使用更高版本语法。
-
-**当前能力状态**:
-- Harness 能力快照：`.aibridge/harness/capabilities.json`。RootRule 只提供 compact 摘要；工作流任务需要确认能力时先用 `$CLI harness status` compact 输出，仅在缺失、过期或任务需要未确认能力时读取完整 snapshot 或运行完整探测。已选助手：codex。Skill 根目录：.codex/skills。Code Index：enabled。外部 agent/sub-agent 能力：Unity 无法判断，按 unknown 处理。
-- Code Index：已启用。C# 代码查找或源码导航中，只要查询可表达为符号、定义、引用、实现、派生类型、调用者或诊断查询，应优先加载 `aibridge-code-index`。Unity 已导入资源或脚本资源的名称/类型查找中，当 AIBridge 和 Editor 可用时使用 `asset search/find --format paths`。字面量内容、模糊文本、非 C# 仓库文件、任意路径正则或 Code Index/AIBridge 不可用时使用 `rg`。
-<!-- AIBRIDGE:END -->

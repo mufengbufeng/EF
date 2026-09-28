@@ -9,7 +9,7 @@
 
 ## 项目概述
 
-Unity 6000.3 (Unity 6) 游戏项目，使用 **EasyFramework (EF)** 自研模块化框架，支持 HybridCLR 热更新、YooAsset 资源管理和 W-Framework UGUI 窗口系统。
+Unity 6000.6 (Unity 6) 游戏项目，使用 **EasyFramework (EF)** 自研模块化框架，支持 HybridCLR 热更新、YooAsset 资源管理和 W-Framework UGUI 窗口系统。
 
 ## 架构
 
@@ -93,20 +93,28 @@ Unity 6000.3 (Unity 6) 游戏项目，使用 **EasyFramework (EF)** 自研模块
 | 读文件片段 | codedb `codedb_read`（小段优先，全文用内置 Read） |
 | 看最近修改的文件 | codedb `codedb_hot` / `codedb_changes` |
 | 查文件依赖/反向依赖 | codedb `codedb_deps`（C# namespace 精度最高） |
+| codedb 不命中时兜底 | `rg` + 邻近文件阅读 |
 
+### 改代码
 
+| 想做的事 | 用什么工具 |
+| -------- | ---------- |
+| 修改公共 API 前检查影响范围 | 先 codedb `codedb_callers` 看影响，必要时用 `rg` 复核 |
+| 局部或跨文件文本修改 | `apply_patch` |
+| 批量机械替换 | 优先脚本/格式化工具生成补丁，人工复查 diff |
+| 改完 C# / Unity 逻辑获取报错 | `unity command recompile` → 轮询 `unity command recompile_status`；用 `unity command console --level error` 查看错误 |
 
 ### 工具使用规则
 
 - 代码搜索默认优先 codedb-mcp；只有非 C# / 未索引文件、codedb 不命中、或必须扫资产/文档/配置时，才用 `rg` 作为备选
 - 想用 `rg` / `grep` / `findstr` → 先尝试 codedb `codedb_search`（必要时 `regex=true`），再按需回退到 `rg`
 - 自然语言/概念/语义搜索 → 用 codedb `codedb_search`
-- 文件已完整读过 → 不要再用 codedb  重复分析
+- 文件已完整读过 → 不要再用 codedb 重复分析
 - 过滤范围 → codedb 工具均支持 `path` 参数；遇到第三方噪音可显式排除 `Library/PackageCache/`
-- 符号级编辑/重构 → 必须 codedb 只读（`codedb_edit` 是 stub）
-- 写操作前 → 先 `codedb_callers` 查影响面
-- 使用范围 → codedb 始终带 `path` 过滤；
-- C# LSP 支持依赖 → `UnityProject.slnx` 必须存在
+- 符号级编辑/重构 → codedb 只读（`codedb_edit` 是 stub），修改使用 `apply_patch` 或项目当前可用工具
+- 写操作前 → 先 `codedb_callers` 查影响面，必要时用 `rg` 复核
+- 使用范围 → codedb 始终带 `path` 过滤
+- C# 语义分析支持依赖 → `UnityProject.slnx` 必须存在
 - codedb 索引依赖 → `.codedb-mcp/codedb-mcp.toml`，文件保存自动增量索引；批量重命名/拉大量代码后手动 `codebase-mcp.exe ... index <repo>` 兜底
 
 ## 构建与测试
@@ -121,16 +129,15 @@ Unity 6000.3 (Unity 6) 游戏项目，使用 **EasyFramework (EF)** 自研模块
 
 | 想做的事 | 怎么做 |
 | -------- | ------ |
-| 默认编译检查（新增/修改/删除 C# 脚本、`.asmdef`、`Packages/manifest.json` 后必须执行） | Unity 已打开时使用 AIBridge CLI `compile unity`；否则使用 Unity Editor batchmode 导入项目 |
-| 回退编译命令（Unity 已打开时） | `dotnet build UnityProject.slnx --no-restore` |
-| Unity 已打开时验证（编译 / Console / EditMode 测试 / 场景 Prefab 检查） | 使用 AIBridge CLI（`.aibridge/cli/AIBridgeCLI.exe`）→ `compile unity` / `get_logs` / `test run --mode EditMode` |
-| 首次配置 AIBridge | Unity 编辑器 → `AIBridge/Workflows` 窗口 → Skills 标签 → 勾选 Claude → "Install Selected Integrations" |
-| Unity 未打开时跑 EditMode 测试 | `"<UnityEditorPath>" -batchmode -quit -runTests -testPlatform EditMode -testResults TestResults/editmode-results.xml -projectPath .` |
-| PlayMode 测试（仅本地） | `Window > General > Test Runner > PlayMode` 标签 → Run；或 AIBridge CLI `test run --mode PlayMode` |
+| 默认编译检查（新增/修改/删除 C# 脚本、`.asmdef`、`Packages/manifest.json` 后必须执行） | 编辑器已打开：`unity command recompile` → 轮询 `unity command recompile_status`，检查 `failed` / `errors`；未打开：`unity run .` 执行批量导入与编译 |
+| 回退编译命令（Pipeline 不可用时，仅辅助诊断） | `dotnet build UnityProject.slnx --no-restore`；不能替代 Unity 编译结果 |
+| Unity 已打开时验证（编译 / Console / EditMode 测试 / 场景检查） | `unity command recompile_status` / `unity command console_status` / `unity command console --level error` / `unity command run_tests --mode editor` / `unity command get_scene_hierarchy` |
+| Unity 未打开时跑 EditMode 测试 | `unity test . --mode EditMode --output TestResults/editmode-results.xml` |
+| PlayMode 测试（仅本地） | `Window > General > Test Runner > PlayMode` 标签 → Run；或 `unity command run_tests --mode playmode` |
 
-- Unity 编辑器路径 → 由开发者本机安装位置决定，命令中以 `<UnityEditorPath>` 表示
-- Unity 版本 → 6000.3.12f1（Unity 6）
-- 同项目已被 Unity 打开 → 禁止启动第二个 `Unity.exe -batchmode` 实例
+- Unity 版本 → 以 `ProjectSettings/ProjectVersion.txt` 为准（当前 6000.6.3f1）
+- C# 语言版本 → 兼容 C# 9.0，禁止使用更高版本语法
+- 同项目已被 Unity 打开 → 禁止通过 `unity run` / `unity test` 或直接启动 `Unity.exe -batchmode` 创建第二个编辑器实例；优先连接当前编辑器
 
 ## 项目约定
 
@@ -181,14 +188,17 @@ Unity 6000.3 (Unity 6) 游戏项目，使用 **EasyFramework (EF)** 自研模块
 - 索引位置 → `<repo>\.codedb-mcp\index.bin`（已 gitignore）
 - 文件监听 → `[watch] enabled = true`，C# 文件保存后 debounce 自动重建对应 chunk
 - 自动更新失效场景 → MCP 进程未运行 / 改的扩展不在 `["cs"]` / 文件在 `skip_dirs` / 文件 > 50 MB → 需手动 reindex
+- 不能用于 → 写操作、Unity Editor 操作（用 Unity CLI + Pipeline）
 
-### AIBridge（编辑器自动化）
+### Unity CLI + Unity Pipeline（编辑器自动化）
 
-- 安装 → Package Manager 导入 `cn.lys.aibridge`（`https://github.com/liyingsong99/AIBridge.git`）
-- 配置 → Unity 编辑器 `AIBridge/Workflows` 窗口 → Skills 标签 → 勾选 Claude → "Install Selected Integrations"
-- CLI 路径 → `.aibridge/cli/AIBridgeCLI.exe`（Unity 导入包后自动生成）
-- 常用 CLI 命令 → `compile unity` / `get_logs --logType Error` / `test run --mode EditMode` / `screenshot game` / `scene get_hierarchy`
-- 优先级 → Unity 已打开时，编译/Console/EditMode 测试/场景检查走 AIBridge CLI
+- CLI → 使用 PATH 中的 `unity`（`unity --version`）；项目依赖 `com.unity.pipeline` 记录在 `Packages/manifest.json`
+- 接入与检查 → 未安装时运行 `unity pipeline install --project-path .`；用 `unity pipeline list` / `unity status` 确认连接，`unity command editor_status` 检查编辑器状态
+- Agent Skill → Codex 使用 `.agents/skills/unity-cli/SKILL.md` 与 `.agents/skills/unity-pipeline/SKILL.md`（缺失时运行 `unity skill install codex --local`）；Claude Code 缺失时运行 `unity skill install claude-code --local`
+- 已打开编辑器 → 如需后台编译/测试，先运行 `unity command set_autotick --enable true`；修改后 `unity command recompile`，轮询 `unity command recompile_status`，再查 `unity command console_status` / `unity command console --level error`
+- 测试与场景 → `unity command run_tests --mode editor` / `unity command get_scene_hierarchy` / `unity command screenshot`；具体参数先用 `unity command --query <关键词>` 查询
+- 多编辑器与故障 → 使用 `--project-path <项目路径>` 指定目标；连接失败先用 `unity pipeline list` 检查 Safe Mode，修复编译错误后再验证
+- 主机命令 → `rg`、`git`、`dotnet` 等直接在终端运行，无需经 Unity CLI 转发
 
 ### Matt Pocock Skills（调试/TDD 辅助）
 

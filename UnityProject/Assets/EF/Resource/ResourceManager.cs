@@ -7,6 +7,11 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using YooAsset;
 using SceneHandle = YooAsset.SceneHandle;
+#if UNITY_6000_6_OR_NEWER
+using ObjectId = UnityEngine.EntityId;
+#else
+using ObjectId = System.Int32;
+#endif
 
 namespace EF.Resource
 {
@@ -19,8 +24,8 @@ namespace EF.Resource
 
         private readonly Dictionary<string, ResourcePackage> _packages = new(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<HandleBase> _trackedHandles = new();
-        private readonly Dictionary<int, List<HandleBase>> _assetHandles = new();
-        private readonly Dictionary<HandleBase, int> _assetHandleInstanceIds = new();
+        private readonly Dictionary<ObjectId, List<HandleBase>> _assetHandles = new();
+        private readonly Dictionary<HandleBase, ObjectId> _assetHandleInstanceIds = new();
         private readonly ResourceBackgroundDownloadService _backgroundDownloads = new();
 
         private ResourceModeConfig _config;
@@ -453,7 +458,7 @@ namespace EF.Resource
         /// <param name="asset">要释放的资源对象。</param>
         public void Release(UnityEngine.Object asset)
         {
-            if (asset == null || !_assetHandles.TryGetValue(asset.GetInstanceID(), out List<HandleBase> handles)
+            if (asset == null || !_assetHandles.TryGetValue(GetObjectId(asset), out List<HandleBase> handles)
                 || handles.Count == 0)
             {
                 return;
@@ -464,7 +469,7 @@ namespace EF.Resource
             handles.RemoveAt(lastIndex);
             if (handles.Count == 0)
             {
-                _assetHandles.Remove(asset.GetInstanceID());
+                _assetHandles.Remove(GetObjectId(asset));
             }
 
             _assetHandleInstanceIds.Remove(handle);
@@ -558,26 +563,26 @@ namespace EF.Resource
 
         private void RegisterAssetHandle(UnityEngine.Object asset, HandleBase handle)
         {
-            int instanceId = asset.GetInstanceID();
-            if (!_assetHandles.TryGetValue(instanceId, out List<HandleBase> handles))
+            ObjectId objectId = GetObjectId(asset);
+            if (!_assetHandles.TryGetValue(objectId, out List<HandleBase> handles))
             {
                 handles = new List<HandleBase>();
-                _assetHandles.Add(instanceId, handles);
+                _assetHandles.Add(objectId, handles);
             }
 
             handles.Add(handle);
-            _assetHandleInstanceIds[handle] = instanceId;
+            _assetHandleInstanceIds[handle] = objectId;
         }
 
         private void RemoveAssetHandleReference(HandleBase handle)
         {
-            if (!_assetHandleInstanceIds.TryGetValue(handle, out int instanceId))
+            if (!_assetHandleInstanceIds.TryGetValue(handle, out ObjectId objectId))
             {
                 return;
             }
 
             _assetHandleInstanceIds.Remove(handle);
-            if (!_assetHandles.TryGetValue(instanceId, out List<HandleBase> handles))
+            if (!_assetHandles.TryGetValue(objectId, out List<HandleBase> handles))
             {
                 return;
             }
@@ -585,8 +590,17 @@ namespace EF.Resource
             handles.Remove(handle);
             if (handles.Count == 0)
             {
-                _assetHandles.Remove(instanceId);
+                _assetHandles.Remove(objectId);
             }
+        }
+
+        private static ObjectId GetObjectId(UnityEngine.Object asset)
+        {
+#if UNITY_6000_6_OR_NEWER
+            return asset.GetEntityId();
+#else
+            return asset.GetInstanceID();
+#endif
         }
 
         private void EnsureYooAssetsBackend()

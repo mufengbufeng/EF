@@ -38,7 +38,7 @@ namespace UnitySkills
 
             var bookmark = new BookmarkData
             {
-                selectedInstanceIds = Selection.instanceIDs ?? Array.Empty<int>(),
+                selectedInstanceIds = ObjectSessionIds.GetSelectedIds(),
                 note = note,
                 createdAt = System.DateTime.Now
             };
@@ -76,9 +76,9 @@ namespace UnitySkills
 
             // Restore selection
             var validIds = (bookmark.selectedInstanceIds ?? Array.Empty<int>())
-                .Where(id => EditorUtility.InstanceIDToObject(id) != null)
+                .Where(id => ObjectSessionIds.Resolve(id) != null)
                 .ToArray();
-            Selection.instanceIDs = validIds;
+            ObjectSessionIds.SetSelectedIds(validIds);
 
             // Restore scene view
             if (bookmark.sceneViewPosition.HasValue)
@@ -238,7 +238,7 @@ namespace UnitySkills
 
             UnityEngine.Object target = null;
             if (instanceId != 0)
-                target = EditorUtility.InstanceIDToObject(instanceId);
+                target = ObjectSessionIds.Resolve(instanceId);
             else if (!string.IsNullOrEmpty(name))
                 target = GameObjectFinder.Find(name: name);
 
@@ -341,7 +341,7 @@ namespace UnitySkills
 
             UnityEngine.Object target = null;
             if (instanceId != 0)
-                target = EditorUtility.InstanceIDToObject(instanceId);
+                target = ObjectSessionIds.Resolve(instanceId);
             else if (!string.IsNullOrEmpty(name))
                 target = GameObjectFinder.Find(name: name);
 

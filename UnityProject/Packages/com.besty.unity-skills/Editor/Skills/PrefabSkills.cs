@@ -75,7 +75,7 @@ namespace UnitySkills
             Undo.RegisterCreatedObjectUndo(instance, "Instantiate Prefab");
             WorkflowManager.SnapshotObject(instance, SnapshotType.Created);
 
-            return new { success = true, name = instance.name, instanceId = instance.GetInstanceID(), path = GameObjectFinder.GetPath(instance) };
+            return new { success = true, name = instance.name, instanceId = instance.GetSessionId(), path = GameObjectFinder.GetPath(instance) };
         }
 
         [UnitySkill("prefab_instantiate_batch", "Instantiate multiple prefabs (Efficient). items: JSON array of {prefabPath, x, y, z, name, rotX, rotY, rotZ, scaleX, scaleY, scaleZ, parentName, parentInstanceId, parentPath}",
@@ -139,7 +139,7 @@ namespace UnitySkills
                 {
                     success = true,
                     name = instance.name,
-                    instanceId = instance.GetInstanceID(),
+                    instanceId = instance.GetSessionId(),
                     position = new { x = item.x, y = item.y, z = item.z }
                 };
             }, item => item.prefabPath);
@@ -330,7 +330,7 @@ namespace UnitySkills
             var instances = allObjects
                 .Where(go => PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(go) == prefabPath)
                 .Take(limit)
-                .Select(go => new { name = go.name, path = GameObjectFinder.GetPath(go), instanceId = go.GetInstanceID() })
+                .Select(go => new { name = go.name, path = GameObjectFinder.GetPath(go), instanceId = go.GetSessionId() })
                 .ToArray();
 
             return new { success = true, prefabPath, count = instances.Length, instances };

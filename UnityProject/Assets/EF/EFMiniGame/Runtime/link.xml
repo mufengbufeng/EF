@@ -4,7 +4,7 @@
     <type fullname="YooAsset.WebServerFileSystem" preserve="all" />
     <type fullname="YooAsset.WebNetworkFileSystem" preserve="all" />
   </assembly>
-  <assembly fullname="YooAsset.MiniGame">
+  <assembly fullname="EF.MiniGame">
     <type fullname="EF.MiniGame.WechatMiniGameFileSystem" preserve="all" />
   </assembly>
   <assembly fullname="UnityEngine.Physics2DModule">

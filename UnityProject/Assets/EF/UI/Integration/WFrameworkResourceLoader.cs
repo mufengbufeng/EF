@@ -4,6 +4,11 @@ using Cysharp.Threading.Tasks;
 using EF.Resource;
 using UnityEngine;
 using UnityEngine.U2D;
+#if UNITY_6000_6_OR_NEWER
+using ObjectId = UnityEngine.EntityId;
+#else
+using ObjectId = System.Int32;
+#endif
 
 namespace EF.UI.WFramework
 {
@@ -14,8 +19,8 @@ namespace EF.UI.WFramework
     {
         private readonly IResourceManager _resourceManager;
         private readonly object _syncRoot = new();
-        private readonly Dictionary<int, UnityEngine.Object> _instanceResources = new();
-        private readonly Dictionary<int, Stack<UnityEngine.Object>> _assetResources = new();
+        private readonly Dictionary<ObjectId, UnityEngine.Object> _instanceResources = new();
+        private readonly Dictionary<ObjectId, Stack<UnityEngine.Object>> _assetResources = new();
         private bool _disposed;
 
         public WFrameworkResourceLoader(IResourceManager resourceManager)
@@ -147,8 +152,8 @@ namespace EF.UI.WFramework
                 return;
             }
 
-            int instanceId = gameObject.GetInstanceID();
-            Release(TakeInstanceResource(instanceId));
+            ObjectId objectId = GetObjectId(gameObject);
+            Release(TakeInstanceResource(objectId));
 
             DestroyObject(gameObject);
         }
@@ -223,7 +228,7 @@ namespace EF.UI.WFramework
                 return false;
             }
 
-            int instanceId = asset.GetInstanceID();
+            ObjectId objectId = GetObjectId(asset);
             lock (_syncRoot)
             {
                 if (_disposed)
@@ -231,10 +236,10 @@ namespace EF.UI.WFramework
                     return false;
                 }
 
-                if (!_assetResources.TryGetValue(instanceId, out Stack<UnityEngine.Object> resources))
+                if (!_assetResources.TryGetValue(objectId, out Stack<UnityEngine.Object> resources))
                 {
                     resources = new Stack<UnityEngine.Object>();
-                    _assetResources.Add(instanceId, resources);
+                    _assetResources.Add(objectId, resources);
                 }
 
                 resources.Push(resource);
@@ -250,7 +255,7 @@ namespace EF.UI.WFramework
                 return false;
             }
 
-            int instanceId = instance.GetInstanceID();
+            ObjectId objectId = GetObjectId(instance);
             lock (_syncRoot)
             {
                 if (_disposed)
@@ -258,7 +263,7 @@ namespace EF.UI.WFramework
                     return false;
                 }
 
-                _instanceResources.Add(instanceId, resource);
+                _instanceResources.Add(objectId, resource);
             }
 
             return true;
@@ -271,11 +276,11 @@ namespace EF.UI.WFramework
                 return;
             }
 
-            int instanceId = asset.GetInstanceID();
+            ObjectId objectId = GetObjectId(asset);
             UnityEngine.Object resource = null;
             lock (_syncRoot)
             {
-                if (!_assetResources.TryGetValue(instanceId, out Stack<UnityEngine.Object> resources)
+                if (!_assetResources.TryGetValue(objectId, out Stack<UnityEngine.Object> resources)
                     || resources.Count == 0)
                 {
                     return;
@@ -284,25 +289,34 @@ namespace EF.UI.WFramework
                 resource = resources.Pop();
                 if (resources.Count == 0)
                 {
-                    _assetResources.Remove(instanceId);
+                    _assetResources.Remove(objectId);
                 }
             }
 
             Release(resource);
         }
 
-        private UnityEngine.Object TakeInstanceResource(int instanceId)
+        private UnityEngine.Object TakeInstanceResource(ObjectId objectId)
         {
             lock (_syncRoot)
             {
-                if (!_instanceResources.TryGetValue(instanceId, out UnityEngine.Object resource))
+                if (!_instanceResources.TryGetValue(objectId, out UnityEngine.Object resource))
                 {
                     return null;
                 }
 
-                _instanceResources.Remove(instanceId);
+                _instanceResources.Remove(objectId);
                 return resource;
             }
+        }
+
+        private static ObjectId GetObjectId(UnityEngine.Object asset)
+        {
+#if UNITY_6000_6_OR_NEWER
+            return asset.GetEntityId();
+#else
+            return asset.GetInstanceID();
+#endif
         }
 
         private bool IsDisposed

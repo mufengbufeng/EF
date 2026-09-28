@@ -601,7 +601,7 @@ namespace UnitySkills
                     list.Add(new
                     {
                         gameObject = g.Key.name,
-                        instanceId = g.Key.GetInstanceID(),
+                        instanceId = g.Key.GetSessionId(),
                         animationIndex = idx++,
                         animationType = DOTweenReflectionHelper.GetFieldByCandidates(c, DOTweenReflectionHelper.AnimationTypeFieldCandidates)?.ToString(),
                         duration = DOTweenReflectionHelper.GetFieldByCandidates(c, DOTweenReflectionHelper.DurationFieldCandidates),

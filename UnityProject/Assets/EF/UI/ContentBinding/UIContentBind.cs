@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Object = UnityEngine.Object;
+#if UNITY_6000_6_OR_NEWER
+using ObjectId = UnityEngine.EntityId;
+#else
+using ObjectId = System.Int32;
+#endif
 
 namespace EF.UI.WFramework
 {
@@ -20,12 +25,12 @@ public static partial class UIContentBind {
 	/// </summary>
 	public static void Shutdown() {
 		try {
-			foreach (KeyValuePair<int, BindedObject> pair in s_binded) {
+			foreach (KeyValuePair<ObjectId, BindedObject> pair in s_binded) {
 				pair.Value.dis.Dispose();
 			}
 		} finally {
 			s_binded.Clear();
-			s_temp_ints.Clear();
+			s_temp_ids.Clear();
 			DestroyEmptyObjects();
 			s_loader = null;
 		}
@@ -81,17 +86,17 @@ public static partial class UIContentBind {
 		public IDisposable dis;
 	}
 
-	private static Dictionary<int, BindedObject> s_binded = new Dictionary<int, BindedObject>(32);
-	private static List<int> s_temp_ints = new List<int>();
+	private static Dictionary<ObjectId, BindedObject> s_binded = new Dictionary<ObjectId, BindedObject>(32);
+	private static List<ObjectId> s_temp_ids = new List<ObjectId>();
 
 	private static IDisposable AddBinded(Object obj, IDisposable dis) {
-		s_binded.Add(obj.GetInstanceID(), new BindedObject() { obj = obj, dis = dis });
+		s_binded.Add(GetObjectId(obj), new BindedObject() { obj = obj, dis = dis });
 		return dis;
 	}
 
 	private static void ClearBinded(Object obj) {
 		if (obj == null || obj.Equals(null)) { return; }
-		int key = obj.GetInstanceID();
+		ObjectId key = GetObjectId(obj);
 		if (!s_binded.TryGetValue(key, out BindedObject binded)) { return; }
 		binded.dis.Dispose();
 		s_binded.Remove(key);
@@ -99,18 +104,26 @@ public static partial class UIContentBind {
 	}
 
 	private static void CheckBinded() {
-		s_temp_ints.Clear();
-		foreach (KeyValuePair<int, BindedObject> kv in s_binded) {
+		s_temp_ids.Clear();
+		foreach (KeyValuePair<ObjectId, BindedObject> kv in s_binded) {
 			Object obj = kv.Value.obj;
 			if (obj == null || obj.Equals(null)) {
-				s_temp_ints.Add(kv.Key);
+				s_temp_ids.Add(kv.Key);
 				kv.Value.dis.Dispose();
 			}
 		}
-		for (int i = s_temp_ints.Count - 1; i >= 0; i--) {
-			s_binded.Remove(s_temp_ints[i]);
+		for (int i = s_temp_ids.Count - 1; i >= 0; i--) {
+			s_binded.Remove(s_temp_ids[i]);
 		}
-		s_temp_ints.Clear();
+		s_temp_ids.Clear();
+	}
+
+	private static ObjectId GetObjectId(Object obj) {
+#if UNITY_6000_6_OR_NEWER
+		return obj.GetEntityId();
+#else
+		return obj.GetInstanceID();
+#endif
 	}
 
 }

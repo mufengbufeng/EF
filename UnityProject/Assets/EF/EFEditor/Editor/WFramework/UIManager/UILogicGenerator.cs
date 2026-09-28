@@ -7,6 +7,13 @@ using System.Text;
 using UnityEditor;
 using UnityEditor.ProjectWindowCallback;
 using UnityEngine;
+#if UNITY_6000_6_OR_NEWER
+using CreationEndAction = UnityEditor.ProjectWindowCallback.AssetCreationEndAction;
+using CreationId = UnityEngine.EntityId;
+#else
+using CreationEndAction = UnityEditor.ProjectWindowCallback.EndNameEditAction;
+using CreationId = System.Int32;
+#endif
 
 namespace EF.UI.WFramework {
 
@@ -27,7 +34,7 @@ namespace EF.UI.WFramework {
 			if (!dir.EndsWith("/")) { dir += "/"; }
 			string path = dir + "UILogicTemplateFixed.cs";
 			ProjectWindowUtil.StartNameEditingIfProjectWindowExists(
-				0,
+				default(CreationId),
 				ScriptableObject.CreateInstance<TplCreatedAction>(),
 				path,
 				EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D,
@@ -50,7 +57,7 @@ namespace EF.UI.WFramework {
 			if (!dir.EndsWith("/")) { dir += "/"; }
 			string path = dir + "UILogicTemplateStack.cs";
 			ProjectWindowUtil.StartNameEditingIfProjectWindowExists(
-				0,
+				default(CreationId),
 				ScriptableObject.CreateInstance<TplCreatedAction>(),
 				path,
 				EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D,
@@ -191,8 +198,11 @@ namespace EF.UI.WFramework {
 			void ITplDefine.GetPropertiesDefine(List<string> properties) { mDef.GetPropertiesDefine(properties); }
 		}
 
-		private class TplCreatedAction : EndNameEditAction {
-			public override void Action(int instanceId, string pathName, string resourceFile) {
+		private class TplCreatedAction : CreationEndAction {
+			/// <summary>
+			/// 用户确认文件名后生成 UI 逻辑模板脚本。
+			/// </summary>
+			public override void Action(CreationId entityId, string pathName, string resourceFile) {
 				string fn = Path.GetFileNameWithoutExtension(pathName);
 				string impl = resourceFile;
 				StringBuilder code = new StringBuilder();

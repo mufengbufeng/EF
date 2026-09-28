@@ -158,11 +158,11 @@ namespace UnitySkills
                 // Add detailed component listing
                 info["interactorDetails"] = interactors.Select(c => new {
                     name = c.gameObject.name, type = c.GetType().Name,
-                    instanceId = c.gameObject.GetInstanceID()
+                    instanceId = c.gameObject.GetSessionId()
                 }).ToArray();
                 info["interactableDetails"] = interactables.Select(c => new {
                     name = c.gameObject.name, type = c.GetType().Name,
-                    instanceId = c.gameObject.GetInstanceID()
+                    instanceId = c.gameObject.GetSessionId()
                 }).ToArray();
             }
 
@@ -252,7 +252,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = root.name,
-                instanceId = root.GetInstanceID(),
+                instanceId = root.GetSessionId(),
                 xriVersion = XRReflectionHelper.XRIMajorVersion,
                 hierarchy = new
                 {
@@ -290,7 +290,7 @@ namespace UnitySkills
                     success = true,
                     alreadyExists = true,
                     name = existing.gameObject.name,
-                    instanceId = existing.gameObject.GetInstanceID()
+                    instanceId = existing.gameObject.GetSessionId()
                 };
 
             var go = new GameObject(name ?? "XR Interaction Manager");
@@ -304,7 +304,7 @@ namespace UnitySkills
                 success = true,
                 alreadyExists = false,
                 name = go.name,
-                instanceId = go.GetInstanceID()
+                instanceId = go.GetSessionId()
             };
 #endif
         }
@@ -368,7 +368,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = esGo.name,
-                instanceId = esGo.GetInstanceID(),
+                instanceId = esGo.GetSessionId(),
                 created,
                 removedStandaloneInputModule = removedStandalone,
                 addedXRUIInputModule = addedXRInput
@@ -419,7 +419,7 @@ namespace UnitySkills
                         {
                             ["type"] = comp.GetType().Name,
                             ["gameObject"] = comp.gameObject.name,
-                            ["instanceId"] = comp.gameObject.GetInstanceID(),
+                            ["instanceId"] = comp.gameObject.GetSessionId(),
                             ["path"] = GameObjectFinder.GetPath(comp.gameObject),
                             ["enabled"] = comp is Behaviour b ? b.enabled : true
                         };
@@ -512,7 +512,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = go.name,
-                instanceId = go.GetInstanceID(),
+                instanceId = go.GetSessionId(),
                 interactorType = comp.GetType().Name,
                 maxRaycastDistance = maxDistance,
                 lineType,
@@ -561,7 +561,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = go.name,
-                instanceId = go.GetInstanceID(),
+                instanceId = go.GetSessionId(),
                 interactorType = comp.GetType().Name,
                 triggerRadius = radius
             };
@@ -609,7 +609,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = go.name,
-                instanceId = go.GetInstanceID(),
+                instanceId = go.GetSessionId(),
                 interactorType = comp.GetType().Name,
                 showHoverMesh,
                 recycleDelay
@@ -639,7 +639,7 @@ namespace UnitySkills
                     {
                         ["type"] = comp.GetType().Name,
                         ["gameObject"] = comp.gameObject.name,
-                        ["instanceId"] = comp.gameObject.GetInstanceID(),
+                        ["instanceId"] = comp.gameObject.GetSessionId(),
                         ["path"] = GameObjectFinder.GetPath(comp.gameObject),
                         ["enabled"] = comp is Behaviour b ? b.enabled : true
                     };
@@ -744,7 +744,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = go.name,
-                instanceId = go.GetInstanceID(),
+                instanceId = go.GetSessionId(),
                 movementType,
                 throwOnDetach,
                 smoothPosition,
@@ -786,7 +786,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = go.name,
-                instanceId = go.GetInstanceID(),
+                instanceId = go.GetSessionId(),
                 interactableType = comp.GetType().Name,
                 note = "Use xr_add_interaction_event to wire up hover/select callbacks."
             };
@@ -852,7 +852,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = go.name,
-                instanceId = go.GetInstanceID(),
+                instanceId = go.GetSessionId(),
                 interactableType = comp.GetType().Name,
                 changedProperties = changed,
                 selectModeOptions = XRReflectionHelper.GetEnumValues(comp, "selectMode"),
@@ -883,7 +883,7 @@ namespace UnitySkills
                     {
                         ["type"] = comp.GetType().Name,
                         ["gameObject"] = comp.gameObject.name,
-                        ["instanceId"] = comp.gameObject.GetInstanceID(),
+                        ["instanceId"] = comp.gameObject.GetSessionId(),
                         ["path"] = GameObjectFinder.GetPath(comp.gameObject),
                         ["enabled"] = comp is Behaviour b ? b.enabled : true,
                         ["isSelected"] = (bool)(XRReflectionHelper.GetProperty(comp, "isSelected") ?? false),
@@ -907,7 +907,7 @@ namespace UnitySkills
                     {
                         ["type"] = comp.GetType().Name,
                         ["gameObject"] = comp.gameObject.name,
-                        ["instanceId"] = comp.gameObject.GetInstanceID(),
+                        ["instanceId"] = comp.gameObject.GetSessionId(),
                         ["path"] = GameObjectFinder.GetPath(comp.gameObject),
                         ["enabled"] = comp is Behaviour b2 ? b2.enabled : true
                     });
@@ -967,7 +967,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = go.name,
-                instanceId = go.GetInstanceID(),
+                instanceId = go.GetSessionId(),
                 providerType = comp.GetType().Name,
                 note = "Now create teleport targets via xr_add_teleport_area or xr_add_teleport_anchor."
             };
@@ -1016,7 +1016,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = go.name,
-                instanceId = go.GetInstanceID(),
+                instanceId = go.GetSessionId(),
                 teleportType = "TeleportationArea",
                 matchOrientation,
                 matchOrientationOptions = XRReflectionHelper.GetEnumValues(comp, "matchOrientation")
@@ -1086,7 +1086,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = go.name,
-                instanceId = go.GetInstanceID(),
+                instanceId = go.GetSessionId(),
                 teleportType = "TeleportationAnchor",
                 position = new { x, y, z },
                 rotationY = rotY,
@@ -1145,7 +1145,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = go.name,
-                instanceId = go.GetInstanceID(),
+                instanceId = go.GetSessionId(),
                 providerType = comp.GetType().Name,
                 moveSpeed,
                 enableStrafe,
@@ -1213,7 +1213,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = go.name,
-                instanceId = go.GetInstanceID(),
+                instanceId = go.GetSessionId(),
                 providerType = comp.GetType().Name,
                 turnType,
                 turnAmount = isSnap ? turnAmount : 0f,
@@ -1278,7 +1278,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = go.name,
-                instanceId = go.GetInstanceID(),
+                instanceId = go.GetSessionId(),
                 removedStandardRaycaster = removedStandard,
                 addedTrackedDeviceRaycaster = addedTracked,
                 renderMode = "WorldSpace",
@@ -1337,7 +1337,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = go.name,
-                instanceId = go.GetInstanceID(),
+                instanceId = go.GetSessionId(),
                 interactorType = comp.GetType().Name,
                 changedProperties = changed,
                 selectIntensity,
@@ -1437,7 +1437,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = go.name,
-                instanceId = go.GetInstanceID(),
+                instanceId = go.GetSessionId(),
                 eventType,
                 targetObject = targetName,
                 targetMethod,
@@ -1510,7 +1510,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = go.name,
-                instanceId = go.GetInstanceID(),
+                instanceId = go.GetSessionId(),
                 componentType = comp.GetType().Name,
                 layers,
                 isInteractor

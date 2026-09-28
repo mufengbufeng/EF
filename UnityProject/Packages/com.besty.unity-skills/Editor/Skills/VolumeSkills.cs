@@ -102,7 +102,7 @@ namespace UnitySkills
                 success = true,
                 name,
                 path = resolvedPath,
-                instanceId = profile.GetInstanceID(),
+                instanceId = profile.GetSessionId(),
                 componentCount = profile.components.Count
             };
         }
@@ -155,7 +155,7 @@ namespace UnitySkills
             {
                 success = true,
                 name = go.name,
-                instanceId = go.GetInstanceID(),
+                instanceId = go.GetSessionId(),
                 path = GameObjectFinder.GetPath(go),
                 isGlobal,
                 priority = volume.priority,
