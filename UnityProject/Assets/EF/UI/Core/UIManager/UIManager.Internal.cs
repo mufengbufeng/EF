@@ -6,7 +6,7 @@ namespace EF.UI.WFramework {
 
 	public partial class UIManager {
 
-		private class Processor {
+		private partial class Processor {
 
 			private static readonly List<UIInstanceStack> temp_uistack_ins = new List<UIInstanceStack>(32);
 			private readonly List<UIInstanceStack> mStack = new List<UIInstanceStack>();
@@ -154,6 +154,7 @@ namespace EF.UI.WFramework {
 			}
 
 			public void Shutdown() {
+				mShutdown = true;
 				mFocusMgr.HoldDispatchFocusChange();
 				for (int i = mStack.Count - 1; i >= 0; i--) {
 					UIInstanceStack item = mStack[i];

@@ -24,8 +24,6 @@ namespace EF.UI.WFramework
         private float m_PositionZInterval = 1000f;
         [SerializeField]
         private Vector2 m_OffScreenPositionDelta = new Vector2(3000f, 3000f);
-        [SerializeField]
-        private bool m_StandaloneUpdate;
 
 		public Canvas RootCanvas { get { return m_RootCanvas; } }
 
@@ -95,19 +93,6 @@ namespace EF.UI.WFramework
             if (m_LayerForHide < 0 || m_LayerForHide > 31)
             {
                 throw new System.InvalidOperationException("LayerForHide 必须是有效的 Unity Layer。");
-            }
-
-            if (m_StandaloneUpdate)
-            {
-                throw new System.InvalidOperationException("ModuleSystem 驱动时必须关闭 Standalone Update。");
-            }
-        }
-
-        private void Update()
-        {
-            if (m_StandaloneUpdate)
-            {
-                UIManager.Update();
             }
         }
     }

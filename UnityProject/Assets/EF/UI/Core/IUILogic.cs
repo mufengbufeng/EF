@@ -17,6 +17,7 @@ namespace EF.UI.WFramework {
 		void OnShow();
 		void OnHide();
 		void OnClose();
+		void OnUpdate(float elapseSeconds, float realElapseSeconds);
 		void OnTerminated();
 	}
 

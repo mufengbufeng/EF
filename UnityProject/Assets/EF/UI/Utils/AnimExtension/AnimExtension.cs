@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using EF.UI.WFramework.Collections;
 using System;
 using System.Collections.Generic;
@@ -67,17 +66,32 @@ namespace EF.UI.WFramework.Utils {
 
 		private static Playing s_playing { get; } = new Playing();
 
+		/// <summary>
+		/// UIManager 内部帧更新入口，推进活动动画并派发完成事件。
+		/// </summary>
+		internal static void Update(float elapseSeconds, float realElapseSeconds) {
+			s_playing.Update(elapseSeconds, realElapseSeconds);
+		}
+
+		/// <summary>
+		/// UIManager 关闭时回收活动项并清空列表。
+		/// </summary>
+		internal static void Shutdown() {
+			s_playing.Shutdown();
+		}
+
 		private class Playing {
 			private static List<AnimEventInvoke> s_temp_invokes = new List<AnimEventInvoke>();
 			private List<AnimItem> mPlayings = new List<AnimItem>(16);
+			private uint mUpdateVersion = 0u;
+
 			public Playing() { }
+
 			public void AddPlaying(AnimItem item) {
 				if (item == null) { return; }
 				mPlayings.Add(item);
-				if (mPlayings.Count == 1) {
-					Loop();
-				}
 			}
+
 			public bool Remove(Component comp, int layer) {
 				for (int i = mPlayings.Count - 1; i >= 0; i--) {
 					var playing = mPlayings[i];
@@ -89,31 +103,36 @@ namespace EF.UI.WFramework.Utils {
 				}
 				return false;
 			}
-			private uint mLoopVersion = 0u;
-			private async void Loop() {
-				uint version = ++mLoopVersion;
-				await UniTask.NextFrame();
-				while (version == mLoopVersion) {
-					s_temp_invokes.Clear();
-					for (int i = mPlayings.Count - 1; i >= 0; i--) {
-						AnimItem item = mPlayings[i];
-						if (!item.Tick(s_temp_invokes)) {
-							mPlayings.RemoveAt(i);
-							item.Recycle();
-						}
+
+			internal void Update(float elapseSeconds, float realElapseSeconds) {
+				s_temp_invokes.Clear();
+				for (int i = mPlayings.Count - 1; i >= 0; i--) {
+					AnimItem item = mPlayings[i];
+					if (!item.Tick(s_temp_invokes, elapseSeconds, realElapseSeconds)) {
+						mPlayings.RemoveAt(i);
+						item.Recycle();
 					}
-					for (int i = s_temp_invokes.Count - 1; i >= 0; i--) {
-						AnimEventInvoke item = s_temp_invokes[i];
-						try {
-							item.callback.Invoke(item.time, item.length);
-						} catch (Exception ex) {
-							Debug.LogException(ex);
-						}
-					}
-					s_temp_invokes.Clear();
-					if (mPlayings.Count <= 0) { break; }
-					await UniTask.NextFrame();
 				}
+				uint currentVersion = mUpdateVersion;
+				for (int i = s_temp_invokes.Count - 1; i >= 0; i--) {
+					if (mUpdateVersion != currentVersion) { break; }
+					AnimEventInvoke invoke = s_temp_invokes[i];
+					try {
+						invoke.callback.Invoke(invoke.time, invoke.length);
+					} catch (Exception ex) {
+						Debug.LogException(ex);
+					}
+				}
+				s_temp_invokes.Clear();
+			}
+
+			internal void Shutdown() {
+				unchecked { mUpdateVersion++; }
+				for (int i = mPlayings.Count - 1; i >= 0; i--) {
+					mPlayings[i].Recycle();
+				}
+				mPlayings.Clear();
+				s_temp_invokes.Clear();
 			}
 		}
 
@@ -127,7 +146,7 @@ namespace EF.UI.WFramework.Utils {
 			private int mRetryCount;
 			public string AnimName { get; private set; }
 			public abstract bool Equals(Component comp, int layer);
-			public bool Tick(List<AnimEventInvoke> invokes) {
+			public bool Tick(List<AnimEventInvoke> invokes, float elapseSeconds, float realElapseSeconds) {
 				if (!CheckValid()) { return false; }
 				if (mLength <= 0f) {
 					TryGetClipLength(out float len, out bool unscaledTime);
@@ -139,7 +158,7 @@ namespace EF.UI.WFramework.Utils {
 					mEventsFrom.Clear();
 				}
 				float nt = GetNormalizedTime(out float speed);
-				float dt = mUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+				float dt = mUnscaledTime ? realElapseSeconds : elapseSeconds;
 				TickEvents(mEvents, invokes, mPrevNT, nt, dt * speed, mLength);
 				if (nt < mPrevNT) {
 					mEvents.Clear();

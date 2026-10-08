@@ -22,6 +22,9 @@
 - 热更新入口将自身程序集传给加载器；因此仍按窗口命名约定解析 Logic，同时不会在同进程热更后误用旧程序集类型。
 - `WFrameworkResourceLoader` 使用 `IResourceManager` 和 YooAsset 资源地址加载 Prefab、Sprite、Texture 与图集 Sprite，并在关闭时释放对应句柄。
 - `WFrameworkUIManager.Update()` 使用新 Input System 分发 Escape；上游旧输入 API 已移除。
+- UI 帧统一由 `ModuleSystem` → `WFrameworkUIManager.Update()` 驱动，依次处理屏幕/相机变化、Escape、UI 计时器、动画事件及窗口回调；不再使用 `UIRoot` 独立 Update 或工具内部的 UniTask 帧循环。
+- Logic 可重写 `OnUpdate(float elapseSeconds, float realElapseSeconds)`；绑定组件继承 `UIWindowBase` 后可重写同名方法。仅已打开、可见、完成初始化且根节点活跃的窗口接收回调，Logic 先于 Window；禁用的 Window 组件不更新。
+- 绑定生成器支持 `TextMeshProUGUI`，以 `Window` 结尾且使用默认 MonoBehaviour 基类的绑定自动继承 `UIWindowBase`；显式自定义基类保留不变。启动界面的状态文案使用 TMP，Prefab 必须提供 `Panel/StatusText` 的 `TMP_Text` 组件。
 - 上游静态管理器增加了 `Shutdown()`，由 EF 模块生命周期清理窗口、动态绑定与静态状态。
 - 数据驱动运行时位于 `Assets/EF/EFRuntime/DataDriven/`，命名空间为 `EF.DataDriven`；编辑器菜单为 `EF/Data Driven/Regenerate Code`。
 - 组件绑定工具位于 `Assets/EF/EFEditor/Editor/SerializeComponentTool/`，编辑器菜单为 `EF/Serialize Component Tool/Open Binding Tool`。
@@ -33,5 +36,7 @@
 ```csharp
 GameLogicEntry.WFrameworkUI.Open("InventoryWindow");
 ```
+
+需要在窗口打开完成后继续执行时，使用 `await GameLogicEntry.WFrameworkUI.OpenAsync("InventoryWindow")`。`Open` 的布尔值只表示请求是否受理；`OpenAsync` 在 `OnOpened` 时返回 `true`，请求被拒绝或打开前终止时返回 `false`。调用方可按业务需要附加取消令牌或超时；取消等待不会关闭窗口。
 
 窗口逻辑可以继承 `UIStackLogicBase` 或 `UIFixedLogicBase`。项目窗口统一遵循上述命名和资源地址约定；需要不同映射时，应扩展 Loader 规则，而不是在业务层维护窗口注册表。编辑器侧的 UI Logic 生成器、Prefab 检查器和动画属性绘制器位于 `Assets/EF/EFEditor/Editor/WFramework/`。

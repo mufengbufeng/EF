@@ -13,7 +13,7 @@ namespace GameLogic.Tests
     /// 验证 W-Framework UI 源码接入 EF 后的基础生命周期契约。
     /// </summary>
     [TestFixture]
-    public sealed class WFrameworkUiIntegrationTests
+    public sealed partial class WFrameworkUiIntegrationTests
     {
         /// <summary>
         /// 每个测试后清理上游静态状态，避免影响其它 EditMode 测试。
@@ -37,7 +37,7 @@ namespace GameLogic.Tests
                 InitializeCore(firstRoot);
                 Assert.IsTrue(UIManager.IsInitialized);
 
-                UIManager.Update(false);
+                UIManager.Update(0f, 0f, false);
                 UIManager.Shutdown();
                 Assert.IsFalse(UIManager.IsInitialized);
 
@@ -311,7 +311,6 @@ namespace GameLogic.Tests
             SetSerializedField(root, "m_RootCanvas", rootObject.GetComponent<Canvas>());
             SetSerializedField(root, "m_ParentForUI", rootObject.GetComponent<RectTransform>());
             SetSerializedField(root, "m_LayerForHide", 2);
-            SetSerializedField(root, "m_StandaloneUpdate", false);
             rootObject.SetActive(true);
             UIManager.SetUIRoot(root);
             return root;

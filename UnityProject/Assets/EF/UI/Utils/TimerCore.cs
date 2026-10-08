@@ -106,6 +106,14 @@ namespace EF.UI.WFramework.Utils {
 			DoUpdate(mCalculator.GetNow());
 		}
 
+		/// <summary>
+		/// 清空队列但不触发回调，不重置 ID 生成器避免旧 TimerHandler 重用。
+		/// </summary>
+		internal void Clear() {
+			mQueue.Clear();
+			mKeySet.Clear();
+		}
+
 		public TimerHandler Add(D delay, TimerDelegate onTimer) {
 			uint id = AddInternal(null, Param.Delay(delay, onTimer));
 			return new TimerHandler() {

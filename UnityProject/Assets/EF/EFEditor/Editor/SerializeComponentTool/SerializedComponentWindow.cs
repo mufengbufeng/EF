@@ -52,6 +52,11 @@ namespace EF.Editor.SerializeComponentTool {
 		static SupportedTypeData DefineTypeText() {
 			return new SupportedTypeData(typeof(UnityEngine.UI.Text), 100).SetClearEventsOnClear(false);
 		}
+		/// <summary>为 TMP(UI) 生成强类型文字绑定，不清理组件内部事件。</summary>
+		[SupportedComponentType]
+		static SupportedTypeData DefineTypeTextMeshProUGUI() {
+			return new SupportedTypeData(typeof(TMPro.TextMeshProUGUI), 100).SetVariableName("text").SetClearEventsOnClear(false);
+		}
 		[SupportedComponentType]
 		static SupportedTypeData DefineTypeButton() {
 			return new SupportedTypeData(typeof(UnityEngine.UI.Button), 101);
@@ -481,6 +486,22 @@ namespace EF.Editor.SerializeComponentTool {
 		private string[] mNameSpaceList;
 		private int mNameSpaceIndex;
 
+		private const string WindowBaseClass = "EF.UI.WFramework.UIWindowBase";
+
+		/// <summary>
+		/// 归一化 Window 类的基类为 UIWindowBase，其它类及显式自定义基类保持不变。
+		/// </summary>
+		private static string ResolveBaseClass(string className, string baseClass) {
+			if (string.IsNullOrEmpty(className)) { return baseClass; }
+			if (!className.EndsWith("Window", System.StringComparison.Ordinal)) {
+				return baseClass;
+			}
+			if (baseClass == "MonoBehaviour" || baseClass == "UnityEngine.MonoBehaviour") {
+				return WindowBaseClass;
+			}
+			return baseClass;
+		}
+
 		private List<string> mUsedBaseClasss = new List<string>();
 		private string[] mBaseClassList;
 
@@ -668,7 +689,7 @@ namespace EF.Editor.SerializeComponentTool {
 									if (cp != null && cp.className == fowi.fieldobject.cls) {
 										fowi.fieldobject.partialClass = cp.partialClass;
 										fowi.fieldobject.publicProperty = cp.publicProperty;
-										fowi.fieldobject.baseClass = cp.baseClass;
+										fowi.fieldobject.baseClass = ResolveBaseClass(fowi.fieldobject.cls, cp.baseClass);
 										fowi.fieldobject.baseClassIndex = -1;
 									}
 								}
@@ -803,6 +824,7 @@ namespace EF.Editor.SerializeComponentTool {
 					fo.partialClass = EditorGUILayout.Toggle(s_content_partial, fo.partialClass);
 					fo.publicProperty = EditorGUILayout.Toggle(s_content_public_property, fo.publicProperty);
 					EditorGUILayout.BeginHorizontal();
+					fo.baseClass = ResolveBaseClass(fo.cls, fo.baseClass);
 					if (fo.baseClassIndex < 0) {
 						fo.baseClass = EditorGUILayout.DelayedTextField(s_content_base_class, fo.baseClass);
 					} else {
@@ -1191,6 +1213,7 @@ namespace EF.Editor.SerializeComponentTool {
 		}
 
 		private static bool GetClass(FieldObject fo, ClassData cls) {
+			fo.baseClass = ResolveBaseClass(fo.cls, fo.baseClass);
 			if (cls.cls != fo.cls) { return false; }
 			if (cls.baseClass != null && cls.baseClass != fo.baseClass) { return false; }
 			cls.baseClass = fo.baseClass;
@@ -1252,16 +1275,15 @@ namespace EF.Editor.SerializeComponentTool {
 			List<string> clearInvokes = new List<string>();
 			List<string> compOpenInvokes = new List<string>();
 			List<string> compClearInvokes = new List<string>();
-			code.AppendLine("#pragma warning disable 649");
-			code.AppendLine();
 			Dictionary<string, KeyValuePair<string, string>> itemClasses = new Dictionary<string, KeyValuePair<string, string>>();
 			string codeIndent = "";
 			if (!string.IsNullOrEmpty(ns)) {
 				codeIndent = "\t";
-				code.AppendLine(string.Format("namespace {0} {{", ns));
+				code.AppendLine(string.Format("namespace {0}\n{{", ns));
 				code.AppendLine();
 			}
-			code.AppendLine(string.Format("{0}public {1}class {2} : {3} {{",
+			cls.baseClass = ResolveBaseClass(cls.cls, cls.baseClass);
+			code.AppendLine(string.Format("{0}public {1}class {2} : {3}\n{0}{{",
 				codeIndent, cls.partialClass ? "partial " : "", cls.cls, cls.baseClass));
 			code.AppendLine();
 			List<string> tempStrings = new List<string>();
@@ -1294,14 +1316,14 @@ namespace EF.Editor.SerializeComponentTool {
 				}
 				if (field.isArray) {
 					if (compOpenInvokes.Count > 0) {
-						openInvokes.Add(string.Format("for (int i = 0; i < {0}.Length; i++) {{", pfn));
+						openInvokes.Add(string.Format("for (int i = 0; i < {0}.Length; i++)\n{{", pfn));
 						foreach (string oi in compOpenInvokes) {
 							openInvokes.Add(string.Format("\t{0}[i]?.{1};", pfn, oi));
 						}
 						openInvokes.Add("}");
 					}
 					if (compClearInvokes.Count > 0) {
-						clearInvokes.Add(string.Format("for (int i = 0; i < {0}.Length; i++) {{", pfn));
+						clearInvokes.Add(string.Format("for (int i = 0; i < {0}.Length; i++)\n{{", pfn));
 						foreach (string oi in compClearInvokes) {
 							clearInvokes.Add(string.Format("\t{0}[i]?.{1};", pfn, oi));
 						}
@@ -1328,13 +1350,13 @@ namespace EF.Editor.SerializeComponentTool {
 				code.AppendLine(string.Format("{0}\t[SerializeField]", codeIndent));
 				var typename = field.isArray ? objTypeName + "[]" : objTypeName;
 				if (cls.publicProperty) {
-					code.AppendLine(string.Format("{0}\tprivate {1} {2};", codeIndent, typename, pfn));
+					code.AppendLine(string.Format("{0}\tprivate {1} {2} = null;", codeIndent, typename, pfn));
 					if (field.isField) {
 						code.AppendLine(string.Format("{0}\tpublic {1} {2} {{ get {{ return {3}; }} }}",
 							codeIndent, typename, field.name, pfn));
 					}
 				} else {
-					code.AppendLine(string.Format("{0}\tprivate {1} {2};", codeIndent, typename, field.name));
+					code.AppendLine(string.Format("{0}\tprivate {1} {2} = null;", codeIndent, typename, field.name));
 				}
 				code.AppendLine();
 				if (!string.IsNullOrEmpty(field.itemType) && !string.IsNullOrEmpty(field.itemVar) && !itemClasses.ContainsKey(objTypeName)) {
@@ -1348,11 +1370,11 @@ namespace EF.Editor.SerializeComponentTool {
 			for (int i = 0; i < aon; i++) {
 				string item = cls.actives[i];
 				code.AppendLine(string.Format("{0}\t[SerializeField]", codeIndent));
-				code.AppendLine(string.Format("{0}\tprivate {1} m_{2};", codeIndent, "GameObject", item));
+				code.AppendLine(string.Format("{0}\tprivate {1} m_{2} = null;", codeIndent, "GameObject", item));
 				openInvokes.Add(string.Format("m_{0}?.SetActive(true);", item));
 			}
 			if (aon > 0) { code.AppendLine(); }
-			code.AppendLine(string.Format("{0}\tpublic void Open() {{", codeIndent));
+			code.AppendLine(string.Format("{0}\t/// <summary>初始化绑定组件。</summary>\n{0}\tpublic void Open()\n{0}\t{{", codeIndent));
 			foreach (string oi in openInvokes) {
 				code.AppendLine(string.Format("{0}\t\t{1}", codeIndent, oi));
 			}
@@ -1361,31 +1383,31 @@ namespace EF.Editor.SerializeComponentTool {
 			code.AppendLine(string.Format("{0}\tprivate UnityEvent mOnClear;", codeIndent));
 			code.AppendLine(string.Format("{0}\tpublic UnityEvent onClear {{", codeIndent));
 			code.AppendLine(string.Format("{0}\t\tget {{", codeIndent));
-			code.AppendLine(string.Format("{0}\t\t\tif (mOnClear == null) {{ mOnClear = new UnityEvent(); }}", codeIndent));
+			code.AppendLine(string.Format("{0}\t\t\tif (mOnClear == null)\n{0}\t\t\t{{\n{0}\t\t\t\tmOnClear = new UnityEvent();\n{0}\t\t\t}}", codeIndent));
 			code.AppendLine(string.Format("{0}\t\t\treturn mOnClear;", codeIndent));
 			code.AppendLine(string.Format("{0}\t\t}}", codeIndent));
 			code.AppendLine(string.Format("{0}\t}}", codeIndent));
 			code.AppendLine();
-			code.AppendLine(string.Format("{0}\tpublic void Clear() {{", codeIndent));
+			code.AppendLine(string.Format("{0}\t/// <summary>释放组件监听并通知清理完成。</summary>\n{0}\tpublic void Clear()\n{0}\t{{", codeIndent));
 			foreach (string ci in clearInvokes) {
 				code.AppendLine(string.Format("{0}\t\t{1}", codeIndent, ci));
 			}
-			code.AppendLine(string.Format("{0}\t\tif (mOnClear != null) {{ mOnClear.Invoke(); mOnClear.RemoveAllListeners(); }}", codeIndent));
+			code.AppendLine(string.Format("{0}\t\tif (mOnClear != null)\n{0}\t\t{{\n{0}\t\t\tmOnClear.Invoke();\n{0}\t\t\tmOnClear.RemoveAllListeners();\n{0}\t\t}}", codeIndent));
 			code.AppendLine(string.Format("{0}\t}}", codeIndent));
 			code.AppendLine();
 			foreach (KeyValuePair<string, SupportedTypeData[]> kv in dataClasses) {
 				code.AppendLine(string.Format("{0}\t[System.Serializable]", codeIndent));
-				code.AppendLine(string.Format("{0}\t{1} class {2} {{",
+				code.AppendLine(string.Format("{0}\t{1} class {2}\n{0}\t{{",
 					codeIndent, cls.publicProperty ? "public" : "private", kv.Key));
 				code.AppendLine();
 				code.AppendLine(string.Format("{0}\t\t[SerializeField]", codeIndent));
-				code.AppendLine(string.Format("{0}\t\tprivate GameObject m_GameObject;", codeIndent));
+				code.AppendLine(string.Format("{0}\t\tprivate GameObject m_GameObject = null;", codeIndent));
 				code.AppendLine(string.Format("{0}\t\tpublic GameObject gameObject {{ get {{ return m_GameObject; }} }}", codeIndent));
 				code.AppendLine();
 				for (int i = 0, imax = kv.Value.Length; i < imax; i++) {
 					SupportedTypeData typeData = kv.Value[i];
 					code.AppendLine(string.Format("{0}\t\t[SerializeField]", codeIndent));
-					code.AppendLine(string.Format("{0}\t\tprivate {1} m_{2};",
+					code.AppendLine(string.Format("{0}\t\tprivate {1} m_{2} = null;",
 						codeIndent, typeData.codeTypeName, typeData.variableName));
 					code.AppendLine(string.Format("{0}\t\tpublic {1} {2} {{ get {{ return m_{2}; }} }}",
 						codeIndent, typeData.codeTypeName, typeData.variableName));
@@ -1395,14 +1417,14 @@ namespace EF.Editor.SerializeComponentTool {
 				if (itemClasses.TryGetValue(kv.Key, out typeAndVar)) {
 					code.AppendLine(string.Format("{0}\t\tprivate Queue<{1}> mCachedInstances;", codeIndent, typeAndVar.Key));
 					code.AppendLine(string.Format("{0}\t\tprivate List<{1}> mUsingInstances;", codeIndent, typeAndVar.Key));
-					code.AppendLine(string.Format("{0}\t\tpublic {1} GetInstance() {{", codeIndent, typeAndVar.Key));
+					code.AppendLine(string.Format("{0}\t\t/// <summary>取得或创建池化实例。</summary>\n{0}\t\tpublic {1} GetInstance()\n{0}\t\t{{", codeIndent, typeAndVar.Key));
 					code.AppendLine(string.Format("{0}\t\t\t{1} instance = null;", codeIndent, typeAndVar.Key));
-					code.AppendLine(string.Format("{0}\t\t\tif (mCachedInstances != null) {{", codeIndent));
-					code.AppendLine(string.Format("{0}\t\t\t\twhile ((instance == null || instance.Equals(null)) && mCachedInstances.Count > 0) {{", codeIndent));
+					code.AppendLine(string.Format("{0}\t\t\tif (mCachedInstances != null)\n{0}\t\t\t{{", codeIndent));
+					code.AppendLine(string.Format("{0}\t\t\t\twhile ((instance == null || instance.Equals(null)) && mCachedInstances.Count > 0)\n{0}\t\t\t\t{{", codeIndent));
 					code.AppendLine(string.Format("{0}\t\t\t\t\tinstance = mCachedInstances.Dequeue();", codeIndent));
 					code.AppendLine(string.Format("{0}\t\t\t\t}}", codeIndent));
 					code.AppendLine(string.Format("{0}\t\t\t}}", codeIndent));
-					code.AppendLine(string.Format("{0}\t\t\tif (instance == null || instance.Equals(null)) {{", codeIndent));
+					code.AppendLine(string.Format("{0}\t\t\tif (instance == null || instance.Equals(null))\n{0}\t\t\t{{", codeIndent));
 					code.AppendLine(string.Format("{0}\t\t\t\tinstance = Instantiate<{1}>(m_{2});", codeIndent, typeAndVar.Key, typeAndVar.Value));
 					code.AppendLine(string.Format("{0}\t\t\t}}", codeIndent));
 					code.AppendLine(string.Format("{0}\t\t\tTransform t0 = m_{1}.transform;", codeIndent, typeAndVar.Value));
@@ -1412,26 +1434,26 @@ namespace EF.Editor.SerializeComponentTool {
 					code.AppendLine(string.Format("{0}\t\t\tt1.localRotation = t0.localRotation;", codeIndent));
 					code.AppendLine(string.Format("{0}\t\t\tt1.localScale = t0.localScale;", codeIndent));
 					code.AppendLine(string.Format("{0}\t\t\tt1.SetSiblingIndex(t0.GetSiblingIndex() + 1);", codeIndent));
-					code.AppendLine(string.Format("{0}\t\t\tif (mUsingInstances == null) {{ mUsingInstances = new List<{1}>(); }}", codeIndent, typeAndVar.Key));
+					code.AppendLine(string.Format("{0}\t\t\tif (mUsingInstances == null)\n{0}\t\t\t{{\n{0}\t\t\t\tmUsingInstances = new List<{1}>();\n{0}\t\t\t}}", codeIndent, typeAndVar.Key));
 					code.AppendLine(string.Format("{0}\t\t\tmUsingInstances.Add(instance);", codeIndent));
 					code.AppendLine(string.Format("{0}\t\t\treturn instance;", codeIndent));
 					code.AppendLine(string.Format("{0}\t\t}}", codeIndent));
-					code.AppendLine(string.Format("{0}\t\tpublic bool CacheInstance({1} instance) {{", codeIndent, typeAndVar.Key));
-					code.AppendLine(string.Format("{0}\t\t\tif (instance == null || instance.Equals(null)) {{ return false; }}", codeIndent));
-					code.AppendLine(string.Format("{0}\t\t\tif (mUsingInstances == null || !mUsingInstances.Remove(instance)) {{ return false; }}", codeIndent));
-					code.AppendLine(string.Format("{0}\t\t\tif (mCachedInstances == null) {{ mCachedInstances = new Queue<{1}>(); }}", codeIndent, typeAndVar.Key));
+					code.AppendLine(string.Format("{0}\t\t/// <summary>回收一个正在使用的实例。</summary>\n{0}\t\tpublic bool CacheInstance({1} instance)\n{0}\t\t{{", codeIndent, typeAndVar.Key));
+					code.AppendLine(string.Format("{0}\t\t\tif (instance == null || instance.Equals(null))\n{0}\t\t\t{{\n{0}\t\t\t\treturn false;\n{0}\t\t\t}}", codeIndent));
+					code.AppendLine(string.Format("{0}\t\t\tif (mUsingInstances == null || !mUsingInstances.Remove(instance))\n{0}\t\t\t{{\n{0}\t\t\t\treturn false;\n{0}\t\t\t}}", codeIndent));
+					code.AppendLine(string.Format("{0}\t\t\tif (mCachedInstances == null)\n{0}\t\t\t{{\n{0}\t\t\t\tmCachedInstances = new Queue<{1}>();\n{0}\t\t\t}}", codeIndent, typeAndVar.Key));
 					code.AppendLine(string.Format("{0}\t\t\tinstance.Clear();", codeIndent));
 					code.AppendLine(string.Format("{0}\t\t\tinstance.gameObject.SetActive(false);", codeIndent));
 					code.AppendLine(string.Format("{0}\t\t\tmCachedInstances.Enqueue(instance);", codeIndent));
 					code.AppendLine(string.Format("{0}\t\t\treturn true;", codeIndent));
 					code.AppendLine(string.Format("{0}\t\t}}", codeIndent));
-					code.AppendLine(string.Format("{0}\t\tpublic int CacheAll() {{", codeIndent));
-					code.AppendLine(string.Format("{0}\t\t\tif (mUsingInstances == null) {{ return 0; }}", codeIndent));
-					code.AppendLine(string.Format("{0}\t\t\tif (mCachedInstances == null) {{ mCachedInstances = new Queue<{1}>(); }}", codeIndent, typeAndVar.Key));
+					code.AppendLine(string.Format("{0}\t\t/// <summary>回收全部正在使用的实例。</summary>\n{0}\t\tpublic int CacheAll()\n{0}\t\t{{", codeIndent));
+					code.AppendLine(string.Format("{0}\t\t\tif (mUsingInstances == null)\n{0}\t\t\t{{\n{0}\t\t\t\treturn 0;\n{0}\t\t\t}}", codeIndent));
+					code.AppendLine(string.Format("{0}\t\t\tif (mCachedInstances == null)\n{0}\t\t\t{{\n{0}\t\t\t\tmCachedInstances = new Queue<{1}>();\n{0}\t\t\t}}", codeIndent, typeAndVar.Key));
 					code.AppendLine(string.Format("{0}\t\t\tint ret = 0;", codeIndent));
-					code.AppendLine(string.Format("{0}\t\t\tfor (int i = mUsingInstances.Count - 1; i >= 0; i--) {{", codeIndent));
+					code.AppendLine(string.Format("{0}\t\t\tfor (int i = mUsingInstances.Count - 1; i >= 0; i--)\n{0}\t\t\t{{", codeIndent));
 					code.AppendLine(string.Format("{0}\t\t\t\t{1} instance = mUsingInstances[i];", codeIndent, typeAndVar.Key));
-					code.AppendLine(string.Format("{0}\t\t\t\tif (instance != null && !instance.Equals(null)) {{", codeIndent));
+					code.AppendLine(string.Format("{0}\t\t\t\tif (instance != null && !instance.Equals(null))\n{0}\t\t\t\t{{", codeIndent));
 					code.AppendLine(string.Format("{0}\t\t\t\t\tinstance.Clear();", codeIndent));
 					code.AppendLine(string.Format("{0}\t\t\t\t\tinstance.gameObject.SetActive(false);", codeIndent));
 					code.AppendLine(string.Format("{0}\t\t\t\t\tmCachedInstances.Enqueue(instance);", codeIndent));
@@ -1453,7 +1475,6 @@ namespace EF.Editor.SerializeComponentTool {
 				code.AppendLine("}");
 			}
 			code.AppendLine();
-			code.AppendLine("#pragma warning restore");
 			if (!usings.Contains("UnityEngine")) { usings.Add("UnityEngine"); }
 			if (!string.IsNullOrEmpty(ns)) { usings.Remove(ns); }
 			usings.Remove("");
@@ -1510,8 +1531,11 @@ namespace EF.Editor.SerializeComponentTool {
 			if (!string.IsNullOrEmpty(savedBaseClasss)) {
 				mUsedBaseClasss.AddRange(savedBaseClasss.Split('|'));
 			}
-			if (mUsedBaseClasss.Count <= 0) {
+			if (!mUsedBaseClasss.Contains("MonoBehaviour")) {
 				mUsedBaseClasss.Add("MonoBehaviour");
+			}
+			if (!mUsedBaseClasss.Contains(WindowBaseClass)) {
+				mUsedBaseClasss.Add(WindowBaseClass);
 			}
 			mUsedBaseClasss.Add("");
 			mBaseClassList = mUsedBaseClasss.ToArray();

@@ -92,6 +92,7 @@ namespace EF.UI.WFramework.Utils {
 			}
 
 			public override void Recycle() {
+				mState = null;
 				ClearEvents(this);
 				ClearComponent(this);
 				s_cache.Enqueue(this);

@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using Cysharp.Threading.Tasks;
 using EF.Resource;
 using UnityEngine;
 
@@ -129,6 +130,28 @@ namespace EF.UI.WFramework
         public bool Open(string id, object parameter, IUIEventHandler eventHandler)
         {
             return IsInitialized && UIManager.OpenWithHandler(eventHandler, id, parameter);
+        }
+
+        /// <summary>
+        /// 等待窗口完成打开；拒绝请求和打开前终止均作为打开失败返回。
+        /// </summary>
+        public UniTask<bool> OpenAsync(string id, object parameter = null)
+        {
+            if (!IsInitialized)
+            {
+                return UniTask.FromResult(false);
+            }
+
+            var opened = new UniTaskCompletionSource<bool>();
+            var events = UIEventHandlerHelper.OnOpened(() => opened.TrySetResult(true))
+                .SetOnTerminated(() => opened.TrySetResult(false));
+
+            if (!UIManager.OpenWithHandler(events, id, parameter))
+            {
+                opened.TrySetResult(false);
+            }
+
+            return opened.Task;
         }
 
         /// <summary>

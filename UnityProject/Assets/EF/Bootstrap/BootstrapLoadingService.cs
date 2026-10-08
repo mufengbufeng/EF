@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +15,7 @@ namespace EF.Bootstrap
         private const string DefaultStatus = "正在加载";
 
         private static GameObject _instance;
-        private static Text _statusText;
+        private static TMP_Text _statusText;
         private static Image _progressFill;
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace EF.Bootstrap
         }
 
         /// <summary>
-        /// 在首个 W-Framework 游戏窗口真正可见后销毁启动界面。
+        /// 在首个游戏场景或窗口真正可见后销毁启动界面。
         /// </summary>
         public static void Hide()
         {
@@ -91,7 +92,7 @@ namespace EF.Bootstrap
         {
             Transform statusTransform = _instance.transform.Find(StatusTextPath);
             Transform progressTransform = _instance.transform.Find(ProgressFillPath);
-            _statusText = statusTransform != null ? statusTransform.GetComponent<Text>() : null;
+            _statusText = statusTransform != null ? statusTransform.GetComponent<TMP_Text>() : null;
             _progressFill = progressTransform != null ? progressTransform.GetComponent<Image>() : null;
         }
     }

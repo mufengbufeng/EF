@@ -138,6 +138,8 @@ namespace EF.UI.WFramework {
 				}
 			} finally {
 				ClearRuntimeCachesAndReferences();
+				Utils.Timer.Shutdown();
+				Utils.AnimExtension.Shutdown();
 				s_processor = null;
 				s_uiloader = null;
 				s_loading_overlay = null;
@@ -172,26 +174,12 @@ namespace EF.UI.WFramework {
 
 		#region update dispatch
 
-		public static void Update() {
-			Update(Time.deltaTime, Time.unscaledDeltaTime, false);
-		}
-
 		/// <summary>
-		/// 更新 UI 状态，并由外部输入系统传入 Escape 触发信息。
+		/// 由 WFrameworkUIManager 在 ModuleSystem 帧内调用，按固定阶段分发 UI 逻辑帧。
 		/// </summary>
-		public static void Update(bool escapePressed) {
-			Update(Time.deltaTime, Time.unscaledDeltaTime, escapePressed);
-		}
-
-		/// <summary>
-		/// 更新 UI 根状态并分发 Escape 输入。
-		/// </summary>
-		public static void Update(float elapseSeconds, float realElapseSeconds, bool escapePressed = false) {
+		internal static void Update(float elapseSeconds, float realElapseSeconds, bool escapePressed = false) {
 			if (s_processor == null) { return; }
-			CheckScreenOrCameraChanged();
-			if (escapePressed) {
-				ProcessEscape();
-			}
+			s_processor.Update(elapseSeconds, realElapseSeconds, escapePressed);
 		}
 
 		/// <summary>

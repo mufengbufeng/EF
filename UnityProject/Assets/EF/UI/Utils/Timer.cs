@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
 
@@ -17,16 +16,8 @@ namespace EF.UI.WFramework.Utils {
 		public static DefaultTimer Default {
 			get {
 				if (s_default == null) {
-					DefaultTimerCalculator calc = new DefaultTimerCalculator();
-					s_default = new DefaultTimer(calc);
-					Action loop = async () => {
-						while (true) {
-							await UniTask.NextFrame();
-							calc.Tick(Time.deltaTime);
-							s_default.Tick();
-						}
-					};
-					loop();
+					s_defaultCalculator = new DefaultTimerCalculator();
+					s_default = new DefaultTimer(s_defaultCalculator);
 				}
 				return s_default;
 			}
@@ -35,15 +26,7 @@ namespace EF.UI.WFramework.Utils {
 		public static RealtimeTimer DefaultRealTime {
 			get {
 				if (s_default_realtime == null) {
-					DateTime mark = DateTime.UtcNow;
 					s_default_realtime = new RealtimeTimer(new RealtimeTimerCalculator());
-					Action loop = async () => {
-						while (true) {
-							await UniTask.NextFrame();
-							s_default_realtime.Tick();
-						}
-					};
-					loop();
 				}
 				return s_default_realtime;
 			}
@@ -51,6 +34,41 @@ namespace EF.UI.WFramework.Utils {
 
 		private static DefaultTimer s_default;
 		private static RealtimeTimer s_default_realtime;
+		private static DefaultTimerCalculator s_defaultCalculator;
+
+		/// <summary>
+		/// UIManager 内部帧更新入口，只更新已创建的计时器实例。
+		/// 默认计时器按 elapseSeconds 推进；实时计时器保留 DateTime.Now 绝对墙钟语义。
+		/// </summary>
+		internal static void Update(float elapseSeconds, float realElapseSeconds) {
+			DefaultTimerCalculator calc = s_defaultCalculator;
+			DefaultTimer defaultTimer = s_default;
+			if (calc != null && defaultTimer != null) {
+				calc.Tick(elapseSeconds);
+				if (ReferenceEquals(s_default, defaultTimer)) {
+					defaultTimer.Tick();
+				}
+			}
+			RealtimeTimer realtimeTimer = s_default_realtime;
+			if (realtimeTimer != null && ReferenceEquals(s_default_realtime, realtimeTimer)) {
+				realtimeTimer.Tick();
+			}
+		}
+
+		/// <summary>
+		/// UIManager 关闭时清空计时器队列和静态引用。
+		/// </summary>
+		internal static void Shutdown() {
+			if (s_default != null) {
+				s_default.Clear();
+				s_default = null;
+			}
+			if (s_default_realtime != null) {
+				s_default_realtime.Clear();
+				s_default_realtime = null;
+			}
+			s_defaultCalculator = null;
+		}
 
 		private class DefaultTimerCalculator : ITimerCalculator<float, float> {
 			private float mTimer = 0f;

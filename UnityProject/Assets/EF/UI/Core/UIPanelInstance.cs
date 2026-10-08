@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +9,7 @@ namespace EF.UI.WFramework {
 		public GameObject ui { get; private set; }
 		private eUIVisibleOperateType mVisibleOp;
 		private Vector3 mPosition;
-
+		private List<UIWindowBase> mWindows;
 		private bool mVisible = false;
 
 		public void Init(GameObject go, eUIVisibleOperateType visiableOp) {
@@ -22,6 +23,8 @@ namespace EF.UI.WFramework {
 			if (mVisibleOp == eUIVisibleOperateType.SetActive) {
 				go.SetActive(false);
 			}
+			mWindows = new List<UIWindowBase>();
+			go.GetComponents(mWindows);
 		}
 
 		public void DoShow(bool first) {
@@ -35,10 +38,13 @@ namespace EF.UI.WFramework {
 		public void Clear() {
 			SortingOrderModifier.Cache(mSortingOrderModifier);
 			mSortingOrderModifier = null;
+			if (mWindows != null) { mWindows.Clear(); }
 			ui = null;
 		}
 
 		public bool Inited { get { return ui != null; } }
+
+		internal IReadOnlyList<UIWindowBase> Windows { get { return mWindows; } }
 
 		#region visible
 

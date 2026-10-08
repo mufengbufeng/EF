@@ -1,7 +1,10 @@
 {
     "name": "EF.Bootstrap",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "Unity.ugui",
+        "Unity.TextMeshPro"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

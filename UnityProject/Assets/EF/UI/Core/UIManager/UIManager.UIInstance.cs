@@ -9,9 +9,12 @@ namespace EF.UI.WFramework {
 
 		private const float DEFAULT_UI_PREPARE_TIMEOUT = 1.0f;
 
-		private abstract class UIInstanceBase { }
+		private abstract class UIInstanceBase {
+			public abstract uint UpdateVersion { get; }
+			public abstract void UpdateFrame(float elapseSeconds, float realElapseSeconds, uint expectedVersion);
+		}
 
-		private abstract class UIInstanceBase<T, U> : UIInstanceBase where T : UIInstanceBase<T, U> where U : IUILogicBase {
+		private abstract partial class UIInstanceBase<T, U> : UIInstanceBase where T : UIInstanceBase<T, U> where U : IUILogicBase {
 
 			public string Id { get; private set; }
 
@@ -36,7 +39,8 @@ namespace EF.UI.WFramework {
 				float timeout = DEFAULT_UI_PREPARE_TIMEOUT;
 				bool closeWhenTimeout = false;
 				if (Logic.OnPrepareCheck(ref timeout, ref closeWhenTimeout)) {
-					DoPrepareTimeoutCheck(timeout);
+					mPrepareTimeoutRemaining = timeout;
+					mPrepareTimeoutPending = true;
 					DoPrepare();
 				} else {
 					PrepareDone(ePrepareResult.Success);
@@ -87,6 +91,7 @@ namespace EF.UI.WFramework {
 
 			public void Hide() {
 				if (!mShowing) { return; }
+				InvalidateUpdate();
 				mShowing = false;
 				if (mState == eUIState.Opened) {
 					mUI.DoHide();
@@ -103,6 +108,7 @@ namespace EF.UI.WFramework {
 
 			public void Resume() {
 				if (mShowing) { return; }
+				InvalidateUpdate();
 				mShowing = true;
 				if (mState == eUIState.Opened) {
 					mUI.DoShow(false);
@@ -119,6 +125,8 @@ namespace EF.UI.WFramework {
 
 			public bool Close() {
 				if (mState == eUIState.Closed) { return false; }
+				InvalidateUpdate();
+				mPrepareTimeoutPending = false;
 				EndLoading();
 				if (mShowing) {
 					mUI.DoHide();
@@ -193,14 +201,6 @@ namespace EF.UI.WFramework {
 
 			private int mAsyncDoings = 0;
 
-			private async void DoPrepareTimeoutCheck(float dur) {
-				mAsyncDoings++;
-				await UniTask.Delay(TimeSpan.FromSeconds(dur), true);
-				mAsyncDoings--;
-				if (mClearedForShutdown) { return; }
-				PrepareDone(ePrepareResult.Timeout);
-			}
-
 			private async void DoPrepare() {
 				mAsyncDoings++;
 				bool success = await Logic.OnPrepareExecute();
@@ -212,6 +212,7 @@ namespace EF.UI.WFramework {
 			private void PrepareDone(ePrepareResult result) {
 				if (mClearedForShutdown) { return; }
 				if (mLoadResult != 0 && mPrepareResult != ePrepareResult.None) { return; }
+				mPrepareTimeoutPending = false;
 				mPrepareResult = result;
 				TryOpenUI();
 			}
@@ -225,6 +226,7 @@ namespace EF.UI.WFramework {
 					UIManager.CloseGroup(Logic);
 					return -1;
 				}
+				InvalidateUpdate();
 				mState = eUIState.Opened;
 				int baseSortingOrder = mUI.GetBaseSortingOrder();
 				try {
@@ -305,6 +307,9 @@ namespace EF.UI.WFramework {
 				ret.mLoadingOverlayStarted = false;
 				ret.mClearedForShutdown = false;
 				ret.mAsyncDoings = 0;
+				ret.mPrepareTimeoutRemaining = 0f;
+				ret.mPrepareTimeoutPending = false;
+				ret.InvalidateUpdate();
 				return ret;
 			}
 
@@ -322,6 +327,8 @@ namespace EF.UI.WFramework {
 
 			private void ClearReferencesForShutdown() {
 				mClearedForShutdown = true;
+				InvalidateUpdate();
+				mPrepareTimeoutPending = false;
 				EndLoading();
 				Id = null;
 				Logic = default;

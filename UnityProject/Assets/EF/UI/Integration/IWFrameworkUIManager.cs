@@ -1,4 +1,5 @@
 using System.Reflection;
+using Cysharp.Threading.Tasks;
 using EF.Common;
 
 namespace EF.UI.WFramework
@@ -37,6 +38,11 @@ namespace EF.UI.WFramework
         /// 打开指定窗口并接收生命周期回调。
         /// </summary>
         bool Open(string id, object parameter, IUIEventHandler eventHandler);
+
+        /// <summary>
+        /// 等待窗口完成打开；请求被拒绝或窗口在打开前终止时返回 false。
+        /// </summary>
+        UniTask<bool> OpenAsync(string id, object parameter = null);
 
         /// <summary>
         /// 关闭匹配窗口的一个实例。

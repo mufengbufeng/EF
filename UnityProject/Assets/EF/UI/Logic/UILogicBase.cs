@@ -41,6 +41,9 @@ public abstract class UILogicBase : IUILogicBase {
 
 	protected virtual void OnClose() { }
 
+
+	protected virtual void OnUpdate(float elapseSeconds, float realElapseSeconds) { }
+
 	protected virtual void OnTerminated() { }
 
 	#endregion
@@ -101,6 +104,9 @@ public abstract class UILogicBase : IUILogicBase {
 	}
 
 	void IUILogicBase.OnClose() { OnClose(); mDisposesOnClose.Dispose(); }
+
+
+	void IUILogicBase.OnUpdate(float elapseSeconds, float realElapseSeconds) { OnUpdate(elapseSeconds, realElapseSeconds); }
 
 	void IUILogicBase.OnTerminated() { OnTerminated(); }
 
